@@ -22,9 +22,33 @@ void Init() {
 void Display() {
     glClear(GL_COLOR_BUFFER_BIT);
 
+    // Init all as identity matrices
+    glm::mat4 R = IDENTITY_MATRIX;
+    glm::mat4 S = IDENTITY_MATRIX;
+    glm::mat4 T = IDENTITY_MATRIX;
+
     glm::mat4 model = IDENTITY_MATRIX;
-    // compute transformations here
-    triangle.Draw(model);
+
+    // Loop for drawing lots of triangles
+    for(int i = 0; i < 500; ++i){
+
+        // Rotation matrix (fermat formula says: angle = n*2.4 rad)
+        R[0][0] = cos(2.4*i);
+        R[0][1] = sin(2.4*i);
+        R[1][0] = -sin(2.4*i);
+        R[1][1] = cos(2.4*i);
+
+        // Sizing matrix (arbitrary choose a nice looking size)
+        S[0][0] = 0.02;
+        S[1][1] = 0.02;
+
+        // Translation matrix (fermat formula says: distance to center = cst*sqrt(n)
+        T[3][0] = 0.03*sqrt(i);
+        T[3][1] = 0.03*sqrt(i);
+
+        // compute transformations here
+        triangle.Draw(R*T*S);
+    }
 }
 
 void ErrorCallback(int error, const char* description) {
