@@ -11,7 +11,6 @@
 
 Triangle triangle;
 
-
 void Init() {
     // sets background color
     glClearColor(0.937, 0.937, 0.937 /*gray*/, 1.0 /*solid*/);
@@ -19,16 +18,25 @@ void Init() {
     triangle.Init();
 }
 
-void Display() {
-    glClear(GL_COLOR_BUFFER_BIT);
+void spiral(glm::mat4 R, glm::mat4 S, glm::mat4 T){
+    for(int i = 0; i < 60; ++i){
 
-    // Init all as identity matrices
-    glm::mat4 R = IDENTITY_MATRIX;
-    glm::mat4 S = IDENTITY_MATRIX;
-    glm::mat4 T = IDENTITY_MATRIX;
+        R[0][0] = cos(0.3*i);
+        R[0][1] = sin(0.3*i);
+        R[1][0] = -sin(0.3*i);
+        R[1][1] = cos(0.3*i);
 
-    glm::mat4 model = IDENTITY_MATRIX;
+        S[0][0] = 0.02+0.001*i;
+        S[1][1] = 0.02+0.001*i;
 
+        T[3][0] = 0.02+0.013*i;
+
+        // compute transformations here
+        triangle.Draw(R*T*S);
+    }
+}
+
+void fermat(glm::mat4 R, glm::mat4 S, glm::mat4 T){
     // Loop for drawing lots of triangles
     for(int i = 0; i < 500; ++i){
 
@@ -49,6 +57,19 @@ void Display() {
         // compute transformations here
         triangle.Draw(R*T*S);
     }
+}
+
+void Display() {
+    glClear(GL_COLOR_BUFFER_BIT);
+
+    // Init all as identity matrices
+    glm::mat4 R = IDENTITY_MATRIX;
+    glm::mat4 S = IDENTITY_MATRIX;
+    glm::mat4 T = IDENTITY_MATRIX;
+
+    // CHOOSE AMONG THE 2 SPIRAL TYPES
+    spiral(R,S,T);
+    //fermat(RST);
 }
 
 void ErrorCallback(int error, const char* description) {
@@ -119,4 +140,3 @@ int main(int argc, char *argv[]) {
     glfwTerminate();
     return EXIT_SUCCESS;
 }
-
