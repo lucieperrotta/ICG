@@ -1,7 +1,0 @@
-C:/Users/Me/Desktop/BA_6/Visu_3/ICG/build-lab2-Desktop-Default/CMakeFiles/common_headers.dir
-C:/Users/Me/Desktop/BA_6/Visu_3/ICG/build-lab2-Desktop-Default/CMakeFiles/edit_cache.dir
-C:/Users/Me/Desktop/BA_6/Visu_3/ICG/build-lab2-Desktop-Default/CMakeFiles/rebuild_cache.dir
-C:/Users/Me/Desktop/BA_6/Visu_3/ICG/build-lab2-Desktop-Default/lab2_intro_to_glsl/CMakeFiles/lab2_intro_to_glsl.dir
-C:/Users/Me/Desktop/BA_6/Visu_3/ICG/build-lab2-Desktop-Default/lab2_intro_to_glsl/CMakeFiles/copy_shaders_lab2_intro_to_glsl.dir
-C:/Users/Me/Desktop/BA_6/Visu_3/ICG/build-lab2-Desktop-Default/lab2_intro_to_glsl/CMakeFiles/edit_cache.dir
-C:/Users/Me/Desktop/BA_6/Visu_3/ICG/build-lab2-Desktop-Default/lab2_intro_to_glsl/CMakeFiles/rebuild_cache.dir

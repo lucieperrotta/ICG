@@ -4,46 +4,28 @@
 
 // contains helper functions such as shader compiler
 #include "icg_helper.h"
+#include "check_error_gl.h"
 
-// vertex position of the triangle
-const GLfloat vpoint[] = {-1.0f, -1.0f, 0.0f,
-                          1.0f, -1.0f, 0.0f,
-                          0.0f,  1.0f, 0.0f,};
+// Other internal classes
+#include "triangle/triangle.h"
+#include "quad/quad.h"
+Triangle triangle;
+Quad quad;
+
 
 void Init() {
     // sets background color
     glClearColor(0.937, 0.937, 0.937 /*gray*/, 1.0 /*solid*/);
 
-    // compile the shaders
-    GLuint program_id = icg_helper::LoadShaders("triangle_vshader.glsl",
-                                                "triangle_fshader.glsl");
-    if(!program_id) {
-        exit(EXIT_FAILURE);
-    }
+    quad.Init();
 
-    glUseProgram(program_id);
-    
-    // Vertex Array
-    GLuint vertex_array_id;
-    glGenVertexArrays(1, &vertex_array_id);
-    glBindVertexArray(vertex_array_id);
-    
-    // Vertex Buffer
-    GLuint vertex_buffer;
-    glGenBuffers(1, &vertex_buffer);
-    glBindBuffer(GL_ARRAY_BUFFER, vertex_buffer);
-    glBufferData(GL_ARRAY_BUFFER, sizeof(vpoint), vpoint, GL_STATIC_DRAW);
-
-    // position attribute, fetch Attribute ID for Vertex Positions
-    GLuint position = glGetAttribLocation(program_id, "vpoint");
-    glEnableVertexAttribArray(position); // enable it
-    glVertexAttribPointer(position, 3, GL_FLOAT, DONT_NORMALIZE,
-                          ZERO_STRIDE, ZERO_BUFFER_OFFSET);
 }
 
 void Display() {
     glClear(GL_COLOR_BUFFER_BIT);
-    glDrawArrays(GL_TRIANGLES, 0, 3);
+    glDrawArrays(GL_TRIANGLE_STRIP, 0, 3);
+    //glDrawArrays(GL_TRIANGLE_STRIP, 0, 1);
+    triangle.Draw();
 }
 
 void ErrorCallback(int error, const char* description) {
@@ -107,6 +89,7 @@ int main(int argc, char *argv[]) {
         glfwPollEvents();
     }
 
+    triangle.Cleanup();
 
     // close OpenGL window and terminate GLFW
     glfwDestroyWindow(window);
