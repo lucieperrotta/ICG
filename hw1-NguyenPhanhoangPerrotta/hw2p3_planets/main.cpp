@@ -7,21 +7,32 @@
 
 #include "quad/quad.h"
 
-// Quad stuff1;
-// ...
+Quad sun;
+Quad earth;
+Quad moon;
+
 
 void Init() {
     // sets background color
     glClearColor(1.0,1.0,1.0 /*white*/, 1.0 /*solid*/);
-    // {stuff}.Init(...);
+
+    // set images to quad
+    sun.Init("sun.tga");
+    earth.Init("earth.tga");
+    moon.Init("moon.tga");
+
 }
 
 void Display() {
     glClear(GL_COLOR_BUFFER_BIT);
     float time_s = glfwGetTime();
 
+    //TODO : comprendre les {truc}_modelmatrix + positionner les images + les faire bouger + (=_=)
+
     // compute the transformation matrices
-    // {stuff}.Draw({stuff}_modelmatrix);
+    sun.Draw(/*sun_modelmatrix*/);
+    earth.Draw(/*earth_modelmatrix*/);
+    moon.Draw(/*moon_modelmatrix*/);
 }
 
 void ErrorCallback(int error, const char* description) {
@@ -85,7 +96,9 @@ int main(int argc, char *argv[]) {
         glfwPollEvents();
     }
 
-    // {stuff}.Cleanup()
+    sun.Cleanup();
+    earth.Cleanup();
+    moon.Cleanup();
 
     // close OpenGL window and terminate GLFW
     glfwDestroyWindow(window);
