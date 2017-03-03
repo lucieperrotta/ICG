@@ -25,14 +25,96 @@ void Init() {
 
 void Display() {
     glClear(GL_COLOR_BUFFER_BIT);
-    float time_s = glfwGetTime();
 
-    //TODO : comprendre les {truc}_modelmatrix + positionner les images + les faire bouger + (=_=)
+    /*
+    Model maps from an object's local coordinate space into world space,
+    view from world space to camera space,
+    projection from camera to screen.
+    */
+
+    float time_secs = glfwGetTime();
+    float sun_angle = 0.5;
+    float distanceToSun = 1.0f;
+    float distanceToEarth = 0.2f;
+
+    // SUN
+
+    glm::mat4 sun_viewTranslate = glm::translate(
+        glm::mat4(1.0f),
+        glm::vec3(0.0f, 0.0f, 0.0f)
+    );
+    glm::mat4 sun_viewRotation = glm::rotate( // rotate on itself
+        sun_viewTranslate,
+        sun_angle*time_secs,
+        glm::vec3(0.0f, 0.0f, 1.0f)
+    );
+
+
+    // EARTH
+
+    glm::mat4 earth_viewTranslate = glm::translate( // distance to the sun
+        glm::mat4(1.0f),
+        glm::vec3(distanceToSun, 0.0f, 0.0f)
+    );
+    glm::mat4 earth_viewRotation = glm::rotate(
+        earth_viewTranslate,
+        sun_angle*time_secs,
+        glm::vec3(0.0f, 0.0f, 1.0f)
+    );
+    glm::mat4 earth_model = glm::scale( // make it little -> pas sure des coords ??
+        glm::mat4(0.25f),
+        glm::vec3(0.25f)
+    );
+    glm::mat4 earth_projection = glm::translate( // empty translate
+                glm::mat4(1.0f),
+                glm::vec3(0.0f, 0.0f, 0.0f)
+    );
+    glm::mat4 earth_projection2 = glm::rotate( // rotate projection -> rotate around sun
+                earth_projection,
+                sun_angle*time_secs,
+                glm::vec3(0.0f, 0.0f, 1.0f)
+    );
+
+    // MOON
+
+    glm::mat4 moon_viewTranslate = glm::translate( // distance to the sun
+        glm::mat4(1.0f),
+        glm::vec3(distanceToSun, 0.0f, 0.0f)
+    );
+    glm::mat4 moon_viewRotation = glm::rotate( // rotate on itself
+        moon_viewTranslate,
+        sun_angle*time_secs,
+        glm::vec3(0.0f, 0.0f, 1.0f)
+    );
+
+    glm::mat4 moon_model = glm::rotate( // rotate around earth
+        glm::mat4(1.f),
+        sun_angle*time_secs*2,
+        glm::vec3(0.0f, 0.0f, 1.0f)
+    );
+    glm::mat4 moon_model2 = glm::translate( // distance to the earth
+        moon_model,
+        glm::vec3(distanceToEarth, 0.0f, 0.0f)
+    );
+    glm::mat4 moon_model3 = glm::scale( // make it little
+                  moon_model2,
+                  glm::vec3(0.15f)
+    );
+
+    glm::mat4 moon_projection = glm::translate( // empty translate
+                glm::mat4(1.f),
+                glm::vec3(0.0f, 0.0f, 0.0f)
+    );
+    glm::mat4 moon_projection2 = glm::rotate( // rotate around sun
+                moon_projection,
+                sun_angle*time_secs,
+                glm::vec3(0.0f, 0.0f, 1.0f)
+    );
 
     // compute the transformation matrices
-    sun.Draw(/*sun_modelmatrix*/);
-    earth.Draw(/*earth_modelmatrix*/);
-    moon.Draw(/*moon_modelmatrix*/);
+    sun.Draw(IDENTITY_MATRIX, sun_viewRotation);
+    earth.Draw(earth_model, earth_viewRotation, earth_projection2);
+    moon.Draw(moon_model3, moon_viewRotation, moon_projection2);
 }
 
 void ErrorCallback(int error, const char* description) {
@@ -64,7 +146,7 @@ int main(int argc, char *argv[]) {
     // attempt to open the window: fails if required version unavailable
     // note some Intel GPUs do not support OpenGL 3.2
     // note update the driver of your graphic card
-    GLFWwindow* window = glfwCreateWindow(512, 512, "planets", NULL, NULL);
+    GLFWwindow* window = glfwCreateWindow(712, 712, "planets", NULL, NULL);
     if(!window) {
         glfwTerminate();
         return EXIT_FAILURE;
