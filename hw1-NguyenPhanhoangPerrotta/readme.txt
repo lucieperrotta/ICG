@@ -25,5 +25,19 @@ So we choosed an arbitrary value 0.03 and set our translation matrix with the va
 
 1.2 Checkerboard
 
+The checkerboard was the simplest one to implement, and here how we did it.
+
 
 1.3 Solar System
+
+This part of the homework took a several steps to achieve and was the hardest exercise.
+First of all, we created our Quads and initialize them by setting the ".tga" images to each quad corresponding respectively to the moon, the earth and the sun.
+Then, before beginning into the transformations part, we set a few constants like:
+- time_secs : this one was already given and is used to measure the time that passes
+- sun_angle : this represents the angle of rotation of the sun
+- distanceToSun : this is the distance from the earth and the moon to the sun
+- distanceToEarth : this represents the distance between the moon and the Earth
+We also changed the size of the window so the display would be more pleasant.
+
+-- The Sun --
+For the sun we only had to make it rotate.
