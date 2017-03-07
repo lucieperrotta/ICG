@@ -26,95 +26,76 @@ void Init() {
 void Display() {
     glClear(GL_COLOR_BUFFER_BIT);
 
-    /*
-    Model maps from an object's local coordinate space into world space,
-    view from world space to camera space,
-    projection from camera to screen.
-    */
-
     float time_secs = glfwGetTime();
-    float sun_angle = 0.5;
-    float distanceToSun = 1.0f;
-    float distanceToEarth = 0.2f;
+    const float SUN_SPEED = 0.2;
+    const float SUN_ROTATION = 0.2;
+    const float EARTH_SPEED = 0.5;
+    const float EARTH_ROTATION = 0.5;
+    const float MOON_SPEED = 0.7;
+    const float DISTANCE_SUN = 1.0f;
+    const float DISTANCE_EARTH = 0.2f;
+    const float ACCELERATION = 2.5;
 
     // SUN
-
-    glm::mat4 sun_viewTranslate = glm::translate(
-        glm::mat4(1.0f),
-        glm::vec3(0.0f, 0.0f, 0.0f)
-    );
-    glm::mat4 sun_viewRotation = glm::rotate( // rotate on itself
-        sun_viewTranslate,
-        sun_angle*time_secs,
+    glm::mat4 sun_model = glm::rotate( // rotate on itself
+        glm::mat4(1.f),
+        SUN_SPEED*time_secs*ACCELERATION,
         glm::vec3(0.0f, 0.0f, 1.0f)
     );
-
 
     // EARTH
-
-    glm::mat4 earth_viewTranslate = glm::translate( // distance to the sun
+    glm::mat4 earth_rotationSun = glm::rotate( // rotate around sun
         glm::mat4(1.0f),
-        glm::vec3(distanceToSun, 0.0f, 0.0f)
-    );
-    glm::mat4 earth_viewRotation = glm::rotate(
-        earth_viewTranslate,
-        sun_angle*time_secs,
+        SUN_ROTATION*time_secs*ACCELERATION,
         glm::vec3(0.0f, 0.0f, 1.0f)
     );
-    glm::mat4 earth_model = glm::scale( // make it little -> pas sure des coords ??
-        glm::mat4(0.25f),
+    glm::mat4 earth_translate = glm::translate( // distance to the sun
+        earth_rotationSun,
+        glm::vec3(DISTANCE_SUN, 0.0f, 0.0f)
+    );
+    glm::mat4 earth_rotation = glm::rotate( // rotate on itself
+        earth_translate,
+        EARTH_SPEED*time_secs*ACCELERATION,
+        glm::vec3(0.0f, 0.0f, 1.0f)
+    );
+    glm::mat4 earth_model = glm::scale( // make it little
+        earth_rotation,
         glm::vec3(0.25f)
-    );
-    glm::mat4 earth_projection = glm::translate( // empty translate
-                glm::mat4(1.0f),
-                glm::vec3(0.0f, 0.0f, 0.0f)
-    );
-    glm::mat4 earth_projection2 = glm::rotate( // rotate projection -> rotate around sun
-                earth_projection,
-                sun_angle*time_secs,
-                glm::vec3(0.0f, 0.0f, 1.0f)
     );
 
     // MOON
-
-    glm::mat4 moon_viewTranslate = glm::translate( // distance to the sun
-        glm::mat4(1.0f),
-        glm::vec3(distanceToSun, 0.0f, 0.0f)
-    );
-    glm::mat4 moon_viewRotation = glm::rotate( // rotate on itself
-        moon_viewTranslate,
-        sun_angle*time_secs,
-        glm::vec3(0.0f, 0.0f, 1.0f)
-    );
-
-    glm::mat4 moon_model = glm::rotate( // rotate around earth
+    glm::mat4 moon_rotationSun = glm::rotate( // rotate around sun
         glm::mat4(1.f),
-        sun_angle*time_secs*2,
+        SUN_ROTATION*time_secs*ACCELERATION,
         glm::vec3(0.0f, 0.0f, 1.0f)
     );
-    glm::mat4 moon_model2 = glm::translate( // distance to the earth
-        moon_model,
-        glm::vec3(distanceToEarth, 0.0f, 0.0f)
+    glm::mat4 moon_translateSun = glm::translate( // distance to the sun
+        moon_rotationSun,
+        glm::vec3(DISTANCE_SUN, 0.0f, 0.0f)
     );
-    glm::mat4 moon_model3 = glm::scale( // make it little
-                  moon_model2,
-                  glm::vec3(0.15f)
+    glm::mat4 moon_rotateEarth = glm::rotate( // rotate around earth
+        moon_translateSun,
+        EARTH_ROTATION*time_secs*2*ACCELERATION,
+        glm::vec3(0.0f, 0.0f, 1.0f)
     );
-
-    glm::mat4 moon_projection = glm::translate( // empty translate
-                glm::mat4(1.f),
-                glm::vec3(0.0f, 0.0f, 0.0f)
+    glm::mat4 moon_tranlateEarth = glm::translate( // distance to the earth
+        moon_rotateEarth,
+        glm::vec3(DISTANCE_EARTH, 0.0f, 0.0f)
     );
-    glm::mat4 moon_projection2 = glm::rotate( // rotate around sun
-                moon_projection,
-                sun_angle*time_secs,
-                glm::vec3(0.0f, 0.0f, 1.0f)
+    glm::mat4 moon_rotation = glm::rotate( // rotate on itself
+        moon_tranlateEarth,
+        MOON_SPEED*time_secs*ACCELERATION,
+        glm::vec3(0.0f, 0.0f, 1.0f)
+    );
+    glm::mat4 moon_model = glm::scale( // make it little
+        moon_rotation,
+        glm::vec3(0.15f)
     );
 
     // compute the transformation matrices
-    sun.Draw(IDENTITY_MATRIX, sun_viewRotation);
-    earth.Draw(earth_model, earth_viewRotation, earth_projection2);
-    moon.Draw(moon_model3, moon_viewRotation, moon_projection2);
+    sun.Draw(sun_model);
+    earth.Draw(earth_model);
+    moon.Draw(moon_model);
 }
 
 void ErrorCallback(int error, const char* description) {
