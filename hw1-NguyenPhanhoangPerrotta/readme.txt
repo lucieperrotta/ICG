@@ -35,30 +35,23 @@ This part of the homework took a several steps to achieve and was the hardest ex
 First of all, we created our Quads and initialize them by setting the ".tga" images to each quad corresponding respectively to the moon, the earth and the sun.
 Then, before beginning into the transformations part, we set a few constants like:
 - time_secs : this one was already given and is used to measure the time that passes
-- sun_angle : this represents the angle of rotation of the sun
-- distanceToSun : this is the distance from the earth and the moon to the sun
-- distanceToEarth : this represents the distance between the moon and the Earth
-We also changed the size of the window so the display would be more pleasant.
+- SUN_SPEED : this is the rotation speed of the Sun on itself.
+- SUN_ROTATION : this is the rotation speed of the Earth around the Sun.
+- EARTH_SPEED : this is the rotation speed of the Earth on itself.
+- EARTH_ROTATION : this is the rotation speed of the Moon around the Earth.
+- MOON_SPEED :  this is the rotation speed of the Moon on itself.
+- DISTANCE_SUN : this is the distance from the earth and the moon to the sun
+- DISTANCE_EARTH : this represents the distance between the moon and the Earth
 - ACCELERATION : this is an acceleration constant which makes the simulation go faster.
+We also changed the size of the window so the display would be more pleasant.
 
-We then use the model MVP already given, which represents:
-- M: Model which maps local to whole space coordinate. 
-- V: View which describe the world space to camera space
-- P: Projection which maps the camera view to the screen.
-
-The difficulty of the exercice was to compute transformations into the right order (since translation*rotation doesn't provide the same result as rotation*translation). 
+We can use only one matrix for all transformation for one object. The difficulty was to compute transformations into the right order (since translation*rotation doesn't provide the same result as rotation*translation). 
 
 -- The Sun --
-P: Identity matrix, nothing to do.
-V: For the sun we only had to make it rotate on the z axis, by sun_speed * time_secs * ACCELERATION.
-M: Identity matrix, nothing to do.
+We only had to make it rotate on the z axis, by SUN_SPEED * time_secs * ACCELERATION.
 
 -- The Earth --
-P: The Earth is first rotated on the z axis, by earth_rotation * time_secs * ACCELERATION. This will represent the rotation around the Sun.
-V: The Earth is scaled at this moment, making it smaller than the sun using a scale matrix.
-M: The Earth is then translated at a distance distanceToSun with a translate matrix. Once done, we can make it rotate on itself, on the z axis, by earth_speed * time_secs * ACCELERATION.
+The Earth is first rotated on the z axis, by SUN_ROTATION * time_secs * ACCELERATION. This represents the rotation around the Sun. It is then translated at a distance DISTANCE_SUN with a translation matrix. Once done, we can make it rotate on itself, on the z axis, by EARTH_SPEED * time_secs * ACCELERATION. It is finally scaled to make it little than the sun.
 
 -- The Moon --
-P: The Moon is first rotated on the z axis, by earth_rotation * time_secs * ACCELERATION.
-V: The Moon is then rotated on the z axis, by time_secs * moon_speed * ACCELERATION, which will represents the rotation around the Earth. It is then translated by a distance distanceToEarth and scaled to make it smaller than both Sun and Earth.
-M: Finally, the Moon is translated by a distanceToSun and make it rotate on itself by moon_rotation * time_secs * ACCELERATION.
+The Moon is rotated by SUN_ROTATION*time_secs*ACCELERATION on the z axis, which represents the rotation around the sun. It is then translated by a distance DISTANCE_SUN and is rotated on the z axis, by EARTH_ROTATION * time_secs * ACCELERATION, which represents the rotation around the Earth. It is then translated by a distance DISTANCE_EARTH and make it rotate on itself by MOON_SPEED * time_secs * ACCELERATION. It is finally scaled to make it smaller than both Sun and Earth.
