@@ -25,7 +25,8 @@ So we choosed an arbitrary value 0.03 and set our translation matrix with the va
 
 1.2 Checkerboard
 
-The checkerboard was the simplest one to implement, and here how we did it.
+The checkerboard was the simplest one to implement, and here how we did it. As mention in the slides, we mostly use a sinus function to obtain a variation between -1 and 1 and only modified the fshader.glsl file.
+To draw enough squares on the checkerboard it is necessary to use a high period for the sinus function. So we apply the sinus function to each component of the uv coordinate times a period 5 pi. We then multiply the two sinus times 0.5 and add 0.5 to map it correctly all results in the range [0, 1] (as the texture function needs to).
 
 
 1.3 Solar System
@@ -38,6 +39,26 @@ Then, before beginning into the transformations part, we set a few constants lik
 - distanceToSun : this is the distance from the earth and the moon to the sun
 - distanceToEarth : this represents the distance between the moon and the Earth
 We also changed the size of the window so the display would be more pleasant.
+- ACCELERATION : this is an acceleration constant which makes the simulation go faster.
+
+We then use the model MVP already given, which represents:
+- M: Model which maps local to whole space coordinate. 
+- V: View which describe the world space to camera space
+- P: Projection which maps the camera view to the screen.
+
+The difficulty of the exercice was to compute transformations into the right order (since translation*rotation doesn't provide the same result as rotation*translation). 
 
 -- The Sun --
-For the sun we only had to make it rotate.
+P: Identity matrix, nothing to do.
+V: For the sun we only had to make it rotate on the z axis, by sun_speed * time_secs * ACCELERATION.
+M: Identity matrix, nothing to do.
+
+-- The Earth --
+P: The Earth is first rotated on the z axis, by earth_rotation * time_secs * ACCELERATION. This will represent the rotation around the Sun.
+V: The Earth is scaled at this moment, making it smaller than the sun using a scale matrix.
+M: The Earth is then translated at a distance distanceToSun with a translate matrix. Once done, we can make it rotate on itself, on the z axis, by earth_speed * time_secs * ACCELERATION.
+
+-- The Moon --
+P: The Moon is first rotated on the z axis, by earth_rotation * time_secs * ACCELERATION.
+V: The Moon is then rotated on the z axis, by time_secs * moon_speed * ACCELERATION, which will represents the rotation around the Earth. It is then translated by a distance distanceToEarth and scaled to make it smaller than both Sun and Earth.
+M: Finally, the Moon is translated by a distanceToSun and make it rotate on itself by moon_rotation * time_secs * ACCELERATION.
