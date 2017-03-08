@@ -38,7 +38,6 @@ void Display() {
 
     const float ELLIPSE_A = 0.6;
     const float ELLIPSE_B = 0.4;
-    const float ELLIPSE_C = 0.2;
 
     // SUN
     glm::mat4 sun_translate = glm::translate( // translate the sun a bit to the right
@@ -62,15 +61,9 @@ void Display() {
     T[3][1] = -ELLIPSE_B * sin(SUN_ROTATION*time_secs*ACCELERATION);
 
     // EARTH
-    glm::mat4 earth_rotationSun = glm::rotate(
+    glm::mat4 earth_rotationSun = glm::rotate( // rotate around sun (ellipse)
         T,
         SUN_ROTATION,
-        glm::vec3(0.0f, 0.0f, 1.0f)
-    );
-
-    glm::mat4 earth_rotationSun1 = glm::rotate( // rotate around sun
-        glm::mat4(1.f),
-        SUN_ROTATION*time_secs*ACCELERATION,
         glm::vec3(0.0f, 0.0f, 1.0f)
     );
     glm::mat4 earth_translate = glm::translate( // distance to the sun
@@ -88,9 +81,9 @@ void Display() {
     );
 
     // MOON
-    glm::mat4 moon_rotationSun = glm::rotate( // rotate around sun
-        glm::mat4(1.f),
-        SUN_ROTATION*time_secs*ACCELERATION,
+    glm::mat4 moon_rotationSun = glm::rotate( // rotate around sun (ellipse)
+        T,
+        SUN_ROTATION,
         glm::vec3(0.0f, 0.0f, 1.0f)
     );
     glm::mat4 moon_translateSun = glm::translate( // distance to the sun
