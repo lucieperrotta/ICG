@@ -32,20 +32,44 @@ void Display() {
     const float EARTH_SPEED = 0.5;
     const float EARTH_ROTATION = 0.5;
     const float MOON_SPEED = 0.7;
-    const float DISTANCE_SUN = 1.0f;
+    const float DISTANCE_SUN = 0.1f;
     const float DISTANCE_EARTH = 0.2f;
     const float ACCELERATION = 2.5;
 
+    const float ELLIPSE_A = 0.6;
+    const float ELLIPSE_B = 0.4;
+    const float ELLIPSE_C = 0.2;
+
     // SUN
+    glm::mat4 sun_translate = glm::translate( // translate the sun a bit to the right
+        glm::mat4(1.0f),
+        glm::vec3(0.2, 0.0f, 0.0f)
+    );
+
+    glm::mat4 sun_scale = glm::scale( // make it little
+        sun_translate,
+        glm::vec3(0.5f)
+    );
+
     glm::mat4 sun_model = glm::rotate( // rotate on itself
-        glm::mat4(1.f),
+        sun_scale,
         SUN_SPEED*time_secs*ACCELERATION,
         glm::vec3(0.0f, 0.0f, 1.0f)
     );
 
+    glm::mat4 T = IDENTITY_MATRIX;
+    T[3][0] = ELLIPSE_A * cos(SUN_ROTATION*time_secs*ACCELERATION);
+    T[3][1] = -ELLIPSE_B * sin(SUN_ROTATION*time_secs*ACCELERATION);
+
     // EARTH
-    glm::mat4 earth_rotationSun = glm::rotate( // rotate around sun
-        glm::mat4(1.0f),
+    glm::mat4 earth_rotationSun = glm::rotate(
+        T,
+        SUN_ROTATION,
+        glm::vec3(0.0f, 0.0f, 1.0f)
+    );
+
+    glm::mat4 earth_rotationSun1 = glm::rotate( // rotate around sun
+        glm::mat4(1.f),
         SUN_ROTATION*time_secs*ACCELERATION,
         glm::vec3(0.0f, 0.0f, 1.0f)
     );
