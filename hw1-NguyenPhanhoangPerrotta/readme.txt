@@ -25,8 +25,11 @@ So we choosed an arbitrary value 0.03 and set our translation matrix with the va
 
 1.2 Checkerboard
 
-The checkerboard was the simplest one to implement, and here how we did it. As mention in the slides, we mostly use a sinus function to obtain a variation between -1 and 1 and only modified the fshader.glsl file.
-To draw enough squares on the checkerboard it is necessary to use a high period for the sinus function. So we apply the sinus function to each component of the uv coordinate times a period 5 pi. We then multiply the two sinus times 0.5 and add 0.5 to map it correctly all results in the range [0, 1] (as the texture function needs to).
+The checkerboard was the simplest one to implement, and here how we did it.
+As mention in the slides, we mostly use a sinus function to obtain a variation between -1 and 1 and only modified the fshader.glsl file.
+To draw enough squares on the checkerboard it is necessary to use a high period for the sinus function.
+So we apply the sinus function to each component of the uv coordinate times a period 5 pi.
+We then multiply the two sinus times 0.5 and add 0.5 to map it correctly all results in the range [0, 1] (as the texture function needs to).
 
 
 1.3 Solar System
@@ -48,10 +51,18 @@ We also changed the size of the window so the display would be more pleasant.
 We can use only one matrix for all transformation for one object. The difficulty was to compute transformations into the right order (since translation*rotation doesn't provide the same result as rotation*translation). 
 
 -- The Sun --
-We only had to make it rotate on the z axis, by SUN_SPEED * time_secs * ACCELERATION.
+We only had to translate a bit to the right to make it more realistic and make it rotate with an angle of SUN_SPEED * time_secs * ACCELERATION around the z axis.
 
 -- The Earth --
-The Earth is first rotated on the z axis, by SUN_ROTATION * time_secs * ACCELERATION. This represents the rotation around the Sun. It is then translated at a distance DISTANCE_SUN with a translation matrix. Once done, we can make it rotate on itself, on the z axis, by EARTH_SPEED * time_secs * ACCELERATION. It is finally scaled to make it little than the sun.
+The Earth is first rotated on the z axis, by SUN_ROTATION * time_secs * ACCELERATION.
+This represents the rotation around the Sun. It is then translated at a distance DISTANCE_SUN with a translation matrix.
+Once done, we can make it rotate on itself, on the z axis, by EARTH_SPEED * time_secs * ACCELERATION.
+The ellipsoid rotation is created by using the formulam of an ellipse found on Internet.
+It is finally scaled to make it little than the sun.
 
 -- The Moon --
-The Moon is rotated by SUN_ROTATION*time_secs*ACCELERATION on the z axis, which represents the rotation around the sun. It is then translated by a distance DISTANCE_SUN and is rotated on the z axis, by EARTH_ROTATION * time_secs * ACCELERATION, which represents the rotation around the Earth. It is then translated by a distance DISTANCE_EARTH and make it rotate on itself by MOON_SPEED * time_secs * ACCELERATION. It is finally scaled to make it smaller than both Sun and Earth.
+The Moon is rotated by SUN_ROTATION*time_secs*ACCELERATION on the z axis, which represents the rotation around the sun.
+The ellipsoid form is the same as for the earth.
+It is then translated by a distance DISTANCE_SUN and is rotated on the z axis, by EARTH_ROTATION * time_secs * ACCELERATION, which represents the rotation around the Earth.
+It is then translated by a distance DISTANCE_EARTH and make it rotate on itself by MOON_SPEED * time_secs * ACCELERATION.
+It is finally scaled to make it smaller than both Sun and Earth.
