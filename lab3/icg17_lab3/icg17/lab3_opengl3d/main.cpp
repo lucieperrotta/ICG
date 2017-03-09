@@ -26,7 +26,11 @@ mat4 projection_matrix;
 mat4 view_matrix;
 mat4 quad_model_matrix;
 
-
+/*
+ * eye : camera position
+ * center : position that you look at
+ * up : camera's up vector
+ */
 mat4 LookAt(vec3 eye, vec3 center, vec3 up) {
     // we need a function that converts from world coordinates into camera coordiantes.
     //
@@ -46,14 +50,36 @@ mat4 LookAt(vec3 eye, vec3 center, vec3 up) {
     // TODO 3: Create an view matrix that transforms a vector from world space into
     // the camera coordinate system. The camera is located at 'eye' and looks
     // 'center'.
-    mat4 look_at = mat4(1.0f);
-    return look_at;
+
+    vec3 f = normalize(center - eye);
+    vec3 u = normalize(up);
+    vec3 s = normalize(cross(f, u));
+    u = cross(s, f);
+
+    mat4 Result = mat4(1.0f);
+    Result[0][0] = s[0];
+    Result[0][1] = s[1];
+    Result[0][2] = s[2];
+    Result[1][0] = u[0];
+    Result[1][1] = u[1];
+    Result[1][2] = u[2];
+    Result[2][0] = f[0];
+    Result[2][1] = f[1];
+    Result[2][2] = f[2];
+
+    Result[3][0] = -(Result[0][0]* eye[0]+Result[0][1]* eye[1]+Result[0][2]* eye[2]) ;
+    Result[3][1] = -(Result[1][0]* eye[0]+Result[1][1]* eye[1]+Result[1][2]* eye[2]) ;
+    Result[3][2] = -(Result[2][0]* eye[0]+Result[2][1]* eye[1]+Result[2][2]* eye[2]) ;
+
+    return Result;
+    /*mat4 look_at = glm::lookAt(eye, center, up);
+    return look_at;*/
 }
 
 void Init() {
     // sets background color
     glClearColor(0.937, 0.937, 0.937 /*gray*/, 1.0 /*solid*/);
-    
+
     cube.Init();
     quad.Init();
 
@@ -62,8 +88,8 @@ void Init() {
 
     // TODO 3: Complete the LookAt function and use it here.
     view_matrix = mat4(1.0f);
-    //view_matrix = LookAt(vec3(2.0f, 2.0f, 4.0f), vec3(0.0f, 0.0f, 0.0f),
-    //                     vec3(0.0f, 1.0f, 0.0f));
+    view_matrix = LookAt(vec3(2.0f, 2.0f, 4.0f), vec3(0.0f, 0.0f, 0.0f),
+                         vec3(0.0f, 1.0f, 0.0f));
 
     quad_model_matrix = translate(mat4(1.0f), vec3(0.0f, -0.25f, 0.0f));
     quad_model_matrix = rotate(quad_model_matrix, (float)M_PI * 0.5f,
@@ -88,6 +114,26 @@ void Display() {
     // check_error_gl();
 }
 
+mat4 OrthographicProjection(float window_width, float window_height) {
+    float top = 1.0;
+    float bottom = -1.0;
+    float far = -10.0;
+    float near = 10.0;
+    float right = 1.0;
+    float left = right - ((float) window_width)/((float) window_height)*(top - bottom);
+
+    mat4 M = mat4(1.0f);
+    M[0][0] = 2/(right-left);
+    M[1][1] = 2/(top - bottom);
+    M[2][2] = -2/(far - near);
+
+    M[3][0] = -(left + right)/ (right - left);
+    M[3][1] = -(top + bottom)/(top - bottom);
+    M[3][2] = -(far + near)/(far - near);
+    return M;
+}
+
+
 // Gets called when the windows/framebuffer is resized.
 void SetupProjection(GLFWwindow* window, int width, int height) {
     window_width = width;
@@ -95,16 +141,19 @@ void SetupProjection(GLFWwindow* window, int width, int height) {
     cout << "Window has been resized to " << window_width << "x"
          << window_height << "." << endl;
     // TODO 1: Reset the OpenGL framebuffer size.
-    // glViewport(...);
+    glViewport(0, 0, width, height);
 
     // TODO 2: Set up an orthographic projection matrix.
     // The projection should depend on the aspect ratio (window_width / window_height).
     // You could, e.g., fix 'top/bottom' to 1/-1 and calculate 'left/right' with
-    // the given aspect ratio.
+    // the given aspect ratio.OrthographicProjection
     // It might be useful to create a OrthographicProjection function that
     // such a projection matrix.
+
     projection_matrix = mat4(1.0f);
-    //projection_matrix = OrthographicProjection(...)
+
+    // définition de la fonction au-dessus
+    projection_matrix = OrthographicProjection(window_width, window_height);
 }
 
 void ErrorCallback(int error, const char* description) {
