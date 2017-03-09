@@ -25,22 +25,32 @@ public:
         vec3 current_pos = vec3(x, y, 0.0f);
         ProjectOntoSurface(current_pos);
 
-        float angle = acos(dot(current_pos, anchor_pos_)/(current_pos.length()*anchor_pos_.length()));
+        //float angle = 5*acos(dot(current_pos, anchor_pos_)/(current_pos.length()*anchor_pos_.length()));
+        float angleY = x;
+        float angleX = -y;
+        //float angleX = cos(angle);
+        //float angleY = sin(angle);
 
-        mat4 rotation = IDENTITY_MATRIX;
-        rotation[0][0] = cos(angle);
-        rotation[1][0] = -sin(angle);
-        rotation[0][1] = sin(angle);
-        rotation[1][1] = cos(angle);
+        mat4 rotationY = IDENTITY_MATRIX;
+        rotationY[0][0] = cos(angleY);
+        rotationY[0][1] = -sin(angleY);
+        rotationY[2][0] = sin(angleY);
+        rotationY[2][2] = cos(angleY);
 
-        // TODO 3: Calculate the rotation given the projections of the anocher
+        mat4 rotationX = IDENTITY_MATRIX;
+        rotationX[1][1] = cos(angleX);
+        rotationX[2][1] = -sin(angleX);
+        rotationX[1][2] = sin(angleX);
+        rotationX[2][2] = cos(angleX);
+
+        // TODO 3 ??? : Calculate the rotation given the projections of the anocher
         // point and the current position. The rotation axis is given by the cross
         // product of the two projected points, and the angle between them can be
         // used as the magnitude of the rotation.
         // you might want to scale the rotation magnitude by a scalar factor.
         // p.s. No need for using complicated quaternions as suggested inthe wiki
         // article.
-        return rotation;
+        return rotationX * rotationY;
     }
 
 private:
@@ -51,8 +61,9 @@ private:
     // The trackball radius is given by 'radius_'.
     void ProjectOntoSurface(vec3& p) const {
         // TODO 2 DONE : Implement this function. Read above link for details.
-        // Formula inside sphere is z(x,y) = sqrt(r^2 - x^2 + y^2)
-        if(p[0] <= 1 && p[0] >= -1 && p[1] <= 1 && p[1] >= -1){
+        // Check hover inside sphere
+        if(p[0]*p[0]+p[1]*p[1] <= 1){
+            // Formula inside sphere is z(x,y) = sqrt(r^2 - x^2 + y^2)
             p[2] = sqrt(1 - (p[0]*p[0] + p[1]*p[1]));
         }else{
             // Formula outside (hyperbolic) is r*r/2 / sqrt(x^2+x^2)

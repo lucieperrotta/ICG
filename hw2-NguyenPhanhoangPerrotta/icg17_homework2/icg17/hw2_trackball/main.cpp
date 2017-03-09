@@ -107,14 +107,14 @@ void Init() {
     // enable depth test.
     glEnable(GL_DEPTH_TEST);
 
-    // TODO 3: once you use the trackball, you should use a view matrix that
+    // TODO 3 DONE: once you use the trackball, you should use a view matrix that
     // looks straight down the -z axis. Otherwise the trackball's rotation gets
     // applied in a rotated coordinate frame.
     // uncomment lower line to achieve this.
     view_matrix = LookAt(vec3(2.0f, 2.0f, 4.0f),
                          vec3(0.0f, 0.0f, 0.0f),
                          vec3(0.0f, 1.0f, 0.0f));
-    // view_matrix = translate(mat4(1.0f), vec3(0.0f, 0.0f, -4.0f));
+    view_matrix = translate(mat4(1.0f), vec3(0.0f, 0.0f, -4.0f));
 
     trackball_matrix = IDENTITY_MATRIX;
 
@@ -169,19 +169,26 @@ void MouseButton(GLFWwindow* window, int button, int action, int mod) {
 void MousePos(GLFWwindow* window, double x, double y) {
     if (glfwGetMouseButton(window, GLFW_MOUSE_BUTTON_LEFT) == GLFW_PRESS) {
         vec2 p = TransformScreenCoords(window, x, y);
+        double x_i, y_i;
+        glfwGetCursorPos(window, &x_i, &y_i);
+        p = TransformScreenCoords(window, x_i, y_i);
         // TODO 3: Calculate 'trackball_matrix' given the return value of
         // trackball.Drag(...) and the value stored in 'old_trackball_matrix'.
         // See also the mouse_button(...) function.
-        // trackball_matrix = ...
+        trackball_matrix = trackball.Drag(p.x,p.y) * old_trackball_matrix;
     }
 
     // zoom
     if (glfwGetMouseButton(window, GLFW_MOUSE_BUTTON_RIGHT) == GLFW_PRESS) {
-        // TODO 4: Implement zooming. When the right mouse button is pressed,
+        // TODO 4 DONE: Implement zooming. When the right mouse button is pressed,
         // moving the mouse cursor up and down (along the screen's y axis)
         // should zoom out and it. For that you have to update the current
         // 'view_matrix' with a translation along the z axis.
-        // view_matrix = ...
+        double x_i, y_i;
+        glfwGetCursorPos(window, &x_i, &y_i);
+        vec2 p = TransformScreenCoords(window, x_i, y_i);
+
+        view_matrix[3][2] = p.y-2; // bricolage
     }
 }
 
