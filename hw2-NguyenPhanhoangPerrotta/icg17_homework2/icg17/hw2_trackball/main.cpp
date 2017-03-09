@@ -48,19 +48,21 @@ mat4 OrthographicProjection(float left, float right, float bottom,
 mat4 PerspectiveProjection(float fovy, float aspect, float near, float far) {
     // TODO 1: Create a perspective projection matrix given the field of view,
     // aspect ratio, and near and far plane distances.
+    float displayFactor = 5;
+
     float top = near*tan(fovy);
     float bottom = -top;
     float right = top*aspect;
     float left = -right;
     mat4 perspective = mat4(1.0f);
-    perspective[0][0] = 2.f*near/(right-left);
-    perspective[1][1] = 2.f*near/(top-bottom);
+    perspective[0][0] = displayFactor*2.f*near/(right-left);
+    perspective[1][1] = displayFactor*2.f*near/(top-bottom);
     perspective[2][0] = (right+left)/(right-left);
     perspective[2][1] = (top+bottom)/(top-bottom);
     perspective[2][2] = -(far+near)/(far-near);
     perspective[2][3] = -1.f;
     perspective[3][2] = -(2.f*far*near)/(far-near);
-    perspective[3][3] = 0;
+    perspective[3][3] = displayFactor*0;
 
     return perspective;
 }
@@ -89,9 +91,9 @@ mat4 LookAt(vec3 eye, vec3 center, vec3 up) {
     R = transpose(R);
 
     mat4 look_at(vec4(R[0], 0.0f),
-                 vec4(R[1], 0.0f),
-                 vec4(R[2], 0.0f),
-                 vec4(-R * (eye), 1.0f));
+            vec4(R[1], 0.0f),
+            vec4(R[2], 0.0f),
+            vec4(-R * (eye), 1.0f));
     return look_at;
 }
 
@@ -193,13 +195,13 @@ void SetupProjection(GLFWwindow* window, int width, int height) {
 
     glViewport(0, 0, window_width, window_height);
 
-    // TODO 1: Use a perspective projection instead;
+    // TODO 1 DONE: Use a perspective projection instead;
     //GLfloat top = 1.0f;
     //GLfloat right = (GLfloat)window_width / window_height * top;
     //projection_matrix = OrthographicProjection(-right, right, -top, top, -10.0, 10.0f);
     projection_matrix = PerspectiveProjection(45.0f,
                                               (GLfloat)window_width / window_height,
-                                               0.1f, 100.f);
+                                              0.1f, 100.f);
 }
 
 void ErrorCallback(int error, const char* description) {
