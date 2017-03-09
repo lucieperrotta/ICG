@@ -25,7 +25,14 @@ public:
         vec3 current_pos = vec3(x, y, 0.0f);
         ProjectOntoSurface(current_pos);
 
+        float angle = acos(dot(current_pos, anchor_pos_)/(current_pos.length()*anchor_pos_.length()));
+
         mat4 rotation = IDENTITY_MATRIX;
+        rotation[0][0] = cos(angle);
+        rotation[1][0] = -sin(angle);
+        rotation[0][1] = sin(angle);
+        rotation[1][1] = cos(angle);
+
         // TODO 3: Calculate the rotation given the projections of the anocher
         // point and the current position. The rotation axis is given by the cross
         // product of the two projected points, and the angle between them can be
@@ -43,8 +50,14 @@ private:
     // https://www.opengl.org/wiki/Object_Mouse_Trackball.
     // The trackball radius is given by 'radius_'.
     void ProjectOntoSurface(vec3& p) const {
-        // TODO 2 LUCIE : Implement this function. Read above link for details.
-
+        // TODO 2 DONE : Implement this function. Read above link for details.
+        // Formula inside sphere is z(x,y) = sqrt(r^2 - x^2 + y^2)
+        if(p[0] <= 1 && p[0] >= -1 && p[1] <= 1 && p[1] >= -1){
+            p[2] = sqrt(1 - (p[0]*p[0] + p[1]*p[1]));
+        }else{
+            // Formula outside (hyperbolic) is r*r/2 / sqrt(x^2+x^2)
+            p[2] = 1/(2*sqrt(p[0]*p[0] + p[1]*p[1]));
+        }
     }
 
     float radius_;
