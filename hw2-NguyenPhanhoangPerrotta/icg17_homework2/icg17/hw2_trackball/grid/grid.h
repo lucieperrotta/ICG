@@ -34,23 +34,44 @@ class Grid {
                 std::vector<GLuint> indices;
                 // TODO 5: make a triangle grid with dimension 100x100.
                 // always two subsequent entries in 'vertices' form a 2D vertex position.
-                int grid_dim = 100;
+                float grid_dim = 100;
 
                 // the given code below are the vertices for a simple quad.
                 // your grid should have the same dimension as that quad, i.e.,
                 // reach from [-1, -1] to [1, 1].
 
-                // vertex position of the triangles.
-                vertices.push_back(-1.0f); vertices.push_back( 1.0f);
-                vertices.push_back( 1.0f); vertices.push_back( 1.0f);
-                vertices.push_back( 1.0f); vertices.push_back(-1.0f);
-                vertices.push_back(-1.0f); vertices.push_back(-1.0f);
+                float c = grid_dim/5;
+                float count = 0;
 
-                // and indices.
-                indices.push_back(0);
-                indices.push_back(1);
-                indices.push_back(3);
-                indices.push_back(2);
+                for(int j = 0; j < c; j++) { // y
+                    for(int i = 0; i < c; i++) { // x
+                        float d = 2.f/c; // where 2.f is the area of the [-1,-1] to [1,1] original square
+                        float x = i*d;
+                        float y = j*d;
+                        float x1 = (i + 1.0f)*d;
+                        float y1 = (j + 1.0f)*d;
+
+                        // vertex position of the triangles.
+                        vertices.push_back(-1.0f + x); vertices.push_back(1.0f - y);
+                        vertices.push_back(-1.0f + x1); vertices.push_back(1.0f - y);
+                        vertices.push_back(-1.0f + x1); vertices.push_back(1.0f - y1);
+                        vertices.push_back(-1.0f + x); vertices.push_back(1.0f - y1);
+
+                        // and indices.
+                        indices.push_back(0 + 4.f*count);
+                        indices.push_back(1 + 4.f*count);
+                        indices.push_back(3 + 4.f*count);
+                        indices.push_back(2 + 4.f*count);
+
+                        if(i==c-1) { // to avoid having intermediate lines between rows
+                            indices.push_back(2 + 4.f*count);
+                            indices.push_back(0 + 4.f*(count+1));
+                        }
+
+                        count++;
+                    }
+
+                }
 
                 num_indices_ = indices.size();
 

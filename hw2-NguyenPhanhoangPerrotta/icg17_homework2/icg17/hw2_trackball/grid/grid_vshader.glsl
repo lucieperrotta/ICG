@@ -14,7 +14,11 @@ void main() {
     // plane.
     // TODO 6: animate the height of the grid points as a sine function of the
     // 'time' and the position ('uv') within the grid.
-    float height = 0.0;
+    const float PI = 3.1415;
+    float v = 2*PI;
+    float acc = 2.5;
+    float amplitude = 0.2;
+    float height = sin((uv.x*v-time)*acc)*sin((uv.y*v-time)*acc)*amplitude;
     vec3 pos_3d = vec3(position.x, height, -position.y);
 
     gl_Position = MVP * vec4(pos_3d, 1.0);
