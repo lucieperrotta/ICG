@@ -46,6 +46,7 @@ We then filled the functions 'vertices_pushback(...). The first coordinate start
 We add at each iteration on the values described above, and then set the indices to take the points with this order :
 the first one is on the upper left, the second on the upper right, the third on the lower left and the last one on the lower right (it creates a 'Z').
 We also used a 'count' value to iterately go to the next indices, since we want to have a lot of triangles.
+A little trick had to be add to avoid intermediate lines between rows by adding twice the last vertex and one more time the first vertex of the next line.
 
 For the next part, in grid_vshader.glsl, we first set a few values :
 - v : reprensents the frequency of the sinus function. Higher is the value, more bumps there will be.
