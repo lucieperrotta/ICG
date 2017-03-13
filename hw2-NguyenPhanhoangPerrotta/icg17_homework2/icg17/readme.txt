@@ -27,7 +27,13 @@ then we apply the corresponding formula given in the homework which is z(x,y) = 
 - otherwise, the position is OUTSIDE the trackball, we apply a formula also found on this website : https://www.opengl.org/wiki/Object_Mouse_Trackball
 corresponding to the hypersheet we should use and which formula is : r*r/2 / sqrt(x^2+x^2).
 
-TODO3 is still not finished so not possible to describe it.
+For the TODO 3, we simply used the Rodrigue's formula (from wikipedia). We first compute k=a x b / |a x b| with a x b beeing the vec3 called vector in our code. The float angle is the formula for computing the angle between 2 vectors (the factor 5 is just here to offer a more comfortable interface for the user).
+
+Then we can fill the cross-product matrix of the vector k (in our code the matrix is called k, not the vector). 
+
+Finally we use the following formula : https://wikimedia.org/api/rest_v1/media/math/render/svg/9f2d7e8421cb977b8d1c7d8ee0966603478849f4 to compute the rotation matrix according to our parameters.
+
+For the TODO 4 we simply get the Y position of the cursor and similarily to the code given in the mouseButton function, we set the view_matrix accordingly. Down is further, up is nearer.
 
 Then in the Init() function in main.cpp we just had to uncomment a line as said in the project and in MousePos(), we added as asked the computation of
 trackball_matrix by using the function Drag() (trackback.Drag(...)) that we previously implemented, then we multiplied it by the previous state of the trackball
