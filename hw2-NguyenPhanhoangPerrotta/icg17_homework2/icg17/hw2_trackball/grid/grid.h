@@ -40,12 +40,12 @@ class Grid {
                 // your grid should have the same dimension as that quad, i.e.,
                 // reach from [-1, -1] to [1, 1].
 
-                float c = grid_dim;
+                float c = grid_dim/5;
                 float count = 0;
 
                 for(int j = 0; j < c; j++) { // y
                     for(int i = 0; i < c; i++) { // x
-                        float d = 2.f/grid_dim; // where 2.f is the area of the [-1,-1] to [1,1] original square
+                        float d = 2.f/c; // where 2.f is the area of the [-1,-1] to [1,1] original square
                         float x = i*d;
                         float y = j*d;
                         float x1 = (i + 1.0f)*d;
@@ -62,6 +62,11 @@ class Grid {
                         indices.push_back(1 + 4.f*count);
                         indices.push_back(3 + 4.f*count);
                         indices.push_back(2 + 4.f*count);
+
+                        if(i==c-1) { // to avoid having intermediate lines between rows
+                            indices.push_back(2 + 4.f*count);
+                            indices.push_back(0 + 4.f*(count+1));
+                        }
 
                         count++;
                     }
