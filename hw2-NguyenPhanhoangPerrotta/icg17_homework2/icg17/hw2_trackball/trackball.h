@@ -25,32 +25,29 @@ public:
         vec3 current_pos = vec3(x, y, 0.0f);
         ProjectOntoSurface(current_pos);
 
-        //float angle = 5*acos(dot(current_pos, anchor_pos_)/(current_pos.length()*anchor_pos_.length()));
-        float angleY = x;
-        float angleX = -y;
-        //float angleX = cos(angle);
-        //float angleY = sin(angle);
-
-        mat4 rotationY = IDENTITY_MATRIX;
-        rotationY[0][0] = cos(angleY);
-        rotationY[0][1] = -sin(angleY);
-        rotationY[2][0] = sin(angleY);
-        rotationY[2][2] = cos(angleY);
-
-        mat4 rotationX = IDENTITY_MATRIX;
-        rotationX[1][1] = cos(angleX);
-        rotationX[2][1] = -sin(angleX);
-        rotationX[1][2] = sin(angleX);
-        rotationX[2][2] = cos(angleX);
-
-        // TODO 3 ??? : Calculate the rotation given the projections of the anocher
+        // TODO 3 : Calculate the rotation given the projections of the anocher
         // point and the current position. The rotation axis is given by the cross
         // product of the two projected points, and the angle between them can be
         // used as the magnitude of the rotation.
         // you might want to scale the rotation magnitude by a scalar factor.
         // p.s. No need for using complicated quaternions as suggested inthe wiki
         // article.
-        return rotationX * rotationY;
+
+        vec3 vector = cross(current_pos, anchor_pos_);
+        float angle = 5*acos(dot(current_pos, anchor_pos_)/(current_pos.length()*anchor_pos_.length()));
+
+        // K matrix from Rodrigues
+        // https://wikimedia.org/api/rest_v1/media/math/render/svg/9f2d7e8421cb977b8d1c7d8ee0966603478849f4
+        mat4 k = mat4(0.0f);
+        k[0][1] = vector.z;
+        k[0][2] = -vector.y;
+        k[1][0] = -vector.z;
+        k[1][2] = vector.x;
+        k[2][0] = vector.y;
+        k[2][1] = -vector.x;
+
+        mat4 rotationMatrix = IDENTITY_MATRIX+sin(angle)*k +(1-cos(angle))* k*k;
+        return rotationMatrix;
     }
 
 private:
@@ -62,12 +59,16 @@ private:
     void ProjectOntoSurface(vec3& p) const {
         // TODO 2 DONE : Implement this function. Read above link for details.
         // Check hover inside sphere
-        if(p[0]*p[0]+p[1]*p[1] <= 1){
+        float x2 = p.x * p.x;
+        float y2 = p.y * p.y;
+        float radius2 = radius_*radius_;
+
+        if(x2+y2 <= radius2){
             // Formula inside sphere is z(x,y) = sqrt(r^2 - x^2 + y^2)
-            p[2] = sqrt(1 - (p[0]*p[0] + p[1]*p[1]));
+            p.z = sqrt(radius2 - (x2 + y2));
         }else{
             // Formula outside (hyperbolic) is r*r/2 / sqrt(x^2+x^2)
-            p[2] = 1/(2*sqrt(p[0]*p[0] + p[1]*p[1]));
+            p.z = radius2 /(2*sqrt(x2 + y2));
         }
     }
 
