@@ -48,8 +48,8 @@ the first one is on the upper left, the second on the upper right, the third on 
 We also used a 'count' value to iterately go to the next indices, since we want to have a lot of triangles.
 
 For the next part, in grid_vshader.glsl, we first set a few values :
-- v : this is the constant 2*PI we need for our computation, since we use a sine function
+- v : reprensents the frequency of the sinus function. Higher is the value, more bumps there will be.
 - amplitude : determines the height of our bumps
-- acc : this represents the accuracy, the bigger is this value, the more bumps we should have.
+- acc : this represents the acceleration
 
-Then we compute the height as a sine function as asked. (A FINIR JE COMPRENDS PAS XD)
+Then we compute the waves. To have symetric bumps we multiply sinus. We use as input one coordinate of the position times the frequency, then substract the current time to make it move. We finally multiply the final result by an amplitude, to make it more or less high.
