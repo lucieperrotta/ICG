@@ -29,7 +29,9 @@ mat4 quad_model_matrix;
 
 Trackball trackball;
 
-float previous = 0.;
+float previousX = 0.;
+float previousY = 0.;
+float previousZ = 0.;
 
 mat4 OrthographicProjection(float left, float right, float bottom,
                             float top, float near, float far) {
@@ -177,8 +179,10 @@ void MousePos(GLFWwindow* window, double x, double y) {
         // TODO 3: Calculate 'trackball_matrix' given the return value of
         // trackball.Drag(...) and the value stored in 'old_trackball_matrix'.
         // See also the mouse_button(...) function.
-        trackball_matrix = trackball.Drag(p.x,p.y) * old_trackball_matrix;
+        trackball_matrix = trackball.Drag(p.x-previousX,p.y-previousY) * old_trackball_matrix;
     }
+    previousX = p.x;
+    previousY = p.y;
 
     // zoom
     if (glfwGetMouseButton(window, GLFW_MOUSE_BUTTON_RIGHT) == GLFW_PRESS) {
@@ -186,10 +190,10 @@ void MousePos(GLFWwindow* window, double x, double y) {
         // moving the mouse cursor up and down (along the screen's y axis)
         // should zoom out and it. For that you have to update the current
         // 'view_matrix' with a translation along the z axis.
-        vec3 newVec = vec3(0., 0., p.y-previous);
+        vec3 newVec = vec3(0., 0., p.y-previousZ);
         view_matrix=translate(view_matrix, newVec);
     }
-    previous = p.y; // for not going infinitely fast
+    previousZ = p.y; // for not going infinitely fast
 }
 
 // Gets called when the windows/framebuffer is resized.

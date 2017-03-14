@@ -36,17 +36,7 @@ public:
         vec3 vector = cross(current_pos, anchor_pos_);
         float angle = acos(dot(current_pos, anchor_pos_)/(current_pos.length()*anchor_pos_.length()));
 
-        // K matrix from Rodrigues
-        // https://wikimedia.org/api/rest_v1/media/math/render/svg/9f2d7e8421cb977b8d1c7d8ee0966603478849f4
-        mat4 k = mat4(0.0f);
-        k[0][1] = vector.z;
-        k[0][2] = -vector.y;
-        k[1][0] = -vector.z;
-        k[1][2] = vector.x;
-        k[2][0] = vector.y;
-        k[2][1] = -vector.x;
-
-        mat4 rotationMatrix = IDENTITY_MATRIX+sin(angle)*k +(1-cos(angle))* k*k;
+        mat4 rotationMatrix = rotate(IDENTITY_MATRIX, angle, vector);
         return rotationMatrix;
     }
 
