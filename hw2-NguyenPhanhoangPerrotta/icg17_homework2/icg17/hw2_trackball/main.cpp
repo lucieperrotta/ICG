@@ -29,6 +29,8 @@ mat4 quad_model_matrix;
 
 Trackball trackball;
 
+float previous = 0.;
+
 mat4 OrthographicProjection(float left, float right, float bottom,
                             float top, float near, float far) {
     assert(right > left);
@@ -48,7 +50,7 @@ mat4 OrthographicProjection(float left, float right, float bottom,
 mat4 PerspectiveProjection(float fovy, float aspect, float near, float far) {
     // TODO 1: Create a perspective projection matrix given the field of view,
     // aspect ratio, and near and far plane distances.
-    float displayFactor = 5;
+    float displayFactor = 5.;
 
     float top = near*tan(fovy);
     float bottom = -top;
@@ -61,8 +63,8 @@ mat4 PerspectiveProjection(float fovy, float aspect, float near, float far) {
     perspective[2][1] = (top+bottom)/(top-bottom);
     perspective[2][2] = -(far+near)/(far-near);
     perspective[2][3] = -1.f;
-    perspective[3][2] = -(2.f*far*near)/(far-near);
-    perspective[3][3] = displayFactor*0;
+    perspective[3][2] = -(2.f*far+near)/(far-near);
+    perspective[3][3] = 0;
 
     return perspective;
 }
@@ -167,8 +169,8 @@ void MouseButton(GLFWwindow* window, int button, int action, int mod) {
 }
 
 void MousePos(GLFWwindow* window, double x, double y) {
+    vec2 p = TransformScreenCoords(window, x, y);
     if (glfwGetMouseButton(window, GLFW_MOUSE_BUTTON_LEFT) == GLFW_PRESS) {
-        vec2 p = TransformScreenCoords(window, x, y);
         double x_i, y_i;
         glfwGetCursorPos(window, &x_i, &y_i);
         p = TransformScreenCoords(window, x_i, y_i);
@@ -184,12 +186,10 @@ void MousePos(GLFWwindow* window, double x, double y) {
         // moving the mouse cursor up and down (along the screen's y axis)
         // should zoom out and it. For that you have to update the current
         // 'view_matrix' with a translation along the z axis.
-        double x_i, y_i;
-        glfwGetCursorPos(window, &x_i, &y_i);
-        vec2 p = TransformScreenCoords(window, x_i, y_i);
-
-        view_matrix[3][2] = p.y-2; // bricolage
+        vec3 newVec = vec3(0., 0., p.y-previous);
+        view_matrix=translate(view_matrix, newVec);
     }
+    previous = p.y; // for not going infinitely fast
 }
 
 // Gets called when the windows/framebuffer is resized.
