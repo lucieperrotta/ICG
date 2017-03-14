@@ -52,15 +52,14 @@ mat4 OrthographicProjection(float left, float right, float bottom,
 mat4 PerspectiveProjection(float fovy, float aspect, float near, float far) {
     // TODO 1: Create a perspective projection matrix given the field of view,
     // aspect ratio, and near and far plane distances.
-    float displayFactor = 5.;
 
-    float top = near*tan(fovy);
+    float top = near*tan(fovy/2.f);
     float bottom = -top;
     float right = top*aspect;
     float left = -right;
     mat4 perspective = mat4(1.0f);
-    perspective[0][0] = displayFactor*2.f*near/(right-left);
-    perspective[1][1] = displayFactor*2.f*near/(top-bottom);
+    perspective[0][0] = 2.f*near/(right-left);
+    perspective[1][1] = 2.f*near/(top-bottom);
     perspective[2][0] = (right+left)/(right-left);
     perspective[2][1] = (top+bottom)/(top-bottom);
     perspective[2][2] = -(far+near)/(far-near);
