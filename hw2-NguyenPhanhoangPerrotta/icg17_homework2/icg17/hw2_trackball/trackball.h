@@ -34,7 +34,7 @@ public:
         // article.
 
         vec3 vector = cross(current_pos, anchor_pos_);
-        float angle = acos(dot(current_pos, anchor_pos_)/(current_pos.length()*anchor_pos_.length()));
+        float angle = acos(dot(current_pos, anchor_pos_)/(length(current_pos)*length(anchor_pos_)));
 
         mat4 rotationMatrix = rotate(IDENTITY_MATRIX, angle, vector);
         return rotationMatrix;

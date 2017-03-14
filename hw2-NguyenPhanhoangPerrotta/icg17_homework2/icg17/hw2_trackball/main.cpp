@@ -29,8 +29,6 @@ mat4 quad_model_matrix;
 
 Trackball trackball;
 
-float previousX = 0.;
-float previousY = 0.;
 float previousZ = 0.;
 
 mat4 OrthographicProjection(float left, float right, float bottom,
@@ -178,10 +176,8 @@ void MousePos(GLFWwindow* window, double x, double y) {
         // TODO 3: Calculate 'trackball_matrix' given the return value of
         // trackball.Drag(...) and the value stored in 'old_trackball_matrix'.
         // See also the mouse_button(...) function.
-        trackball_matrix = trackball.Drag(p.x-previousX,p.y-previousY) * old_trackball_matrix;
+        trackball_matrix = trackball.Drag(p.x,p.y) * old_trackball_matrix;
     }
-    previousX = p.x;
-    previousY = p.y;
 
     // zoom
     if (glfwGetMouseButton(window, GLFW_MOUSE_BUTTON_RIGHT) == GLFW_PRESS) {
