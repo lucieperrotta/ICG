@@ -10,14 +10,15 @@ The function begins with a variable displayFactor which actually determines the 
 We arbitrary set it to 5 so it looks nice and big enough. The display factor behaves like a resizing matrix, i.e.
 it multiplies the diagonal values by a scalar (5).
 We then compute the 4 directions that are not argument already of the function, that is, left right top bottom.
+
 According to the webpage you gave us, left and right, respectively top and bottom, have to be of equal magnitude and opposite sign.
 Noe we just need to compute 1 out of 2 directions and get the other directly by changing the sign.
 The top coordinate is first computed using fovy (the aperture angle) which tan will be multiplied by near,
 to get the actual height at the start distance and hence know how big in height our display will have to be.
+
 The left coordinate is then computed in order to respect the aspect ratio we get as an argument.
 By a easy cross-multiplication we get the computation from top to right : right = top*aspect.
-Finally, we simply put the coordinates into the matrix as explained on the webpage http://www.songho.ca/opengl/files/gl_projectionmatrix_eq16.png ,
-and we're good to go.
+Finally, we simply put the coordinates into the matrix as explained on the webpage http://www.songho.ca/opengl/files/gl_projectionmatrix_eq16.png ,and we're good to go.
 
 2.2 Trackball
 
@@ -27,21 +28,17 @@ then we apply the corresponding formula given in the homework which is z(x,y) = 
 - otherwise, the position is OUTSIDE the trackball, we apply a formula also found on this website : https://www.opengl.org/wiki/Object_Mouse_Trackball
 corresponding to the hypersheet we should use and which formula is : r*r/2 / sqrt(x^2+x^2).
 
-For the TODO 3, we simply used the Rodrigue's formula (from wikipedia). We first compute k=a x b / |a x b| with a x b beeing the vec3 called vector in our code. The float angle is the formula for computing the angle between 2 vectors (the factor 5 is just here to offer a more comfortable interface for the user).
+For the TODO 3, we simply use a rotation formula. We first compute k=a x b / |a x b| with a x b beeing the vec3 called vector in our code. The float angle is the formula for computing the angle between 2 vectors (the factor 5 is just here to offer a more comfortable interface for the user).
 
-Then we can fill the cross-product matrix of the vector k (in our code the matrix is called k, not the vector). 
+We then rotate an identity matrix with our angle and according to the vector to get the correct rotation matrix.
 
 Finally we use the following formula : https://wikimedia.org/api/rest_v1/media/math/render/svg/9f2d7e8421cb977b8d1c7d8ee0966603478849f4 to compute the rotation matrix according to our parameters.
-
-For the TODO 4 we simply get the Y position of the cursor and similarily to the code given in the mouseButton function, we set the view_matrix accordingly. Down is further, up is nearer.
 
 Then in the Init() function in main.cpp we just had to uncomment a line as said in the project and in MousePos(), we added as asked the computation of
 trackball_matrix by using the function Drag() (trackback.Drag(...)) that we previously implemented, then we multiplied it by the previous state of the trackball
 to get a new state for our trackball.
 
-After that, we implemented the zooming. We first get the position of our mouse cursor and transformed it into screen coordinates
-(we did the same way as in the previous implementation for the left click).
-Then we change the value of our view_matrix by I DON'T KNOW WHY WE DID THIS XD
+For the TODO 4 we simply get the Y position of the cursor and similarily to the code given in the mouseButton function, we set the view_matrix accordingly (to the Z coordinate). Up is further, down is nearer.
 
 2.3 Triangle Grid And Animation
 
