@@ -59,4 +59,13 @@ For the next part, in grid_vshader.glsl, we first set a few values :
 - amplitude : determines the height of our bumps
 - acc : this represents the acceleration
 
-Then we compute the waves. To have symetric bumps we multiply sinus. We use as input one coordinate of the position times the frequency, then substract the current time to make it move. We finally multiply the final result by an amplitude, to make it more or less high.
+Then we compute the waves. We use:
+- The time to make it moves, at speed acc
+- sinus or cosinus functions to obtain waves, which move up and down more or less depending on the amplitude
+- the coordinates of each point of the grid
+
+A lot of combinations exist to obtain waves. 
+
+2.4 Water animation
+
+Here we compute it so that it looks like water. We use a small amplitude, and a sinus + cosinus functions with small frequencies so that waves are bigger. We also change the color using the same function as for the height in the vshader file, defining that light blue are p while darker blue are at the bottom of the waves. 
