@@ -17,7 +17,7 @@ void main() {
     vec4 vpoint_mv = MV * vec4(vpoint, 1.0);
     gl_Position = projection * vpoint_mv;
 
-    ///>>>>>>>>>> TODO >>>>>>>>>>>
+    ///>>>>>>>>>> TODO >>>>>>>>>>> J'AI ESSAYE DE METTRE NORMALMV DANS FSHADER MAIS CA ME FAIT DES ERREURS
     /// TODO 1.1: Phong shading.
     // 1) compute the normal using the model_view matrix.
     normal_mv = normalize((MV * vec4(vnormal,0.f)).xyz);
