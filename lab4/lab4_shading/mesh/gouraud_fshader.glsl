@@ -2,6 +2,7 @@
 
 
 out vec3 color;
+in vec3 vcolor;
 
 void main() {
     color = vec3(0.0,0.0,0.0);
@@ -19,4 +20,5 @@ void main() {
     //>>>>>>>>>> TODO >>>>>>>>>>>
     // TODO 0.1: Gouraud shading.
     //<<<<<<<<<< TODO <<<<<<<<<<<
+    color = vcolor;
 }
