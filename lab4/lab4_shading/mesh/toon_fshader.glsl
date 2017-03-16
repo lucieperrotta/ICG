@@ -1,5 +1,8 @@
 #version 330
 
+in vec3 ambient;
+in vec3 diffuse;
+in vec3 specular;
 
 out vec3 color;
 
@@ -14,4 +17,8 @@ void main() {
     /// 2) compute diffuse term using the texture sampler tex.
     /// 3) compute specular term using the texture sampler tex.
     ///<<<<<<<<<< TODO <<<<<<<<<<<
+
+    color = ambient + diffuse + specular;
+
+
 }
