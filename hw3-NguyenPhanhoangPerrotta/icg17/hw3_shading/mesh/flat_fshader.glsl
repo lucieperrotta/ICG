@@ -23,15 +23,17 @@ void main() {
     vec3 normal_mv = cross(x,y);
 
     /// 1) compute ambient term.
-    /// 2) compute diffuse term.
-    /// 3) compute specular term.
     color += La*ka;
+
     vec3 n = normalize(normal_mv);
     vec3 l = normalize(light_dir);
 
     float lambert = dot(n,l);
     if(lambert > 0.0) {
+        /// 2) compute diffuse term.
         color += Ld*kd*lambert;
+
+        /// 3) compute specular term.
         vec3 v = normalize(view_dir);
         vec3 r = reflect(-l,n);
         color += Ls*ks*pow(max(dot(r,v), 0.0), alpha);

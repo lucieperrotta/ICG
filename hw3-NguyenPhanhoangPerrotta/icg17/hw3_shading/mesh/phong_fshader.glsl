@@ -12,6 +12,7 @@ uniform float alpha;
 
 void main() {
 
+    // ambient term
     vec3 ambient = ka * La;
     color += ambient;
 
@@ -20,9 +21,11 @@ void main() {
     float lambert = dot(n,l);
 
     if(lambert > 0.0) {
+        // diffuse term
         vec3 diffuse = Ld*kd*lambert;
         color += diffuse;
 
+        // specular term
         vec3 v = normalize(view_dir);
         vec3 reflect = reflect(-l, n);
         vec3 specular = Ls*ks*pow(max(dot(reflect,v), 0.0), alpha);
