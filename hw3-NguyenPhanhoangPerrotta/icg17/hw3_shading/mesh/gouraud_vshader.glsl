@@ -21,18 +21,27 @@ void main() {
     vec4 vpoint_mv = MV * vec4(vpoint, 1.0);
     gl_Position = projection * vpoint_mv;
     vcolor = vec3(0.0,0.0,0.0);
+
+    // see this explanation to understand why we do the transpose of the inverse :
+    // http://www.lighthouse3d.com/tutorials/glsl-12-tutorial/the-normal-matrix/
     vec3 normal_mv = normalize(mat3(transpose(inverse(MV))) * vnormal);
     light_dir = light_pos - vpoint_mv.xyz;
     view_dir = -vpoint_mv.xyz;
 
-    vcolor += La*ka;
+    vec3 ambient = La*ka;
+    vcolor += ambient;
+
     vec3 n = normalize(normal_mv);
     vec3 l = normalize(light_dir);
     float lambert = dot(n,l);
+
     if(lambert > 0.0) {
-        vcolor += Ld*kd*lambert;
+        vec3 diffuse = Ld*kd*lambert;
+        vcolor += diffuse;
+
         vec3 v = normalize(view_dir);
         vec3 r = reflect(-l,n);
-        vcolor += Ls*ks*pow(max(dot(r,v), 0.0), alpha);
+        vec3 specular = Ls*ks*pow(max(dot(r,v), 0.0), alpha);
+        vcolor += specular;
     }
 }
