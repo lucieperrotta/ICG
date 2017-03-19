@@ -121,7 +121,7 @@ class Mesh : public Material, public Light {
             if (program_id == art_program_id_) {
                 glBindTexture(GL_TEXTURE_2D, texture_2d_id_);
                 GLuint tex_id = glGetUniformLocation(art_program_id_, "tex2D");
-                glUniform1i(tex_id, 0 /*GL_TEXTURE0*/);
+                glUniform1i(tex_id, 1 /*GL_TEXTURE1*/);
             }
         }
 
