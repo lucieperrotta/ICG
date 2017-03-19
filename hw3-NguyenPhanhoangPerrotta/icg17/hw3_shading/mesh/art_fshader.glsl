@@ -24,4 +24,7 @@ void main() {
     // 1) compute the output color by doing a look-up in the texture using the
     //    texture sampler tex.
     //<<<<<<<<<< TODO <<<<<<<<<<<
+
+
+
 }
