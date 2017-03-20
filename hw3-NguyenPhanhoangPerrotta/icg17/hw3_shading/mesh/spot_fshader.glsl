@@ -12,8 +12,8 @@ uniform vec3 La, Ld, Ls;
 uniform vec3 ka, kd, ks;
 uniform float alpha;
 
-const float spot_cos_cutoff = 0.99; // cos <10 degrees
-const float spot_exp = 150;
+const float spot_cos_cutoff = 0.996; // we increased this value
+const float spot_exp = 350; // we increased this value
 
 void main() {    
 
@@ -34,6 +34,7 @@ void main() {
         float lambert = dot(n,l);
 
         if(lambert > 0.0) {
+
             // diffuse term
             vec3 diffuse = Ld*kd*lambert;
             color += diffuse;
