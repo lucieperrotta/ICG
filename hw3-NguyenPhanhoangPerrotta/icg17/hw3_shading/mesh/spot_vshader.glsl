@@ -25,5 +25,5 @@ void main() {
     normal_mv = normalize(mat3(transpose(inverse(MV))) * vnormal);
     light_dir = light_pos - vpoint_mv.xyz;
     view_dir = -vpoint_mv.xyz;
-    spot_dir = -view_dir+vec3(0.1, 0.05, 0.05);
+    spot_dir = -view_dir;
 }
