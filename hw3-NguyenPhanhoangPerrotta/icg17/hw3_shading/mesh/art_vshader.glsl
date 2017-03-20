@@ -18,13 +18,17 @@ void main() {
     gl_Position = projection * vpoint_mv;
     //>>>>>>>>>> TODO >>>>>>>>>>>
     // TODO: Artistic shading.
+
     // 1) compute normal_mv using the model_view matrix.
-    // 2) compute the light direction light_dir.
-    // 3) compute the view direction view_dir.
-    //<<<<<<<<<< TODO <<<<<<<<<<<
     // see this explanation to understand why we do the transpose of the inverse :
     // http://www.lighthouse3d.com/tutorials/glsl-12-tutorial/the-normal-matrix/
     normal_mv = normalize(mat3(transpose(inverse(MV))) * vnormal);
+
+    // 2) compute the light direction light_dir.
     light_dir = light_pos - vpoint_mv.xyz;
+
+    // 3) compute the view direction view_dir.
     view_dir = -vpoint_mv.xyz;
+
+    //<<<<<<<<<< TODO <<<<<<<<<<<
 }

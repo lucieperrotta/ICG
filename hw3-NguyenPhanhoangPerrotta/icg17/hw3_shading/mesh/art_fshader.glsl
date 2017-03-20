@@ -20,27 +20,18 @@ void main() {
     // TODO 3.2: Artistic shading.
     // 1) compute the output color by doing a look-up in the texture using the
     //    texture sampler tex.
-    //<<<<<<<<<< TODO <<<<<<<<<<<
     vec3 n = normalize(normal_mv);
     vec3 l = normalize(light_dir);
-    float lambert = dot(n,l);
+    float lambert = dot(n,l); // will be mapped to the x-axis
 
     // specular term
     vec3 v = normalize(view_dir);
     vec3 reflect = reflect(-l, n);
-
-    /// 1) compute ambient term.
-    vec3 ambient = ka * La * lambert;
-    //color += ambient;
+    float r_v_alpha = pow(max(dot(reflect,v), 0.0), alpha); // will be mapped to the y-axis
 
     if(lambert > 0.0) {
-
-        vec3 color_factor = texture(tex2D, vec2(lambert, pow(max(dot(reflect,v), 0.0), alpha))).xyz;
-    /// 2) compute diffuse term using the texture sampler tex.
-        vec3 diffuse = Ld*kd*color_factor;
-        vec3 specular = Ls*ks*color_factor;
-        color += color_factor.rgb;
+        vec3 color_factor = texture(tex2D, vec2(lambert, r_v_alpha)).xyz;
+        color += color_factor;
     }
-
-
+    //<<<<<<<<<< TODO <<<<<<<<<<<
 }
