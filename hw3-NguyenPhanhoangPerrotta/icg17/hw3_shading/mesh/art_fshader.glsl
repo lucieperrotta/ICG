@@ -16,16 +16,6 @@ uniform sampler2D tex2D;
 void main() {
     color = vec3(0.0, 0.0, 0.0);
 
-    /*const vec3 COLORS[6] = vec3[](
-        vec3(1.0,0.0,0.0),
-        vec3(0.0,1.0,0.0),
-        vec3(0.0,0.0,1.0),
-        vec3(1.0,1.0,0.0),
-        vec3(0.0,1.0,1.0),
-        vec3(1.0,0.0,1.0));
-    int index = int( mod(gl_PrimitiveID,6) );
-    color = COLORS[index];*/
-
     //>>>>>>>>>> TODO >>>>>>>>>>>
     // TODO 3.2: Artistic shading.
     // 1) compute the output color by doing a look-up in the texture using the
@@ -35,22 +25,21 @@ void main() {
     vec3 l = normalize(light_dir);
     float lambert = dot(n,l);
 
+    // specular term
+    vec3 v = normalize(view_dir);
+    vec3 reflect = reflect(-l, n);
+
     /// 1) compute ambient term.
-    vec3 ambient = ka * La * lambert/* texture2D(tex2D, vec2(0.0, lambert))*/;
-    color += ambient;
+    vec3 ambient = ka * La * lambert;
+    //color += ambient;
 
     if(lambert > 0.0) {
-    /// 2) compute diffuse term using the texture sampler tex.
-        vec3 diffuse = Ld*kd*lambert/*texture(tex2D, lambert)*/;
-        color += diffuse;
-    /// 3) compute specular term using the texture sampler tex.
 
-        // specular term
-        vec3 v = normalize(view_dir);
-        vec3 reflect = reflect(-l, n);
-        /*float reflectCartoon = texture(tex1D, dot(reflect,v));*/
-        vec3 specular = Ls*ks*pow(max(dot(reflect,v), 0.0), alpha);
-        color += specular;
+        vec3 color_factor = texture(tex2D, vec2(lambert, pow(max(dot(reflect,v), 0.0), alpha))).xyz;
+    /// 2) compute diffuse term using the texture sampler tex.
+        vec3 diffuse = Ld*kd*color_factor;
+        vec3 specular = Ls*ks*color_factor;
+        color += color_factor.rgb;
     }
 
 

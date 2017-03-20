@@ -29,7 +29,7 @@ void main() {
 
     if(lambert > 0.0) {
     /// 2) compute diffuse term using the texture sampler tex.
-        vec3 diffuse = Ld*kd*texture(tex1D, lambert);
+        vec3 diffuse = Ld*kd*texture(tex1D, lambert).x;
         color += diffuse;
     /// 3) compute specular term using the texture sampler tex.
 
