@@ -29,14 +29,13 @@ void main() {
 
     if(lambert > 0.0) {
     /// 2) compute diffuse term using the texture sampler tex.
-        vec3 diffuse = Ld*kd*texture(tex1D, lambert).x;
+        vec3 diffuse = Ld*kd*texture(tex1D, lambert).x; // for 1D mapping, we only took the x-axis
         color += diffuse;
-    /// 3) compute specular term using the texture sampler tex.
 
-        // specular term
+    /// 3) compute specular term using the texture sampler tex.
         vec3 v = normalize(view_dir);
         vec3 reflect = reflect(-l, n);
-        /*float reflectCartoon = texture(tex1D, dot(reflect,v));*/
+
         vec3 specular = Ls*ks*pow(max(dot(reflect,v), 0.0), alpha);
         color += specular;
     }
