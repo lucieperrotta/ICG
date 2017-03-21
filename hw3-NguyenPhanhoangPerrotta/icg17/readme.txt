@@ -7,7 +7,7 @@ Homework 3 - Shading
 3.1 Phong Shading
 
 Phong shading follows the same idea as the gouraud shading algorithm.
-The only difference is that the normal vector is computed for each pixel for the phong shading,
+The only difference is that  for the phong shading the normal vector is computed for each pixel,
 rather than for each vector like in the gouraud shading one.
 Thus we stop the algorithm just before computing the normal_mv vector in the vshader file,
 and continue in the fshader one. 
@@ -33,4 +33,4 @@ Flat shading is based on triangles. Thus we need to compute the normal vector de
 
 3.5 Spot Light Shading
 
-For the spot light (per prixel) shading, we reused the same code as in the phong shading, excepted that if the pixel is located withen the range designed by the cirle of aperture angle spot_cos_cuttof, we light it according to the formula given in the paper. For the pixels outside this circle, only the ambient light is displayed. The spot_dir vector is mouse movable, as it is equal to the view_vector. By the way, we increased the spot_cos_cuttof and the spot_exp values so that it looks more like the given example.
+For the spot light (per prixel) shading, we reused the same code as in the phong shading, excepted that if the pixel is located within the range designed by the cirle of aperture angle spot_cos_cuttof, we light it according to the formula given in the paper. For the pixels outside this circle, only the ambient light is displayed. The spot_dir vector is mouse movable, as it is equal to the view_vector. By the way, we increased the spot_cos_cuttof and the spot_exp values so that it looks more like the given example.
