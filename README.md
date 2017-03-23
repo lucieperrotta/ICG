@@ -1,2 +1,0 @@
-# ICG
-Computer Graphics
