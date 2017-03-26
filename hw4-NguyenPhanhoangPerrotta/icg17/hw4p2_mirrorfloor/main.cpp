@@ -47,11 +47,11 @@ void Display() {
     mat4 view_projection = projection_matrix * view;
 
     // TODO: mirror the camera position
-    vec3 cam_pos_mirror = cam_pos;
-    cam_pos_mirror.z = -cam_pos_mirror.z;
+    vec3 cam_pos_mirror(2.f,2.f,-2.f);
 
     // TODO: create new VP for mirrored camera
-    mat4 view_mirror = lookAt(cam_pos_mirror, cam_look, cam_up);
+    vec3 cam_up_mirror(0.f, 0.f, -1.f);
+    mat4 view_mirror = lookAt(cam_pos_mirror, cam_look, cam_up_mirror);
     mat4 vp_mirror = projection_matrix*view_mirror;
 
     // TODO: render the cube using the mirrored camera
@@ -62,6 +62,7 @@ void Display() {
 
     shinyfloor.Draw(view_projection);
     cube.Draw(view_projection);
+
 }
 
 // Gets called when the windows/framebuffer is resized.
