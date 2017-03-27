@@ -16,3 +16,6 @@ In the floor_fshader, we get the window height and width from the texture (using
 
 4.3 Motion Blur
 
+We compute the velocity vector by substracting the previous position from the current one. But before that, we transform the vectors into the screen-space by multiplying them with their respective MVP inverted matrices. Then we only keep the x and y axis. (!!! A CHECKER)
+
+For the ... fshader, we compute all colors we will mix together depending on a constant N parameter and the velocity previously computed. 
