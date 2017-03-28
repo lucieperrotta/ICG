@@ -13,7 +13,7 @@ void main() {
     /// TODO: use gl_FragCoord to build a new [_u,_v] coordinate to query the framebuffer
     /// NOTE: make sure you normalize gl_FragCoord by window_width/height
     float _u = gl_FragCoord.x/window_width;
-    float _v = gl_FragCoord.y/window_height;
+    float _v = 1 - gl_FragCoord.y/window_height;
 
     /// NOTE: you will have to flip the "v" coordinate as framebuffer is upside/down
     /// TODO: mix the texture(tex,uv).rgb with the value you fetch by texture(tex_mirror,vec2(_u,_v)).rgb

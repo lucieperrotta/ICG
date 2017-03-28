@@ -50,8 +50,8 @@ void Display() {
     vec3 cam_pos_mirror(2.f,2.f,-2.f);
 
     // TODO: create new VP for mirrored camera
-    vec3 cam_up_mirror(0.f, 0.f, -1.f);
-    mat4 view_mirror = lookAt(cam_pos_mirror, cam_look, cam_up_mirror);
+    //vec3 cam_up_mirror(0.f, 0.f, -1.f);
+    mat4 view_mirror = lookAt(cam_pos_mirror, cam_look, cam_up);
     mat4 vp_mirror = projection_matrix*view_mirror;
 
     // TODO: render the cube using the mirrored camera
