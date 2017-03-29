@@ -9,28 +9,15 @@ void main() {
     /// TODO: use a constant number of samples for integral (what happens if you take too few?)
     /// HINT: you can scale the velocity vector to make the motion blur effect more prominent
     /// HINT: to debug integration don't use the velocityTex, simply assume velocity is constant, e.g. vec2(1,0)
+    vec4 colorCurrent =texture(colorTex, uv);
+    int N = 4; // size of average
+    vec2 velocity = texture(velocityTex, uv).xy;
 
-    vec2 velocity = vec2(0,2);
-
-    int N = 2;
-    vec4 colorCurrent = texture(colorTex, uv);
-    vec4 colorNext;
-    for(int i = 0; i < N; i++) {
-        colorNext = texture(colorTex, vec2(uv.x + velocity.x*i, uv.y + velocity.y*i));
-        colorCurrent += colorNext;
-        /*colorCurrent.x += colorNext.x;
-        colorCurrent.y += colorNext.y;
-        colorCurrent.z += colorNext.z;
-        colorCurrent.w += colorNext.w;*/
+    // Actual C_new computation
+    for(int i = 1; i < N; i++) {
+        vec4 ith_pixel_color = texture(colorTex, uv + (i * velocity)); // compute the ith pixel color
+        colorCurrent += ith_pixel_color; // add it to our color sum
     }
-    colorCurrent /= N;
-    /*colorCurrent.x = colorCurrent.x/N;
-    colorCurrent.y = colorCurrent.y/N;
-    colorCurrent.z = colorCurrent.z/N;
-    colorCurrent.w = colorCurrent.w/N;*/
 
-    color = colorCurrent;
-
-    //color = texture(colorTex, uv);
-
+    color = colorCurrent/N; // do the average
 }
