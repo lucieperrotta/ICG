@@ -96,6 +96,12 @@ void KeyCallback(GLFWwindow* window, int key, int scancode, int action, int mods
     if (key == GLFW_KEY_ESCAPE && action == GLFW_PRESS) {
         glfwSetWindowShouldClose(window, GL_TRUE);
     }
+    if (key == GLFW_KEY_Q && action == GLFW_PRESS) {
+        screenquad.changeVariance(0.25);
+    }
+    if (key == GLFW_KEY_W && action == GLFW_PRESS) {
+        screenquad.changeVariance(-0.25);
+    }
 }
 
 int main(int argc, char *argv[]) {

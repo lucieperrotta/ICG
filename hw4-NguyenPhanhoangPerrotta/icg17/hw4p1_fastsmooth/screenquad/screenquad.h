@@ -12,6 +12,8 @@ class ScreenQuad {
         float screenquad_width_;
         float screenquad_height_;
 
+        float std_deviation;
+
     public:
         void Init(float screenquad_width, float screenquad_height,
                   GLuint texture) {
@@ -100,6 +102,27 @@ class ScreenQuad {
             this->screenquad_height_ = screenquad_height;
         }
 
+        void changeVariance(float std_deviation) {
+            // we can't go under 0.25
+            this->std_deviation = fmax(0.25, this->std_deviation + std_deviation);
+        }
+
+        float* ComputeKernel() {
+            int kernel_size = screenquad_width_;
+
+            if(screenquad_width_ > screenquad_height_) {
+                kernel_size = screenquad_height_;
+            }
+
+            float* kernel = new float[kernel_size];
+
+            for(int x = 0; x < kernel_size; x++) {
+                kernel[x] = exp(-x*x/(2*std_deviation*std_deviation));
+            }
+
+            return kernel;
+        }
+
         void Draw() {
             glUseProgram(program_id_);
             glBindVertexArray(vertex_array_id_);
@@ -109,6 +132,10 @@ class ScreenQuad {
                         this->screenquad_width_);
             glUniform1f(glGetUniformLocation(program_id_, "tex_height"),
                         this->screenquad_height_);
+
+            // pass kernel to shader
+            glUniform1fv(glGetUniformLocation(program_id_, "kernel"),
+                        min(screenquad_width_, screenquad_height_), ComputeKernel());
 
             // bind texture
             glActiveTexture(GL_TEXTURE0);
