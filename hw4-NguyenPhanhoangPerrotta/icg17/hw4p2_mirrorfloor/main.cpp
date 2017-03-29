@@ -57,6 +57,7 @@ void Display() {
     // TODO: render the cube using the mirrored camera
     // HINT: this render will be done in the framebuffer texture (remember bind/unbind)
     framebuffer.Bind();
+    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     cube.Draw(vp_mirror);
     framebuffer.Unbind();
 

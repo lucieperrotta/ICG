@@ -16,6 +16,10 @@ In the floor_fshader, we get the window height and width from the texture (using
 
 4.3 Motion Blur
 
-We compute the velocity vector by substracting the previous position from the current one. But before that, we transform the vectors into the screen-space by multiplying them with their respective MVP inverted matrices. Then we only keep the x and y axis. (!!! A CHECKER)
+Quad fshader:
+We simple compute the difference of the 2 positions (already given in pixels) and we get a vector in pixels (still with 4 coordinates). Then we only take the x and y coord as we are working in 2 dimensions.
 
-For the ... fshader, we compute all colors we will mix together depending on a constant N parameter and the velocity previously computed. 
+Screenquad fshader:
+We first compute the color of the current pixel using the texture function. Then we set the size of the array to use. And then we get the velocity vector using texture are well but only taking the x and y coord since we just wanna use it as a 2d direction.
+
+Now time for the actual formula given in the slides. In a loop (because of the sum) from 1 (we don't wanna count the original pixel twice) to N, we first compute the ith pixel's color using the same method as we did for comnputing the original pixel's color, i.e. the texture function (but shifted by the velocity*i). Then we add this color to a sum. And finally, out of the loop, we divide the total sum by N to get the average color.
