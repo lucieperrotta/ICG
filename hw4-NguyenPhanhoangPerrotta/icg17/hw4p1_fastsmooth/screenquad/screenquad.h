@@ -8,22 +8,22 @@ class ScreenQuad {
         GLuint program_id_;             // GLSL shader program ID
         GLuint vertex_buffer_object_;   // memory buffer
         GLuint colorTexture_id_;             // texture ID
-        GLuint velocityTexture_id_;             // texture ID
+        GLuint tmp_colorTexture_id_;             // temp texture ID
 
         float screenquad_width_;
         float screenquad_height_;
 
-        float std_deviation;
+        float std_dev_; // standard deviation
 
     public:
         void Init(float screenquad_width, float screenquad_height,
-                  GLuint colorTexture, GLuint velocityTexture) {
+                  GLuint colorTexture, GLuint tmp_colorTexture) {
 
             // set screenquad size
             this->screenquad_width_ = screenquad_width;
             this->screenquad_height_ = screenquad_height;
 
-            this->std_deviation = 3.;
+            this->std_dev_ = 3.;
 
             // compile the shaders
             program_id_ = icg_helper::LoadShaders("screenquad_vshader.glsl",
@@ -84,15 +84,15 @@ class ScreenQuad {
             glBindTexture(GL_TEXTURE_2D, colorTexture_id_);
             glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
             glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
-            GLuint colorTex_id = glGetUniformLocation(program_id_, "colorTex");
+            GLuint colorTex_id = glGetUniformLocation(program_id_, "tex");
             glUniform1i(colorTex_id, 0 /*GL_TEXTURE0*/);
 
-            this->velocityTexture_id_ = colorTexture;
-            glBindTexture(GL_TEXTURE_2D, velocityTexture_id_);
-            glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
-            glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
-            GLuint velocityTex_id = glGetUniformLocation(program_id_, "velocityTex");
-            glUniform1i(velocityTex_id, 0 /*GL_TEXTURE1*/);
+            this->tmp_colorTexture_id_ = colorTexture;
+            glBindTexture(GL_TEXTURE_2D, tmp_colorTexture_id_);
+            glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_BORDER);
+            glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_BORDER);
+            GLuint tmp_colorTex_id = glGetUniformLocation(program_id_, "tmp");
+            glUniform1i(tmp_colorTex_id, 1 /*GL_TEXTURE1*/);
 
             glBindTexture(GL_TEXTURE_2D, 0);
 
@@ -108,7 +108,7 @@ class ScreenQuad {
             glDeleteProgram(program_id_);
             glDeleteVertexArrays(1, &vertex_array_id_);
             glDeleteTextures(1, &colorTexture_id_);
-            glDeleteTextures(1, &velocityTexture_id_);
+            glDeleteTextures(1, &tmp_colorTexture_id_);
         }
 
         void UpdateSize(int screenquad_width, int screenquad_height) {
@@ -116,29 +116,23 @@ class ScreenQuad {
             this->screenquad_height_ = screenquad_height;
         }
 
-        void changeVariance(float std_deviation) {
+        void ChangeVariance(float added_value) {
             // we can't go under 0.25
-            this->std_deviation = fmax(0.25, this->std_deviation + std_deviation);
+            this->std_dev_ = fmax(0.25, this->std_dev_ + added_value);
         }
 
-        float* ComputeKernel() {
-            int kernel_size = 1 + 6 * int(ceil(std_deviation));
-
-            if(screenquad_width_ < kernel_size) {
-                kernel_size = min(screenquad_width_, screenquad_height_);
+        void ComputeKernel(float* kernel, int size, int max_size) {
+            if(size > max_size) {
+               size = max_size;
             }
 
-            float* kernel = new float[kernel_size];
-            int x = 0;
-            for(int i = 0; i < kernel_size; i++) {
-                x = i-(kernel_size/2.);
-                kernel[i] = exp(-(x*x)/(2.*std_deviation*std_deviation));
+            for(int i = 0; i < size; ++i) {
+               float x = i - (size/2);
+               kernel[i] = exp(-(x*x) / (2.0*this->std_dev_*this->std_dev_));
             }
-
-            return kernel;
         }
 
-        void Draw(int axis) {
+        /*void Draw(int pass_number) {
             glUseProgram(program_id_);
             glBindVertexArray(vertex_array_id_);
 
@@ -148,29 +142,64 @@ class ScreenQuad {
             glUniform1f(glGetUniformLocation(program_id_, "tex_height"),
                         this->screenquad_height_);
 
-            glUniform1f(glGetUniformLocation(program_id_, "axis"),
-                        axis);
+            //glUniform1f(glGetUniformLocation(program_id_, "axis"),
+              //          1-pass_number);
+
 
             // pass kernel to shader
+            int max_size = min(this->screenquad_width_, this->screenquad_height_);
+            int kernel_size = 1 + 6*int(ceil(this->std_dev_));
+            float* kernel = new float[max_size];
+           ComputeKernel(kernel, kernel_size, max_size);
+
             glUniform1fv(glGetUniformLocation(program_id_, "kernel"),
-                        min(screenquad_width_, screenquad_height_), ComputeKernel());
-            glUniform1f(glGetUniformLocation(program_id_, "k_length"), 1 + 6 * int(ceil(std_deviation)));
+                        max_size, kernel);
+            glUniform1f(glGetUniformLocation(program_id_, "kernel_size"), kernel_size);
+            glUniform1i(glGetUniformLocation(program_id_, "axis"), 1-pass_number);
+
+
+        }*/
+        void Draw(int pass_number) {
+            glUseProgram(program_id_);
+            glBindVertexArray(vertex_array_id_);
+
+            // window size uniforms
+            glUniform1f(glGetUniformLocation(program_id_, "tex_width"),
+                        this->screenquad_width_);
+            glUniform1f(glGetUniformLocation(program_id_, "tex_height"),
+                        this->screenquad_height_);
+
+
+
+            int max_size = min(this->screenquad_width_, this->screenquad_height_);
+            int kernel_size = 1 + 6*int(ceil(this->std_dev_));
+            float* kernel = new float[max_size];
+
+            ComputeKernel(kernel, kernel_size, max_size);
+
+            glUniform1fv(glGetUniformLocation(program_id_, "kernel"),
+                        max_size, kernel);
+
+            glUniform1i(glGetUniformLocation(program_id_, "kernel_size"), kernel_size);
+
+            glUniform1i(glGetUniformLocation(program_id_, "axis"), 1-pass_number);
+
 
             // bind texture
-            glActiveTexture(GL_TEXTURE0);
-
-            if(axis == 0) {
+            if(pass_number == 1) {
                 glBindTexture(GL_TEXTURE_2D, colorTexture_id_);
             }
             else {
-                glBindTexture(GL_TEXTURE_2D, velocityTexture_id_);
+                glBindTexture(GL_TEXTURE_2D, tmp_colorTexture_id_);
             }
-
 
             // draw
             glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
 
             glBindVertexArray(0);
             glUseProgram(0);
+
+            // we delete the kernel previously created
+            delete [] kernel;
         }
 };

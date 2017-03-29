@@ -51,22 +51,22 @@ void Init(GLFWwindow* window) {
     // this unsures that the framebuffer has the same size as the window
     // (see http://www.glfw.org/docs/latest/window.html#window_fbsize)
     glfwGetFramebufferSize(window, &window_width, &window_height);
-    framebuffer.Init(window_width, window_height);
-    GLuint velocityTexture = framebuffer.velocity_texture_id_;
-    GLuint colorTexture = framebuffer.color_texture_id_;
-    screenquad.Init(window_width, window_height, velocityTexture, colorTexture);
+    GLuint framebuffer_texture_id, framebuffer_tmp_texture_id;
+    std::tie(framebuffer_texture_id, framebuffer_tmp_texture_id) = framebuffer.Init(window_width, window_height, true);
+    cout << framebuffer_texture_id << endl;
+    cout << framebuffer_tmp_texture_id << endl;
+    screenquad.Init(window_width, window_height, framebuffer_texture_id, framebuffer_tmp_texture_id);
 }
 
 void Display() {
-
-    framebuffer.Clear();
-
     // render to framebuffer
+    framebuffer.Clear();
     framebuffer.Bind();
     {
-        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+        //glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
         cube.Draw(cube_model_matrix, view_matrix, projection_matrix);
         quad.Draw(IDENTITY_MATRIX, view_matrix, projection_matrix);
+
         screenquad.Draw(0);
     }
     framebuffer.Unbind();
@@ -74,7 +74,8 @@ void Display() {
     // render to Window
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     glViewport(0, 0, window_width, window_height);
-    //screenquad.Draw(1);
+
+    screenquad.Draw(1);
 }
 
 // gets called when the windows/framebuffer is resized.
@@ -90,7 +91,11 @@ void ResizeCallback(GLFWwindow* window, int width, int height) {
     // when the window is resized, the framebuffer and the screenquad
     // should also be resized
     framebuffer.Cleanup();
-    framebuffer.Init(window_width, window_height);
+
+    GLuint framebuffer_texture_id, framebuffer_tmp_texture_id;
+    std::tie(framebuffer_texture_id, framebuffer_tmp_texture_id) = framebuffer.Init(window_width, window_height, true);
+
+    screenquad.Init(window_width, window_height, framebuffer_texture_id, framebuffer_tmp_texture_id);
     screenquad.UpdateSize(window_width, window_height);
 }
 
@@ -102,11 +107,22 @@ void KeyCallback(GLFWwindow* window, int key, int scancode, int action, int mods
     if (key == GLFW_KEY_ESCAPE && action == GLFW_PRESS) {
         glfwSetWindowShouldClose(window, GL_TRUE);
     }
-    if (key == GLFW_KEY_Q && action == GLFW_PRESS) {
-        screenquad.changeVariance(0.25);
+
+    if(action != GLFW_RELEASE) {
+        return;
     }
-    if (key == GLFW_KEY_W && action == GLFW_PRESS) {
-        screenquad.changeVariance(-0.25);
+
+    switch(key) {
+        case 'Q':
+            screenquad.ChangeVariance(0.25);
+        break;
+
+        case 'W':
+            screenquad.ChangeVariance(-0.25);
+        break;
+
+        default:
+        break;
     }
 }
 
