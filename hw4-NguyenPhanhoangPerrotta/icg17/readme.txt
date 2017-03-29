@@ -6,7 +6,7 @@ Homework 4 - Framebuffers
 
 4.1 Fast Gaussian Blur
 
-
+We duplicated the texture to gave 2 copies of it, as explained in the pdf, and then modified the uses of the texture is accordance to that edit. Then we wrote the kernel we would use in the f_shader, and edited the gaussian_convolution so that it processes only the x or the y coordinate according to a parameter named "axis".
 
 4.2 Screen Space Reflections
 
