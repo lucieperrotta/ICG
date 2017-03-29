@@ -1,14 +1,18 @@
 #pragma once
 #include "icg_helper.h"
+#include <tuple>
 
 class FrameBuffer {
+
+    public:
+        GLuint color_texture_id_;
+        GLuint velocity_texture_id_;
 
     private:
         int width_;
         int height_;
         GLuint framebuffer_object_id_;
         GLuint depth_render_buffer_id_;
-        GLuint color_texture_id_;
 
     public:
         // warning: overrides viewport!!
@@ -16,7 +20,7 @@ class FrameBuffer {
             glViewport(0, 0, width_, height_);
             glBindFramebuffer(GL_FRAMEBUFFER, framebuffer_object_id_);
             const GLenum buffers[] = { GL_COLOR_ATTACHMENT0, GL_COLOR_ATTACHMENT1 };
-            glDrawBuffers(2 /*length of buffers[]*/, buffers);
+            glDrawBuffers(1 /*length of buffers[]*/, buffers);
         }
 
         void Unbind() {
@@ -24,7 +28,7 @@ class FrameBuffer {
             glBindFramebuffer(GL_FRAMEBUFFER, 0);
         }
 
-        int Init(int image_width, int image_height, bool use_interpolation = false) {
+        void Init(int image_width, int image_height, bool use_interpolation = false) {
 
            //std::tuple<int, int> Init(int image_width, int image_height,
            //bool use_interpolation = false)
@@ -62,8 +66,7 @@ class FrameBuffer {
                 glBindRenderbuffer(GL_RENDERBUFFER, 0);
             }
 
-            /*
-             * // create second color attachement for velocity texture
+             // create second color attachement for velocity texture
             {
                 glGenTextures(1, &velocity_texture_id_);
                 glBindTexture(GL_TEXTURE_2D, velocity_texture_id_);
@@ -82,7 +85,7 @@ class FrameBuffer {
                 glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB16F, width_, height_, 0,
                              GL_RGB, GL_FLOAT, NULL);
             }
-            */
+
 
             // tie it all together
             {
@@ -102,7 +105,7 @@ class FrameBuffer {
                 glBindFramebuffer(GL_FRAMEBUFFER, 0); // avoid pollution
             }
 
-            return color_texture_id_;
+            //return color_texture_id_;
             //return std::make_tuple(color_texture_id_, velocity_texture_id_);
         }
 
@@ -122,6 +125,7 @@ class FrameBuffer {
 
         void Cleanup() {
             glDeleteTextures(1, &color_texture_id_);
+            glDeleteTextures(1, &velocity_texture_id_);
             glDeleteRenderbuffers(1, &depth_render_buffer_id_);
             glBindFramebuffer(GL_FRAMEBUFFER, 0 /*UNBIND*/);
             glDeleteFramebuffers(1, &framebuffer_object_id_);

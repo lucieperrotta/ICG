@@ -8,23 +8,34 @@ uniform sampler2D tex;
 uniform float tex_width;
 uniform float tex_height;
 
-uniform float kernel[];
+uniform int k_length;
+uniform float kernel[450];
+
+// = 0 -> x
+// = 1 -> y
+uniform int axis;
 
 void main() {
+
     // gaussian convolution
-    float std = 2; // standard deviation (<.3 disable)
-    // float std = .1; // standard deviation (<.3 disable)
-    vec3 color_tot = vec3(0,0,0);
+    vec3 color_tot = vec3(0.0);
     float weight_tot = 0;
-    int SIZE = 1 + 2 * 3 * int(ceil(std));
-    for(int i=-SIZE; i<=SIZE; i++){
-        for(int j=-SIZE; j<=SIZE; j++){
-            float w = exp(-(i*i+j*j)/(2.0*std*std));
-            vec3 neigh_color = texture(tex, uv+vec2(i/tex_width,j/tex_height)).rgb;
-            color_tot += w * neigh_color; 
-            weight_tot += w;
+    vec3 neigh_color;
+    float middle = k_length/2.0f;
+    for(int i = 0; i < k_length; i++){
+
+        // check if you have to compute on the x or y axis
+        if(axis==1) {
+            neigh_color = texture(tex, uv+vec2(0,(i-middle)/tex_height)).rgb;
         }
+        else {
+            neigh_color = texture(tex, uv+vec2((i-middle)/tex_width,0)).rgb;
+        }
+
+        color_tot += kernel[i] * neigh_color;
+        weight_tot += kernel[i];
     }
     color = color_tot / weight_tot; // ensure \int w = 1
+
 }
 

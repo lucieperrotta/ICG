@@ -51,8 +51,10 @@ void Init(GLFWwindow* window) {
     // this unsures that the framebuffer has the same size as the window
     // (see http://www.glfw.org/docs/latest/window.html#window_fbsize)
     glfwGetFramebufferSize(window, &window_width, &window_height);
-    GLuint framebuffer_texture_id = framebuffer.Init(window_width, window_height);
-    screenquad.Init(window_width, window_height, framebuffer_texture_id);
+    framebuffer.Init(window_width, window_height);
+    GLuint velocityTexture = framebuffer.velocity_texture_id_;
+    GLuint colorTexture = framebuffer.color_texture_id_;
+    screenquad.Init(window_width, window_height, velocityTexture, colorTexture);
 }
 
 void Display() {
@@ -65,13 +67,14 @@ void Display() {
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
         cube.Draw(cube_model_matrix, view_matrix, projection_matrix);
         quad.Draw(IDENTITY_MATRIX, view_matrix, projection_matrix);
+        screenquad.Draw(0);
     }
     framebuffer.Unbind();
 
     // render to Window
-    glViewport(0, 0, window_width, window_height);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-    screenquad.Draw();
+    glViewport(0, 0, window_width, window_height);
+    //screenquad.Draw(1);
 }
 
 // gets called when the windows/framebuffer is resized.
