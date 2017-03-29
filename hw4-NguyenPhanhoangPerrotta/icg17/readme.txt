@@ -6,13 +6,13 @@ Homework 4 - Framebuffers
 
 4.1 Fast Gaussian Blur
 
-We duplicated the texture to gave 2 copies of it, as explained in the pdf, and then modified the uses of the texture is accordance to that edit. Then we wrote the kernel we would use in the f_shader, and edited the gaussian_convolution so that it processes only the x or the y coordinate according to a parameter named "axis".
+We duplicated the texture to gave 2 copies of it, as explained in the pdf, and then modified the uses of the texture in accordance to that edit. Then we wrote the kernel we would use in the f_shader, and edited the gaussian_convolution so that it processes only the x coordinate or the y coordinate, according to a parameter named "axis" (need only one for loop, use a kernel array instead of weight, ...). The right texture to use is also bind or unbind depending on the parameter "axis".
 
 4.2 Screen Space Reflections
 
 To display a reflected cube in the framebuffer, we need to mirror the cam_pos and the cam_up vectors by inversing their z values. Then we compute a new view_projection matrix using these mirrored vectors. At the end we can display our cube in the framebuffer (using bind and unbind functions around it). 
 
-In the floor_fshader, we get the window height and width from the texture (using textureSize function), use gl_FragCoord to obtain the new coordinates u and v, normalized using window width/height. We can at the end display both the floor texture with the cube texture using the mix function (THE V COORDINATE IS FLIPPED USING....).
+In the floor_fshader, we get the window height and width from the texture (using textureSize function), use gl_FragCoord to obtain the new coordinates u and v, normalized using window width/height. We can at the end display both the floor texture with the cube texture using the mix function. The v coordinate, once normalized, need to be flipped (1-v) to obtain the right rotation direction.
 
 4.3 Motion Blur
 
