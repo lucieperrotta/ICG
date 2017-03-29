@@ -20,10 +20,14 @@ class FrameBuffer {
         }
 
         void Unbind() {
+            // here we bind the default frame buffer
             glBindFramebuffer(GL_FRAMEBUFFER, 0);
         }
 
         int Init(int image_width, int image_height, bool use_interpolation = false) {
+
+           //std::tuple<int, int> Init(int image_width, int image_height,
+           //bool use_interpolation = false)
             this->width_ = image_width;
             this->height_ = image_height;
 
@@ -58,6 +62,28 @@ class FrameBuffer {
                 glBindRenderbuffer(GL_RENDERBUFFER, 0);
             }
 
+            /*
+             * // create second color attachement for velocity texture
+            {
+                glGenTextures(1, &velocity_texture_id_);
+                glBindTexture(GL_TEXTURE_2D, velocity_texture_id_);
+                glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+                glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+                if(use_interpolation){
+                    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+                    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+                } else {
+                    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+                    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+                }
+
+                // On some intel OpenGL drivers, GL_RGB32F isn't supported inside
+                // a framebuffer, but using GL_RGB16F is
+                glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB16F, width_, height_, 0,
+                             GL_RGB, GL_FLOAT, NULL);
+            }
+            */
+
             // tie it all together
             {
                 glGenFramebuffers(1, &framebuffer_object_id_);
@@ -77,6 +103,21 @@ class FrameBuffer {
             }
 
             return color_texture_id_;
+            //return std::make_tuple(color_texture_id_, velocity_texture_id_);
+        }
+
+        void Clear() {
+            glViewport(0, 0, width_, height_);
+            glBindFramebuffer(GL_FRAMEBUFFER, framebuffer_object_id_);
+
+            glDrawBuffer(GL_COLOR_ATTACHMENT0);
+            glClearColor(1.0, 1.0, 1.0, 1.0);
+            glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
+            glDrawBuffer(GL_COLOR_ATTACHMENT1);
+            glClearColor(0.0, 0.0, 0.0, 1.0);
+            glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+            glBindFramebuffer(GL_FRAMEBUFFER, 0);
         }
 
         void Cleanup() {

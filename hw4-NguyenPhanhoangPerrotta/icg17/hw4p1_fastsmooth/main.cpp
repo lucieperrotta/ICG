@@ -56,6 +56,9 @@ void Init(GLFWwindow* window) {
 }
 
 void Display() {
+
+    framebuffer.Clear();
+
     // render to framebuffer
     framebuffer.Bind();
     {
