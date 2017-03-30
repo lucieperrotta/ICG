@@ -60,15 +60,15 @@ void Display() {
     framebuffer.Bind();
     {
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-        cube.Draw(cube_model_matrix, view_matrix, projection_matrix);
-        quad.Draw(IDENTITY_MATRIX, view_matrix, projection_matrix);
     }
     framebuffer.Unbind();
 
     // render to Window
     glViewport(0, 0, window_width, window_height);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
     screenquad.Draw();
+
 }
 
 // gets called when the windows/framebuffer is resized.
