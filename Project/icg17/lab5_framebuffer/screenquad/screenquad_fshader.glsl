@@ -23,6 +23,7 @@ void main() {
 
     // Get to the correct square in grid (row number and column numer)
     vec2 colums_line_number = floor(uv*N);
+    vec2 coord_frac = fract(uv*N);
 
     // Compute the pixel values [0, 1] of the 4 corners of the square
     vec2 bl = (colums_line_number+vec2(0.,0.) ) / N;
@@ -55,9 +56,9 @@ void main() {
     float tr_scalar = dot(tr_rand_vec, tr_diff); // v
 
     // Smooth interpolation vectors (merge bottoms together, merge tops, then merge the mergings)
-    float bottom_mix = mix(bl_scalar, br_scalar, smooth_interpolation(uv.x));
-    float top_mix = mix(tl_scalar, tr_scalar, smooth_interpolation(uv.x));
-    float noise = mix(bottom_mix, top_mix, smooth_interpolation(uv.y));
+    float bottom_mix = mix(bl_scalar, br_scalar, smooth_interpolation(coord_frac.x));
+    float top_mix = mix(tl_scalar, tr_scalar, smooth_interpolation(coord_frac.x));
+    float noise = mix(bottom_mix, top_mix, smooth_interpolation(coord_frac.y));
 
     color = vec3(pow(noise, 0.15));
 }
@@ -67,7 +68,7 @@ void main() {
 vec2 hash(vec2 p){
     vec2 d = vec2( dot(p,vec2(127.1,311.7)),dot(p,vec2(269.5,183.3)));
     return fract(sin(d)*43758.5453);
-    //return vec2(1, 1);
+    //return vec2(0, 1);
 }
 
 float rand(vec2 c){
