@@ -21,5 +21,5 @@ include(common/icg_settings.cmake)
 #add_subdirectory(hw4_shading)
 
 # week 5
-add_subdirectory(lab5_framebuffer)
+add_subdirectory(project)
 

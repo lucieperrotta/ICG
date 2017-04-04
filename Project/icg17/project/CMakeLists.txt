@@ -13,7 +13,8 @@ copy_files_once(${TEXTURES})
 file(GLOB SHADERS
     cube/*.glsl
     quad/*.glsl
-    screenquad/*.glsl)
+    screenquad/*.glsl
+	grid/*.glsl)
 deploy_shaders_to_build_dir(${SHADERS})
 
 add_executable(${EXERCISENAME} ${SOURCES} ${HEADERS} ${SHADERS})
