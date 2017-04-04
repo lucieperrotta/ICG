@@ -1,7 +1,6 @@
 #version 330
 
 in vec2 uv;
-
 out vec3 color;
 
 uniform sampler2D tex;
@@ -12,42 +11,34 @@ uniform float tex_height;
 vec2 hash(vec2 p);
 float smooth_interpolation(float t);
 float mix(float x, float y, float alpha);
-float rand(vec2 c);
-vec4 taylorInvSqrt(vec4 r);
-
 
 void main() {
 
     // Grid size in squares
     float N = 16.;
 
-    // Get to the correct square in grid (row number and column numer)
-    vec2 colums_line_number = floor(uv*N);
-    vec2 coord_frac = fract(uv*N);
+    // Coordinates definitions
+    vec2 checker_coord = uv*N; // Global big checkerboord coordinates
+    vec2 colums_line_number = floor(checker_coord); // "Line/column #" coordinate
+    vec2 coord_frac = fract(checker_coord); // Relative-to-local-rectangle coordinate
 
     // Compute the pixel values [0, 1] of the 4 corners of the square
-    vec2 bl = (colums_line_number+vec2(0.,0.) ) / N;
-    vec2 br = (colums_line_number+vec2(0.,1.) ) / N;
-    vec2 tl = (colums_line_number+vec2(1.,0.) ) / N;
-    vec2 tr = (colums_line_number+vec2(1.,1.) ) / N;
+    vec2 bl = (colums_line_number+vec2(0.,0.) );
+    vec2 br = (colums_line_number+vec2(1.,0.) );
+    vec2 tl = (colums_line_number+vec2(0.,1.) );
+    vec2 tr = (colums_line_number+vec2(1.,1.) );
 
     // Compute difference vectors from corners to actual point
-    vec2 bl_diff = bl - uv; // a
-    vec2 br_diff = br - uv; // b
-    vec2 tl_diff = tl - uv; // c
-    vec2 tr_diff = tr - uv; // d
+    vec2 bl_diff = checker_coord - bl; // a
+    vec2 br_diff = checker_coord - br; // b
+    vec2 tl_diff = checker_coord - tl; // c
+    vec2 tr_diff = checker_coord - tr; // d
 
     // Generate random vector for each corner
     vec2 bl_rand_vec = hash(bl); // g(x0, y0)
     vec2 br_rand_vec = hash(br); // g(x1, y0)
     vec2 tl_rand_vec = hash(tl); // g(x0, y1)
     vec2 tr_rand_vec = hash(tr); // g(x1, y1)
-
-    vec4 norm = taylorInvSqrt(vec4(dot(bl_rand_vec, bl_rand_vec), dot(br_rand_vec, br_rand_vec), dot(tl_rand_vec, tl_rand_vec), dot(tr_rand_vec, tr_rand_vec)));
-    bl_rand_vec*=norm.x;
-    br_rand_vec*=norm.y;
-    tl_rand_vec*=norm.z;
-    tr_rand_vec*=norm.w;
 
     // Dot product to get scalar values for the corners
     float bl_scalar = dot(bl_rand_vec, bl_diff); // s
@@ -60,19 +51,14 @@ void main() {
     float top_mix = mix(tl_scalar, tr_scalar, smooth_interpolation(coord_frac.x));
     float noise = mix(bottom_mix, top_mix, smooth_interpolation(coord_frac.y));
 
-    color = vec3(pow(noise, 0.15));
+    // Noise is between -1 and 1 and we want it between 0 and 1
+    color = vec3((noise+1)/2);
 }
 
-// @TODO changer ????
-// Pseudo-random hash function by Pietro De Nicola
+// Pseudo-random hash function by Pietro De Nicola (vectors coord between -1 and 1)
 vec2 hash(vec2 p){
     vec2 d = vec2( dot(p,vec2(127.1,311.7)),dot(p,vec2(269.5,183.3)));
-    return fract(sin(d)*43758.5453);
-    //return vec2(0, 1);
-}
-
-float rand(vec2 c){
-    return fract(sin(dot(c.xy ,vec2(12.9898,78.233))) * 43758.5453);
+    return (fract(sin(d)*43758.5453)-0.5)*2.;
 }
 
 // Interpolation function (given in slide 12)
@@ -85,8 +71,9 @@ float mix(float x, float y, float alpha){
     return (1-alpha)*x + alpha*y;
 }
 
-
-vec4 taylorInvSqrt(vec4 r)
-{
-    return 1.79284291400159 - 0.85373472095314 * r;
+/* ULTIMATE DEBUG TECHNIQUE
+if (bl_diff.x < -1.0 || bl_diff.y < -1.0 || bl_diff.x > 1.0 || bl_diff.y > 1.0 ) {
+    color = vec3(1, 0, 0);
+    return;
 }
+*/
