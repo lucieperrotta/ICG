@@ -12,5 +12,6 @@ void main() {
     float acc = 2;
     float amplitude = 0.1;
     float height = (sin((uv.x*v-time)*acc)+cos((uv.y*v-time)*acc))*amplitude;
-    color = vec3(69./255. + height*120./255, 184./255. + (height)*120/255, 255./255.);
+    //color = vec3(69./255. + height*120./255, 184./255. + (height)*120/255, 255./255.);
+    color = vec3(uv.x, uv.y,1);
 }

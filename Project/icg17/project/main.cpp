@@ -8,44 +8,41 @@
 
 #include "framebuffer.h"
 
-#include "cube/cube.h"
-#include "quad/quad.h"
+#include "grid/grid.h"
 #include "screenquad/screenquad.h"
-
-Cube cube;
-Quad quad;
 
 int window_width = 800;
 int window_height = 600;
 
 FrameBuffer framebuffer;
 ScreenQuad screenquad;
+Grid grid;
 
 using namespace glm;
 
 mat4 projection_matrix;
 mat4 view_matrix;
-mat4 cube_model_matrix;
+mat4 quad_model_matrix;
+
 
 void Init(GLFWwindow* window) {
-    glClearColor(1.0, 1.0, 1.0 /*white*/, 1.0 /*solid*/);
+    // sets background color
+    glClearColor(0, 0, 0, 1.0 /*solid*/);
     glEnable(GL_DEPTH_TEST);
 
-    cube.Init();
-    quad.Init();
+    grid.Init();
 
     // setup view and projection matrices
     vec3 cam_pos(2.0f, 2.0f, 2.0f);
     vec3 cam_look(0.0f, 0.0f, 0.0f);
-    vec3 cam_up(0.0f, 0.0f, 1.0f);
+    vec3 cam_up(0.0f, 1.0f, 0.0f);
     view_matrix = lookAt(cam_pos, cam_look, cam_up);
     float ratio = window_width / (float) window_height;
     projection_matrix = perspective(45.0f, ratio, 0.1f, 10.0f);
 
     // create the model matrix (remember OpenGL is right handed)
     // accumulated transformation
-    cube_model_matrix = scale(IDENTITY_MATRIX, vec3(0.5));
-    cube_model_matrix = translate(cube_model_matrix, vec3(0.0, 0.0, 0.6));
+    quad_model_matrix = translate(mat4(1.0f), vec3(0.0f, -0.25f, 0.0f));
 
     // on retina/hidpi displays, pixels != screen coordinates
     // this unsures that the framebuffer has the same size as the window
@@ -56,18 +53,23 @@ void Init(GLFWwindow* window) {
 }
 
 void Display() {
+
+    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
+   double time = 0;
+            //glfwGetTime();
+
     // render to framebuffer
     framebuffer.Bind();
     {
-        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+        screenquad.Draw();
     }
     framebuffer.Unbind();
 
     // render to Window
     glViewport(0, 0, window_width, window_height);
-    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-    screenquad.Draw();
+    grid.Draw(time, quad_model_matrix, view_matrix, projection_matrix);
 
 }
 
@@ -154,8 +156,7 @@ int main(int argc, char *argv[]) {
     }
 
     // cleanup
-    quad.Cleanup();
-    cube.Cleanup();
+    grid.Cleanup();
     framebuffer.Cleanup();
     screenquad.Cleanup();
 
