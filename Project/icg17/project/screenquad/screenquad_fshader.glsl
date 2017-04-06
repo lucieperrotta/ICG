@@ -8,7 +8,7 @@ uniform float tex_width;
 uniform float tex_height;
 
 // Functions headers
-float fbm(vec2 uv, int octaves);
+float fBm(vec2 point, float H, float lacunarity, int octaves);
 float perlin(vec2 uv);
 vec2 hash(vec2 p);
 float smooth_interpolation(float t);
@@ -16,21 +16,17 @@ float mix(float x, float y, float alpha);
 
 void main() {
 
-    color=vec3(fbm(uv, 5));
+    color=vec3(fBm(uv, 2, 2, 10));
 }
 
-// Inspired by http://www.kamend.com/
-float fbm(vec2 uv, int octaves){
-    float result = 0.0;
-    float amp = 1.0;
-    vec2 uv2 = uv;
-
-    for(int i = 0; i < octaves; ++i){
-        amp *= 0.6;
-        result += (amp * perlin(uv2));
-        uv2 *= 2.;
+float fBm(vec2 point, float H, float lacunarity, int octaves){
+    float value = 0.0;
+    /* inner loop of fractal construction */
+    for (int i = 0; i < octaves; i++) {
+        value += perlin(point) * pow(lacunarity, -H*i);
+        point *= lacunarity;
     }
-    return result;
+    return value;
 }
 
 float perlin(vec2 uv){
