@@ -6,11 +6,12 @@ class FrameBuffer {
     private:
         int width_;
         int height_;
-        GLuint framebuffer_object_id_;
         GLuint depth_render_buffer_id_;
-        GLuint color_texture_id_;
 
-    public:
+    public: 
+        GLuint color_texture_id_;
+        GLuint framebuffer_object_id_;
+
         // warning: overrides viewport!!
         void Bind() {
             glViewport(0, 0, width_, height_);
@@ -46,7 +47,7 @@ class FrameBuffer {
                 // see Table.2 on
                 // khronos.org/opengles/sdk/docs/man3/docbook4/xhtml/glTexImage2D.xml
                 glTexImage2D(GL_TEXTURE_2D, 0, GL_R32F, width_, height_, 0,
-                             GL_RGB, GL_UNSIGNED_BYTE, NULL);
+                             GL_RED, GL_UNSIGNED_BYTE, NULL);
                 // how to load from buffer
             }
 

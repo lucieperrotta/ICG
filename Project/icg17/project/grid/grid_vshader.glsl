@@ -13,9 +13,14 @@ void main() {
 
     // use the texture to obtain z axis
     vec4 height = texture(tex, uv);
+
+    /*const float PI = 3.1415;
+    float v = 0.7*PI;
+    float acc = 2;
+    float amplitude = 0.1;
+    float height = (sin((uv.x*v-time)*acc)+cos((uv.y*v-time)*acc))*amplitude;*/
     vec3 pos_3d = vec3(position.x, height.x, -position.y);
 
     gl_Position = MVP * vec4(pos_3d, 1.0);
-
 
 }

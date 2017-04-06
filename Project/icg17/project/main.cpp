@@ -30,8 +30,6 @@ void Init(GLFWwindow* window) {
     glClearColor(0, 0, 0, 1.0 /*solid*/);
     glEnable(GL_DEPTH_TEST);
 
-    grid.Init();
-
     // setup view and projection matrices
     vec3 cam_pos(2.0f, 2.0f, 2.0f);
     vec3 cam_look(0.0f, 0.0f, 0.0f);
@@ -50,18 +48,19 @@ void Init(GLFWwindow* window) {
     glfwGetFramebufferSize(window, &window_width, &window_height);
     GLuint framebuffer_texture_id = framebuffer.Init(window_width, window_height);
     screenquad.Init(window_width, window_height, framebuffer_texture_id);
+    grid.Init(framebuffer_texture_id);
 }
 
 void Display() {
 
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-   double time = 0;
-            //glfwGetTime();
+   double time = 0;  //glfwGetTime();
 
     // render to framebuffer
     framebuffer.Bind();
     {
+        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
         screenquad.Draw();
     }
     framebuffer.Unbind();
