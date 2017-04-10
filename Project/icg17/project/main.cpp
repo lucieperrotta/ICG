@@ -25,6 +25,8 @@ mat4 view_matrix;
 mat4 quad_model_matrix;
 
 
+
+
 void Init(GLFWwindow* window) {
     // sets background color
     glClearColor(0, 0, 0, 1.0 /*solid*/);
@@ -147,12 +149,14 @@ int main(int argc, char *argv[]) {
     // initialize our OpenGL program
     Init(window);
 
+
     // render loop
     while(!glfwWindowShouldClose(window)){
         Display();
         glfwSwapBuffers(window);
         glfwPollEvents();
     }
+
 
     // cleanup
     grid.Cleanup();

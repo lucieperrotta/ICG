@@ -66,8 +66,7 @@ class ScreenQuad {
                              vertex_texture_coordinates, GL_STATIC_DRAW);
 
                 // attribute
-                GLuint vertex_texture_coord_id = glGetAttribLocation(program_id_,
-                                                                     "vtexcoord");
+                GLuint vertex_texture_coord_id = glGetAttribLocation(program_id_, "vtexcoord");
                 glEnableVertexAttribArray(vertex_texture_coord_id);
                 glVertexAttribPointer(vertex_texture_coord_id, 2, GL_FLOAT,
                                       DONT_NORMALIZE, ZERO_STRIDE,
