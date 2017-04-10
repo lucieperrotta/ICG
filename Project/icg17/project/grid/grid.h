@@ -2,7 +2,6 @@
 #include "icg_helper.h"
 #include <glm/gtc/type_ptr.hpp>
 
-
 #undef M_PI
 #define M_PI 3.14159
 
@@ -147,14 +146,15 @@ public:
             glVertexAttribPointer(loc_position, 2, GL_FLOAT, DONT_NORMALIZE,
                                   ZERO_STRIDE, ZERO_BUFFER_OFFSET);
 
-
+            /*
             GLint vertex_point_id = glGetAttribLocation(program_id_, "vpoint");
             if (vertex_point_id >= 0) {
                 glEnableVertexAttribArray(vertex_point_id);
                 glBindBuffer(GL_ARRAY_BUFFER, vertex_buffer_object_position_);
-                glVertexAttribPointer(vertex_point_id, 3 /*vec3*/, GL_FLOAT,
+                glVertexAttribPointer(vertex_point_id, 3, GL_FLOAT,
                                       DONT_NORMALIZE, ZERO_STRIDE, ZERO_BUFFER_OFFSET);
             }
+            */
         }
 
         // load texture
@@ -224,6 +224,7 @@ public:
         glActiveTexture(GL_TEXTURE0);
         glBindTexture(GL_TEXTURE_2D, texture_id_);
 
+        // setup variables for shading
         Material::Setup(program_id_);
         Light::Setup(program_id_);
 
@@ -231,7 +232,7 @@ public:
         /*glm::mat4 MVP = projection*view*model;
         glUniformMatrix4fv(MVP_id_, ONE, DONT_TRANSPOSE, glm::value_ptr(MVP));
 */
-        // setup matrix stack
+        // setup matrix stack - model, view, projection
         GLint model_id = glGetUniformLocation(program_id_, "model");
         glUniformMatrix4fv(model_id, ONE, DONT_TRANSPOSE, glm::value_ptr(model));
         GLint view_id = glGetUniformLocation(program_id_, "view");
