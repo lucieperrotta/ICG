@@ -7,6 +7,7 @@ uniform sampler2D tex;
 
 in vec2 position;
 
+out float lake_height;
 out vec4 vpoint_mv;
 out mat4 MV;
 out vec2 uv;
@@ -20,7 +21,12 @@ void main() {
 
     // use the texture to obtain z axis
     vec4 height = texture(tex, uv);
-    vec3 pos_3d = vec3(position.x, height.x, -position.y);
+    // height goes from 0.55 -> 0.85
+
+    // to have flat lakes
+    lake_height = max(height.x, 0.7);
+
+    vec3 pos_3d = 1.5*vec3(position.x, lake_height, -position.y);
     gl_Position =  projection*MV * vec4(pos_3d, 1.0);
 
     // point position to send to fshader for shading
