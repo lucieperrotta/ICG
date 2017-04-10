@@ -32,8 +32,8 @@ struct Light {
 };
 
 struct Material {
-        glm::vec3 ka = glm::vec3(0.18f, 0.1f, 0.1f);
-        glm::vec3 kd = glm::vec3(0.9f, 0.5f, 0.5f);
+        glm::vec3 ka = glm::vec3(0.1f, 0.1f, 0.1f);
+        glm::vec3 kd = glm::vec3(0.5f, 0.5f, 0.5f);
         glm::vec3 ks = glm::vec3(0.8f, 0.8f, 0.8f);
         float alpha = 60.0f;
 
@@ -148,11 +148,10 @@ public:
                                   ZERO_STRIDE, ZERO_BUFFER_OFFSET);
 
 
-
             GLint vertex_point_id = glGetAttribLocation(program_id_, "vpoint");
             if (vertex_point_id >= 0) {
                 glEnableVertexAttribArray(vertex_point_id);
-                glBindBuffer(GL_ARRAY_BUFFER, vertex_buffer_object_index_);
+                glBindBuffer(GL_ARRAY_BUFFER, vertex_buffer_object_position_);
                 glVertexAttribPointer(vertex_point_id, 3 /*vec3*/, GL_FLOAT,
                                       DONT_NORMALIZE, ZERO_STRIDE, ZERO_BUFFER_OFFSET);
             }
@@ -224,6 +223,9 @@ public:
         // bind textures
         glActiveTexture(GL_TEXTURE0);
         glBindTexture(GL_TEXTURE_2D, texture_id_);
+
+        Material::Setup(program_id_);
+        Light::Setup(program_id_);
 
         // setup MVP
         /*glm::mat4 MVP = projection*view*model;
