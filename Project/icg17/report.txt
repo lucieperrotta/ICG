@@ -1,0 +1,36 @@
+Project report
+Kim Lan Phan Hoang, Tim Nguyen, Lucie Perrotta
+
+Part 1 - Procedural Terrain
+
+State
+
+Part 1.1 - Height Map Generation
+We use as basis the last homework, keeping the screenquad (used to create Perlin Noise) and adding a grid object (which generate the terrain).
+
+Perlin Noise....
+
+Part 1.2 - Terrain Rendering
+Once the Perlin Noise (and fBm) are generated, we can use it to display a terrain. For that, we bind the framebuffer texture to the grid object. The grid vshader will then be able to use it and compute "random" height which will form mountains. 
+
+Color...
+
+Phong shading is added to the terrain. The implementation is inspired from the previous homework, using same computation and same structures. Unless that normal vectors are computed in the fshader, using neighbor coordinates and cross function. Specular effect is also removed (since moutains don't shine).
+
+
+
+Implementation
+
+Preparation of project basis - Kim
+Perlin Noise & fBm - Lucie
+Terrain generated with Perlin Noise - Kim
+Shading - Kim
+Color - Tim
+
+
+
+Fraction of the workload of each group member
+
+Kim : 33%
+Lucie : 33%
+Tim: 33%
