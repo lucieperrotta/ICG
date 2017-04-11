@@ -87,7 +87,7 @@ public:
             std::vector<GLuint> indices;
             // TODO 5: make a triangle grid with dimension 100x100.
             // always two subsequent entries in 'vertices' form a 2D vertex position.
-            float grid_dim = 100;
+            float grid_dim = 1000;
 
             // the given code below are the vertices for a simple quad.
             // your grid should have the same dimension as that quad, i.e.,

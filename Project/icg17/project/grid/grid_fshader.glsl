@@ -17,16 +17,47 @@ void main() {
     // height normalization from 0 to 1 (lake_height is from 0.55 to 0.85)
     float norm_height = (lake_height-0.7)*14;
 
-    // Forest color
-    color = (1-norm_height) *vec3(0.06, 0.3, 0.02) + norm_height *vec3(91./255., 70./255., 6./255.);
+    // initialize RGB colors
+    float red = 0.0;
+    float green = 0.0;
+    float blue = 0.0;
 
-    // Lake level
-    if(lake_height<=0.7)
-        color= vec3(23./255., 2./255., 214./255.);
+    // initialize height limits (lake, forest and mountains)
+    // the values can be changed here
+    float lake_level = 0.7;
+    //float forest_level = 0.75;
+    float mountains_level = 0.8;
 
-    // Snow level
-    if(lake_height>0.77)
-        color= vec3(0.7);
+    if(lake_height <= lake_level) {
+        // Lake level
+        color= vec3(23./255., 10./255., 200./255.);
+   /* } else if(lake_height <= forest_level) {
+        // Sand level
+        red = 0.2;
+        green = 0.3;
+        blue = 0.07;
+
+        float forest_height = norm_height - forest_level - lake_level;
+
+        color = (1-forest_height) * vec3(red, green, blue)
+                + (forest_height) * vec3(0.15, green, blue);*/
+    } else if (lake_height <= mountains_level) {
+        // Forest color
+        red = 0.09;
+        green = 0.25;
+        blue = 0.01;
+
+        float forest_height = (norm_height - lake_level);
+
+        color = (forest_height) * vec3(0.0, 0.10, 0.0)
+              + (1-forest_height) * vec3(red, green, blue);
+    } else {
+        // Snow level
+        float mountains_height = norm_height - mountains_level;
+        color = (mountains_height) * vec3(0.2, 0.2, 0.2)
+              + (1 - mountains_height) * vec3(0.0, 0.0, 0.0);
+    }
+
 
     // PHONG SHADING
     //color=vec3(0);
