@@ -61,6 +61,7 @@ private:
     GLuint vertex_buffer_object_index_;     // memory buffer for indices
     GLuint program_id_;                     // GLSL shader program ID
     GLuint texture_id_;                     // texture ID
+    GLuint texture_1d_id_;
     GLuint num_indices_;                    // number of vertices to render
     //GLuint MVP_id_;                         // model, view, proj matrix ID
 
@@ -70,6 +71,11 @@ public:
         program_id_ = icg_helper::LoadShaders("grid_vshader.glsl",
                                               "grid_fshader.glsl");
 
+        // forest texture
+        const int colormap_size = 9;
+        GLfloat texture_forest[colormap_size] = {0.3f, 0.5f, 0.0f, // yellow
+                                                 0.0f, 0.15f, 0.0f, // green
+                                                 0.8f, 0.8f, 0.8f}; // grey
 
         if(!program_id_) {
             exit(EXIT_FAILURE);
@@ -146,46 +152,10 @@ public:
             glVertexAttribPointer(loc_position, 2, GL_FLOAT, DONT_NORMALIZE,
                                   ZERO_STRIDE, ZERO_BUFFER_OFFSET);
 
-            /*
-            GLint vertex_point_id = glGetAttribLocation(program_id_, "vpoint");
-            if (vertex_point_id >= 0) {
-                glEnableVertexAttribArray(vertex_point_id);
-                glBindBuffer(GL_ARRAY_BUFFER, vertex_buffer_object_position_);
-                glVertexAttribPointer(vertex_point_id, 3, GL_FLOAT,
-                                      DONT_NORMALIZE, ZERO_STRIDE, ZERO_BUFFER_OFFSET);
-            }
-            */
         }
 
         // load texture
         {
-            /*int width;
-                int height;
-                int nb_component;
-                string filename = "grid_texture.tga";
-                // set stb_image to have the same coordinates as OpenGL
-                stbi_set_flip_vertically_on_load(1);
-                unsigned char* image = stbi_load(filename.c_str(), &width,
-                                                 &height, &nb_component, 0);
-
-                if(image == nullptr) {
-                    throw(string("Failed to load texture"));
-                }
-
-                glGenTextures(1, &texture_id_);
-                glBindTexture(GL_TEXTURE_2D, texture_id_);
-                glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-                glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-
-                if(nb_component == 3) {
-                    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0,
-                                 GL_RGB, GL_UNSIGNED_BYTE, image);
-                } else if(nb_component == 4) {
-                    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, width, height, 0,
-                                 GL_RGBA, GL_UNSIGNED_BYTE, image);
-                }
-                */
-
             texture_id_ = framebuffer_texture_id_;
 
             GLuint tex_id = glGetUniformLocation(program_id_, "tex");
@@ -195,6 +165,24 @@ public:
             glBindTexture(GL_TEXTURE_2D, 0);
             //stbi_image_free(image);
         }
+
+        // bind forest texture
+        {
+           glBindTexture(GL_TEXTURE_1D, texture_1d_id_);
+           GLuint tex_id = glGetUniformLocation(program_id_, "texture_forest");
+           glUniform1i(tex_id, 0 /*GL_TEXTURE0*/);
+        }
+
+        // 1D texture for forest texture
+        glGenTextures(1, &texture_1d_id_);
+        glActiveTexture(GL_TEXTURE0);
+        glBindTexture(GL_TEXTURE_1D, texture_1d_id_);
+        glTexImage1D(GL_TEXTURE_1D, 0, GL_RGB, colormap_size, 0, GL_RGB, GL_FLOAT, texture_forest);
+
+        glTexParameteri(GL_TEXTURE_1D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+        glTexParameteri(GL_TEXTURE_1D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+        glTexParameteri( GL_TEXTURE_1D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+        glTexParameteri( GL_TEXTURE_1D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
 
         // other uniforms
         //MVP_id_ = glGetUniformLocation(program_id_, "MVP");

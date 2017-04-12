@@ -1,4 +1,4 @@
-    #version 330
+#version 330
 
 in vec2 uv;
 out vec3 color;
@@ -24,6 +24,7 @@ float fBm(vec2 point, float H, float lacunarity, int octaves, float gain){
     /* inner loop of fractal construction */
     for (int i = 0; i < octaves; i++) {
         value += gain * perlin(point) * pow(lacunarity, -H*i);
+        //value += perlin(point) * 0.7;
         point *= lacunarity;
     }
     return value;

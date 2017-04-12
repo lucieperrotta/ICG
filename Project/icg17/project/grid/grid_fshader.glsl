@@ -6,6 +6,9 @@ uniform vec3 light_pos;
 uniform sampler2D tex;
 uniform float time;
 
+uniform sampler1D texture_forest;
+
+
 in float lake_height;
 in vec2 uv;
 in vec4 vpoint_mv;
@@ -15,12 +18,14 @@ out vec3 color;
 
 void main() {
     // height normalization from 0 to 1 (lake_height is from 0.55 to 0.85)
-    float norm_height = (lake_height-0.7)*14;
+    float norm_height = (lake_height - 0.71)/0.6;
 
     // initialize RGB colors
-    float red = 0.0;
-    float green = 0.0;
-    float blue = 0.0;
+    vec3 yellow = vec3(1.0, 1.0, 0.0);
+    vec3 green = vec3(0.0, 1.0, 0.0);
+    vec3 grey = vec3(0.0);
+
+    mat3 table = mat3(yellow, green, grey);
 
     // initialize height limits (lake, forest and mountains)
     // the values can be changed here
@@ -30,34 +35,22 @@ void main() {
 
     if(lake_height <= lake_level) {
         // Lake level
-        color= vec3(23./255., 10./255., 200./255.);
-   /* } else if(lake_height <= forest_level) {
-        // Sand level
-        red = 0.2;
-        green = 0.3;
-        blue = 0.07;
+        color= vec3(0./255., 90/255., 170./255.);
 
-        float forest_height = norm_height - forest_level - lake_level;
-
-        color = (1-forest_height) * vec3(red, green, blue)
-                + (forest_height) * vec3(0.15, green, blue);*/
-    } else if (lake_height <= mountains_level) {
+   /* } else if (lake_height <= mountains_level) {
         // Forest color
-        red = 0.09;
-        green = 0.25;
-        blue = 0.01;
 
-        float forest_height = (norm_height - lake_level);
+        float forest_height = (norm_height - lake_level)/(mountains_level - lake_height);
 
-        color = (forest_height) * vec3(0.0, 0.10, 0.0)
-              + (1-forest_height) * vec3(red, green, blue);
+        color = (forest_height) * vec3(0.07, 0.07, 0.07)
+              + (1. - forest_height) * vec3(0.15, 0.3, 0.00);*/
     } else {
         // Snow level
-        float mountains_height = norm_height - mountains_level;
-        color = (mountains_height) * vec3(0.2, 0.2, 0.2)
-              + (1 - mountains_height) * vec3(0.0, 0.0, 0.0);
+       // float mountains_height = (norm_height - mountains_level)/(1. - mountains_level);
+        //color = (mountains_height) * vec3(0.07, 0.07, 0.07)
+              //+ (1. - mountains_height) * vec3(0.0, 0.0, 0.0);
+       color = texture(texture_forest, norm_height).rgb;
     }
-
 
     // PHONG SHADING
     //color=vec3(0);
@@ -79,12 +72,15 @@ void main() {
     vec3 ambient = ka * La;
     color += ambient;
 
+
+
     vec3 n = normalize(normal_mv);
     vec3 l = normalize(light_dir);
     float lambert = dot(n,l);
 
     if(lambert > 0.0) {
-        // diffuse term
+
+       // diffuse term
         vec3 diffuse = Ld*kd*lambert;
         color += diffuse;
 
