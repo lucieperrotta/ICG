@@ -18,7 +18,9 @@ The final color value is simply this gray value. We then send it to the frame bu
 Part 1.2 - Terrain Rendering
 Once the Perlin Noise (and fBm) are generated, we can use it to display a terrain. For that, we bind the framebuffer texture to the grid object. The grid vshader will then be able to use it and compute "random" height which will form mountains. 
 
-Color... /* TODO */
+For the coloring part, we wanted to map the colors according to the height.
+Ou first step was to create a texture of colors (yellow, dark green, gray/white). After binding this texture, we used it to color the forest and mountains part. For the lake part, we just apply the same color without any gradient effect.
+Instead, we added a cloud-mirrored effect, by using the diffuse term we saw in our previous lessons, that was used for the shading.
 
 Phong shading is added to the terrain. The implementation is inspired from the previous homework, using same computation and same structures. Unless that normal vectors are computed in the fshader, using neighbor coordinates and cross function. Specular effect is also removed (since moutains don't shine).
 
@@ -29,7 +31,7 @@ Implementation
 Perlin Noise & fBm - Lucie
 Terrain generated with Perlin Noise - Kim
 Shading - Kim
-Color - Tim
+Colorint terrain depending on height - Tim
 
 
 
