@@ -15,6 +15,8 @@ copy_files_once(${TEXTURES})
 # you build (ie, you want the shaders there)
 file(GLOB SHADERS
     sky/*.glsl
+    cube/*.glsl
+    water/*.glsl
     #quad/*.glsl
     screenquad/*.glsl
     grid/*.glsl
