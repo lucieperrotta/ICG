@@ -10,13 +10,16 @@
 
 #include "grid/grid.h"
 #include "screenquad/screenquad.h"
+#include "water/water.h"
 
 int window_width = 800;
 int window_height = 600;
 
 FrameBuffer framebuffer;
+FrameBuffer waterFramebuffer;
 ScreenQuad screenquad;
 Grid grid;
+Water water;
 
 using namespace glm;
 
@@ -29,7 +32,7 @@ mat4 quad_model_matrix;
 
 void Init(GLFWwindow* window) {
     // sets background color
-    glClearColor(0, 0, 0, 1.0 /*solid*/);
+    glClearColor(1,1, 1, 1.0 /*solid*/);
     glEnable(GL_DEPTH_TEST);
 
     // setup view and projection matrices
@@ -48,9 +51,13 @@ void Init(GLFWwindow* window) {
     // this unsures that the framebuffer has the same size as the window
     // (see http://www.glfw.org/docs/latest/window.html#window_fbsize)
     glfwGetFramebufferSize(window, &window_width, &window_height);
+
     GLuint framebuffer_texture_id = framebuffer.Init(window_width, window_height);
     screenquad.Init(window_width, window_height, framebuffer_texture_id);
     grid.Init(framebuffer_texture_id);
+
+    GLuint water_texture_id = waterFramebuffer.Init(window_width, window_height);
+    water.Init(water_texture_id);
 }
 
 void Display() {
@@ -59,18 +66,28 @@ void Display() {
 
    double time = 0;  //glfwGetTime();
 
-    // render to framebuffer
-    framebuffer.Bind();
-    {
-        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-        screenquad.Draw();
-    }
-    framebuffer.Unbind();
+   // render to framebuffer
+   framebuffer.Bind();
+   {
+       glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+       screenquad.Draw();
+   }
+   framebuffer.Unbind();
+
+   // render to framebuffer
+   waterFramebuffer.Bind();
+   {
+       glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+       grid.Draw(time, quad_model_matrix, view_matrix, projection_matrix);
+   }
+   waterFramebuffer.Unbind();
 
     // render to Window
     glViewport(0, 0, window_width, window_height);
 
-    grid.Draw(time, quad_model_matrix, view_matrix, projection_matrix);
+    //grid.Draw(time, quad_model_matrix, view_matrix, projection_matrix);
+
+    water.Draw(time, quad_model_matrix, view_matrix, projection_matrix);
 
 }
 
@@ -162,6 +179,7 @@ int main(int argc, char *argv[]) {
     grid.Cleanup();
     framebuffer.Cleanup();
     screenquad.Cleanup();
+    water.Cleanup();
 
     // close OpenGL window and terminate GLFW
     glfwDestroyWindow(window);
