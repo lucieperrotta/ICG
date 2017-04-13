@@ -8,6 +8,7 @@ uniform float tex_width;
 uniform float tex_height;
 
 // Functions headers
+float ridged_fBm(vec2 point, float H, float lacunarity, int octaves, float gain);
 float fBm(vec2 point, float H, float lacunarity, int octaves, float gain);
 float perlin(vec2 uv);
 vec2 hash(vec2 p);
@@ -16,7 +17,8 @@ float mix(float x, float y, float alpha);
 
 void main() {
 
-    color=vec3(fBm(uv, 0.9, 1.8, 10, 0.6));
+    color=vec3(fBm(uv, 0.9, 1.8, 20, 0.6)+0.05);
+    //color=vec3(ridged_fBm(uv, 1.2, 1.8, 100, 1));
 }
 
 float fBm(vec2 point, float H, float lacunarity, int octaves, float gain){
@@ -30,9 +32,20 @@ float fBm(vec2 point, float H, float lacunarity, int octaves, float gain){
     return value;
 }
 
+float ridged_fBm(vec2 point, float H, float lacunarity, int octaves, float gain){
+    float value = 0.0;
+    /* inner loop of fractal construction */
+    for (int i = 0; i < octaves; i++) {
+        value += gain * (1.0 - abs(perlin(point))) * pow(lacunarity, -H*i);
+        //value += perlin(point) * 0.7;
+        point *= lacunarity;
+    }
+    return value;
+}
+
 float perlin(vec2 uv){
     // Grid size in squares
-    float N = 6.;
+    float N = 2.;
 
     // Coordinates definitions
     vec2 checker_coord = uv*N; // Global big checkerboord coordinates
