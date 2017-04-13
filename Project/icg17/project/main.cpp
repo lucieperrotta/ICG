@@ -117,9 +117,10 @@ void Display() {
     grid.Draw(time, quad_model_matrix, trackball_matrix*view_matrix, projection_matrix);
     sky.Draw(quad_model_matrix, trackball_matrix*view_matrix, projection_matrix);
     //screenquad.Draw();
+    water.Draw(time, quad_model_matrix, trackball_matrix*view_matrix, projection_matrix);
 }
 
-    water.Draw(time, quad_model_matrix, view_matrix, projection_matrix);
+
 
 // transforms glfw screen coordinates into normalized OpenGL coordinates.
 vec2 TransformScreenCoords(GLFWwindow* window, int x, int y) {
