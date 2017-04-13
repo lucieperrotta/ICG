@@ -6,7 +6,7 @@ uniform vec3 light_pos;
 uniform sampler2D tex;
 uniform float time;
 
-uniform sampler1D texture_forest;
+uniform sampler1D tex_coloring;
 
 
 in float lake_height;
@@ -35,21 +35,10 @@ void main() {
 
     if(lake_height <= lake_level) {
         // Lake level
-        color= vec3(0./255., 90/255., 170./255.);
-
-   /* } else if (lake_height <= mountains_level) {
-        // Forest color
-
-        float forest_height = (norm_height - lake_level)/(mountains_level - lake_height);
-
-        color = (forest_height) * vec3(0.07, 0.07, 0.07)
-              + (1. - forest_height) * vec3(0.15, 0.3, 0.00);*/
+        color = vec3(0./255., 90/255., 170./255.);
     } else {
-        // Snow level
-       // float mountains_height = (norm_height - mountains_level)/(1. - mountains_level);
-        //color = (mountains_height) * vec3(0.07, 0.07, 0.07)
-              //+ (1. - mountains_height) * vec3(0.0, 0.0, 0.0);
-       color = texture(texture_forest, norm_height).rgb;
+        // Forest & snow level
+       color = texture(tex_coloring, norm_height).rgb;
     }
 
     // PHONG SHADING

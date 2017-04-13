@@ -6,50 +6,50 @@
 #define M_PI 3.14159
 
 struct Light {
-        glm::vec3 La = glm::vec3(1.0f, 1.0f, 1.0f);
-        glm::vec3 Ld = glm::vec3(1.0f, 1.0f, 1.0f);
-        glm::vec3 Ls = glm::vec3(1.0f, 1.0f, 1.0f);
+    glm::vec3 La = glm::vec3(1.0f, 1.0f, 1.0f);
+    glm::vec3 Ld = glm::vec3(1.0f, 1.0f, 1.0f);
+    glm::vec3 Ls = glm::vec3(1.0f, 1.0f, 1.0f);
 
-        glm::vec3 light_pos = glm::vec3(0.0f, 0.0f, 2.0f);
+    glm::vec3 light_pos = glm::vec3(0.0f, 0.0f, 2.0f);
 
-        // pass light properties to the shader
-        void Setup(GLuint program_id) {
-            glUseProgram(program_id);
+    // pass light properties to the shader
+    void Setup(GLuint program_id) {
+        glUseProgram(program_id);
 
-            // given in camera space
-            GLuint light_pos_id = glGetUniformLocation(program_id, "light_pos");
+        // given in camera space
+        GLuint light_pos_id = glGetUniformLocation(program_id, "light_pos");
 
-            GLuint La_id = glGetUniformLocation(program_id, "La");
-            GLuint Ld_id = glGetUniformLocation(program_id, "Ld");
-            GLuint Ls_id = glGetUniformLocation(program_id, "Ls");
+        GLuint La_id = glGetUniformLocation(program_id, "La");
+        GLuint Ld_id = glGetUniformLocation(program_id, "Ld");
+        GLuint Ls_id = glGetUniformLocation(program_id, "Ls");
 
-            glUniform3fv(light_pos_id, ONE, glm::value_ptr(light_pos));
-            glUniform3fv(La_id, ONE, glm::value_ptr(La));
-            glUniform3fv(Ld_id, ONE, glm::value_ptr(Ld));
-            glUniform3fv(Ls_id, ONE, glm::value_ptr(Ls));
-        }
+        glUniform3fv(light_pos_id, ONE, glm::value_ptr(light_pos));
+        glUniform3fv(La_id, ONE, glm::value_ptr(La));
+        glUniform3fv(Ld_id, ONE, glm::value_ptr(Ld));
+        glUniform3fv(Ls_id, ONE, glm::value_ptr(Ls));
+    }
 };
 
 struct Material {
-        glm::vec3 ka = glm::vec3(0.1f, 0.1f, 0.1f);
-        glm::vec3 kd = glm::vec3(0.5f, 0.5f, 0.5f);
-        glm::vec3 ks = glm::vec3(0.8f, 0.8f, 0.8f);
-        float alpha = 60.0f;
+    glm::vec3 ka = glm::vec3(0.1f, 0.1f, 0.1f);
+    glm::vec3 kd = glm::vec3(0.5f, 0.5f, 0.5f);
+    glm::vec3 ks = glm::vec3(0.8f, 0.8f, 0.8f);
+    float alpha = 60.0f;
 
-        // pass material properties to the shaders
-        void Setup(GLuint program_id) {
-            glUseProgram(program_id);
+    // pass material properties to the shaders
+    void Setup(GLuint program_id) {
+        glUseProgram(program_id);
 
-            GLuint ka_id = glGetUniformLocation(program_id, "ka");
-            GLuint kd_id = glGetUniformLocation(program_id, "kd");
-            GLuint ks_id = glGetUniformLocation(program_id, "ks");
-            GLuint alpha_id = glGetUniformLocation(program_id, "alpha");
+        GLuint ka_id = glGetUniformLocation(program_id, "ka");
+        GLuint kd_id = glGetUniformLocation(program_id, "kd");
+        GLuint ks_id = glGetUniformLocation(program_id, "ks");
+        GLuint alpha_id = glGetUniformLocation(program_id, "alpha");
 
-            glUniform3fv(ka_id, ONE, glm::value_ptr(ka));
-            glUniform3fv(kd_id, ONE, glm::value_ptr(kd));
-            glUniform3fv(ks_id, ONE, glm::value_ptr(ks));
-            glUniform1f(alpha_id, alpha);
-        }
+        glUniform3fv(ka_id, ONE, glm::value_ptr(ka));
+        glUniform3fv(kd_id, ONE, glm::value_ptr(kd));
+        glUniform3fv(ks_id, ONE, glm::value_ptr(ks));
+        glUniform1f(alpha_id, alpha);
+    }
 };
 
 
@@ -60,23 +60,47 @@ private:
     GLuint vertex_buffer_object_position_;  // memory buffer for positions
     GLuint vertex_buffer_object_index_;     // memory buffer for indices
     GLuint program_id_;                     // GLSL shader program ID
-    GLuint texture_id_;                     // texture ID
-    GLuint texture_1d_id_;
+
+    //GLuint texture_id_;                     // texture ID
+    GLuint tex_coloring_;                  // texture for coloring
+
+    GLuint tex_grass_;                       // texture of the grass
+    GLuint tex_rock_;                        // texture of the rock
+    GLuint tex_sand_;                        // texture of the sand
+    GLuint tex_snow_;                        // texture of the snow
+
     GLuint num_indices_;                    // number of vertices to render
     //GLuint MVP_id_;                         // model, view, proj matrix ID
+
+
+    void BindShader(GLuint program_id) {
+        // bind forest texture (coloring)
+        {
+            // forest texture
+            const int colormap_size = 9;
+            GLfloat texture_forest[colormap_size] = {0.3f, 0.5f, 0.0f, // yellow
+                                                     0.0f, 0.15f, 0.0f, // green
+                                                     0.8f, 0.8f, 0.8f}; // grey
+
+            // 1D texture for forest texture
+            glGenTextures(1, &tex_coloring_);
+            glActiveTexture(GL_TEXTURE0);
+            glBindTexture(GL_TEXTURE_1D, tex_coloring_);
+            glTexImage1D(GL_TEXTURE_1D, 0, GL_RGB, colormap_size, 0, GL_RGB, GL_FLOAT, texture_forest);
+
+            glTexParameteri(GL_TEXTURE_1D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+            glTexParameteri(GL_TEXTURE_1D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+            glTexParameteri( GL_TEXTURE_1D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+            glTexParameteri( GL_TEXTURE_1D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+
+        }
+    }
 
 public:
     void Init(GLuint framebuffer_texture_id_) {
         // compile the shaders.
         program_id_ = icg_helper::LoadShaders("grid_vshader.glsl",
                                               "grid_fshader.glsl");
-
-        // forest texture
-        const int colormap_size = 9;
-        GLfloat texture_forest[colormap_size] = {0.3f, 0.5f, 0.0f, // yellow
-                                                 0.0f, 0.15f, 0.0f, // green
-                                                 0.8f, 0.8f, 0.8f}; // grey
-
         if(!program_id_) {
             exit(EXIT_FAILURE);
         }
@@ -154,39 +178,6 @@ public:
 
         }
 
-        // load texture
-        {
-            texture_id_ = framebuffer_texture_id_;
-
-            GLuint tex_id = glGetUniformLocation(program_id_, "tex");
-            glUniform1i(tex_id, 0 /*GL_TEXTURE0*/);
-
-            // cleanup
-            glBindTexture(GL_TEXTURE_2D, 0);
-            //stbi_image_free(image);
-        }
-
-        // bind forest texture
-        {
-           glBindTexture(GL_TEXTURE_1D, texture_1d_id_);
-           GLuint tex_id = glGetUniformLocation(program_id_, "texture_forest");
-           glUniform1i(tex_id, 0 /*GL_TEXTURE0*/);
-        }
-
-        // 1D texture for forest texture
-        glGenTextures(1, &texture_1d_id_);
-        glActiveTexture(GL_TEXTURE0);
-        glBindTexture(GL_TEXTURE_1D, texture_1d_id_);
-        glTexImage1D(GL_TEXTURE_1D, 0, GL_RGB, colormap_size, 0, GL_RGB, GL_FLOAT, texture_forest);
-
-        glTexParameteri(GL_TEXTURE_1D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-        glTexParameteri(GL_TEXTURE_1D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-        glTexParameteri( GL_TEXTURE_1D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
-        glTexParameteri( GL_TEXTURE_1D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
-
-        // other uniforms
-        //MVP_id_ = glGetUniformLocation(program_id_, "MVP");
-
         // to avoid the current object being polluted
         glBindVertexArray(0);
         glUseProgram(0);
@@ -199,7 +190,6 @@ public:
         glDeleteBuffers(1, &vertex_buffer_object_index_);
         glDeleteVertexArrays(1, &vertex_array_id_);
         glDeleteProgram(program_id_);
-        glDeleteTextures(1, &texture_id_);
     }
 
     void Draw(float time, const glm::mat4 &model = IDENTITY_MATRIX,
@@ -208,18 +198,10 @@ public:
         glUseProgram(program_id_);
         glBindVertexArray(vertex_array_id_);
 
-        // bind textures
-        glActiveTexture(GL_TEXTURE0);
-        glBindTexture(GL_TEXTURE_2D, texture_id_);
-
         // setup variables for shading
         Material::Setup(program_id_);
         Light::Setup(program_id_);
 
-        // setup MVP
-        /*glm::mat4 MVP = projection*view*model;
-        glUniformMatrix4fv(MVP_id_, ONE, DONT_TRANSPOSE, glm::value_ptr(MVP));
-*/
         // setup matrix stack - model, view, projection
         GLint model_id = glGetUniformLocation(program_id_, "model");
         glUniformMatrix4fv(model_id, ONE, DONT_TRANSPOSE, glm::value_ptr(model));
@@ -229,12 +211,15 @@ public:
         glUniformMatrix4fv(projection_id, ONE, DONT_TRANSPOSE, glm::value_ptr(projection));
 
 
+        BindShader(program_id_);
+
         // pass the current time stamp to the shader.
         glUniform1f(glGetUniformLocation(program_id_, "time"), time);
 
         // draw
         // You can do that by uncommenting the next line.
         //glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+
         // might have to change GL_TRIANGLE_STRIP to GL_TRIANGLES.
         glDrawElements(GL_TRIANGLE_STRIP, num_indices_, GL_UNSIGNED_INT, 0);
 
