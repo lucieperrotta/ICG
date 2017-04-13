@@ -10,6 +10,9 @@
 
 #include "grid/grid.h"
 #include "screenquad/screenquad.h"
+#include "sky/sky.h"
+
+#include "trackball.h"
 
 int window_width = 800;
 int window_height = 600;
@@ -17,15 +20,39 @@ int window_height = 600;
 FrameBuffer framebuffer;
 ScreenQuad screenquad;
 Grid grid;
+Sky sky;
+
+Trackball trackball;
+float previousZ = 0.;
 
 using namespace glm;
 
 mat4 projection_matrix;
 mat4 view_matrix;
 mat4 quad_model_matrix;
+mat4 trackball_matrix;
+mat4 old_trackball_matrix;
 
+mat4 PerspectiveProjection(float fovy, float aspect, float near, float far) {
+    // TODO 1: Create a perspective projection matrix given the field of view,
+    // aspect ratio, and near and far plane distances.
 
+    float top = near*tan(fovy/2.f);
+    float bottom = -top;
+    float right = top*aspect;
+    float left = -right;
+    mat4 perspective = mat4(1.0f);
+    perspective[0][0] = 2.f*near/(right-left);
+    perspective[1][1] = 2.f*near/(top-bottom);
+    perspective[2][0] = (right+left)/(right-left);
+    perspective[2][1] = (top+bottom)/(top-bottom);
+    perspective[2][2] = -(far+near)/(far-near);
+    perspective[2][3] = -1.f;
+    perspective[3][2] = -(2.f*far+near)/(far-near);
+    perspective[3][3] = 0;
 
+    return perspective;
+}
 
 void Init(GLFWwindow* window) {
     // sets background color
@@ -43,6 +70,7 @@ void Init(GLFWwindow* window) {
     // create the model matrix (remember OpenGL is right handed)
     // accumulated transformation
     quad_model_matrix = translate(mat4(1.0f), vec3(0.0f, -0.25f, 0.0f));
+    trackball_matrix = IDENTITY_MATRIX;
 
     // on retina/hidpi displays, pixels != screen coordinates
     // this unsures that the framebuffer has the same size as the window
@@ -51,6 +79,7 @@ void Init(GLFWwindow* window) {
     GLuint framebuffer_texture_id = framebuffer.Init(window_width, window_height);
     screenquad.Init(window_width, window_height, framebuffer_texture_id);
     grid.Init(framebuffer_texture_id);
+    sky.Init();
 }
 
 void Display() {
@@ -70,8 +99,74 @@ void Display() {
     // render to Window
     glViewport(0, 0, window_width, window_height);
 
-    grid.Draw(time, quad_model_matrix, view_matrix, projection_matrix);
+    grid.Draw(time, quad_model_matrix, trackball_matrix*view_matrix, projection_matrix);
+    sky.Draw(quad_model_matrix, trackball_matrix*view_matrix, projection_matrix);
+    //screenquad.Draw();
+}
 
+// transforms glfw screen coordinates into normalized OpenGL coordinates.
+vec2 TransformScreenCoords(GLFWwindow* window, int x, int y) {
+    // the framebuffer and the window doesn't necessarily have the same size
+    // i.e. hidpi screens. so we need to get the correct one
+    int width;
+    int height;
+    glfwGetWindowSize(window, &width, &height);
+    return vec2(2.0f * (float)x / width - 1.0f,
+                1.0f - 2.0f * (float)y / height);
+}
+
+void MouseButton(GLFWwindow* window, int button, int action, int mod) {
+    if (button == GLFW_MOUSE_BUTTON_LEFT && action == GLFW_PRESS) {
+        double x_i, y_i;
+        glfwGetCursorPos(window, &x_i, &y_i);
+        vec2 p = TransformScreenCoords(window, x_i, y_i);
+        trackball.BeingDrag(p.x, p.y);
+        old_trackball_matrix = trackball_matrix;
+        // Store the current state of the model matrix.
+    }
+}
+
+void MousePos(GLFWwindow* window, double x, double y) {
+    vec2 p = TransformScreenCoords(window, x, y);
+    if (glfwGetMouseButton(window, GLFW_MOUSE_BUTTON_LEFT) == GLFW_PRESS) {
+        double x_i, y_i;
+        glfwGetCursorPos(window, &x_i, &y_i);
+        p = TransformScreenCoords(window, x_i, y_i);
+        // TODO 3: Calculate 'trackball_matrix' given the return value of
+        // trackball.Drag(...) and the value stored in 'old_trackball_matrix'.
+        // See also the mouse_button(...) function.
+        trackball_matrix = trackball.Drag(p.x,p.y) * old_trackball_matrix;
+    }
+
+    // zoom
+    if (glfwGetMouseButton(window, GLFW_MOUSE_BUTTON_RIGHT) == GLFW_PRESS) {
+        // TODO 4 DONE: Implement zooming. When the right mouse button is pressed,
+        // moving the mouse cursor up and down (along the screen's y axis)
+        // should zoom out and it. For that you have to update the current
+        // 'view_matrix' with a translation along the z axis.
+        vec3 newVec = vec3(0., 0., p.y-previousZ);
+        view_matrix=translate(view_matrix, newVec);
+    }
+    previousZ = p.y; // for not going infinitely fast
+}
+
+// Gets called when the windows/framebuffer is resized.
+void SetupProjection(GLFWwindow* window, int width, int height) {
+    window_width = width;
+    window_height = height;
+
+    cout << "Window has been resized to "
+         << window_width << "x" << window_height << "." << endl;
+
+    glViewport(0, 0, window_width, window_height);
+
+    // TODO 1 DONE: Use a perspective projection instead;
+    //GLfloat top = 1.0f;
+    //GLfloat right = (GLfloat)window_width / window_height * top;
+    //projection_matrix = OrthographicProjection(-right, right, -top, top, -10.0, 10.0f);
+    projection_matrix = PerspectiveProjection(45.0f,
+                                              (GLfloat)window_width / window_height,
+                                              0.1f, 100.f);
 }
 
 // gets called when the windows/framebuffer is resized.
@@ -136,6 +231,13 @@ int main(int argc, char *argv[]) {
     // set the framebuffer resize callback
     glfwSetFramebufferSizeCallback(window, ResizeCallback);
 
+    // set the framebuffer resize callback
+    glfwSetFramebufferSizeCallback(window, SetupProjection);
+
+    // set the mouse press and position callback
+    glfwSetMouseButtonCallback(window, MouseButton);
+    glfwSetCursorPosCallback(window, MousePos);
+
     // GLEW Initialization (must have a context)
     // https://www.opengl.org/wiki/OpenGL_Loading_Library
     glewExperimental = GL_TRUE; // fixes glew error (see above link)
@@ -162,6 +264,7 @@ int main(int argc, char *argv[]) {
     grid.Cleanup();
     framebuffer.Cleanup();
     screenquad.Cleanup();
+    //sky.Cleanup();
 
     // close OpenGL window and terminate GLFW
     glfwDestroyWindow(window);
