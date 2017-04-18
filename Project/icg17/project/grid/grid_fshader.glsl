@@ -3,11 +3,12 @@ uniform vec3 La, Ld, Ls;
 uniform vec3 ka, kd, ks;
 uniform float alpha;
 uniform vec3 light_pos;
-uniform sampler2D tex;
+
 uniform float time;
 
 uniform sampler1D tex_coloring;
-
+uniform sampler2D tex;
+uniform sampler2D tex_sand;
 
 in float lake_height;
 in vec2 uv;
@@ -38,7 +39,8 @@ void main() {
         color = vec3(0./255., 90/255., 170./255.);
     } else {
         // Forest & snow level
-       color = texture(tex_coloring, norm_height).rgb;
+       //color = texture(tex_sand, vec2(norm_height, 0.0)).xyz;
+        color = texture(tex_coloring, norm_height).rgb;
     }
 
     // PHONG SHADING
