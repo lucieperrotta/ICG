@@ -7,6 +7,10 @@ file(GLOB TEXTURES
     sky/sky_texture.tga
     sky/sky_texture_2.tga
     grid/grid_texture.tga
+    grid/rock_texture.tga
+    grid/sand_texture.tga
+    grid/snow_texture.tga
+    grid/grass_texture.tga
     #quad/quad_texture.tga
     )
 copy_files_once(${TEXTURES})

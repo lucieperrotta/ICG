@@ -45,7 +45,7 @@ float ridged_fBm(vec2 point, float H, float lacunarity, int octaves, float gain)
 
 float perlin(vec2 uv){
     // Grid size in squares
-    float N = 2.;
+    float N = 4.;
 
     // Coordinates definitions
     vec2 checker_coord = uv*N; // Global big checkerboord coordinates

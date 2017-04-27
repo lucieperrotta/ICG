@@ -19,6 +19,6 @@ void main() {
 
     /// NOTE: you will have to flip the "v" coordinate as framebuffer is upside/down
     vec3 blue = vec3(0.1,0.3,0.8);
-    color = mix(vec3(1,1,1), texture(tex,vec2(_u,_v)).rgb, vec3(1));
+    color = mix(vec3(0,0,1), texture(tex,vec2(_u,_v)).rgb, vec3(0.3));
 
 }
