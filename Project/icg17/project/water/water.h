@@ -105,6 +105,7 @@ public:
 
         // load texture
         {
+
             reflection_texture_id_ = framebuffer_texture_id_;
 
             GLuint tex_id = glGetUniformLocation(program_id_, "tex");
@@ -152,6 +153,10 @@ public:
         glUseProgram(program_id_);
         glBindVertexArray(vertex_array_id_);
 
+        // transparency
+        glEnable(GL_BLEND);
+        glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+
         // bind textures
         glActiveTexture(GL_TEXTURE0);
         glBindTexture(GL_TEXTURE_2D, reflection_texture_id_);
@@ -176,5 +181,8 @@ public:
 
         glBindVertexArray(0);
         glUseProgram(0);
+
+        //end transparency
+        glDisable(GL_BLEND);
     }
 };

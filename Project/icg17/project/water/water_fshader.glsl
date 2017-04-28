@@ -3,7 +3,7 @@ uniform sampler2D tex;
 
 in vec2 uv;
 
-out vec3 color;
+out vec4 color;
 
 void main() {
 
@@ -18,7 +18,6 @@ void main() {
     float _v = 1 - gl_FragCoord.y/window_height;
 
     /// NOTE: you will have to flip the "v" coordinate as framebuffer is upside/down
-    vec3 blue = vec3(0.1,0.3,0.8);
-    color = mix(vec3(0,0,1), texture(tex,vec2(_u,_v)).rgb, vec3(0.3));
-
+    vec4 blue = vec4(27./255., 41./255., 92./255., 0.8);
+    color = mix(blue, texture(tex,vec2(_u,_v)).rrra, vec4(0.1));
 }

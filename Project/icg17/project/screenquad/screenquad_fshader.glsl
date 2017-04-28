@@ -9,7 +9,7 @@ uniform float tex_height;
 
 // Functions headers
 float ridged_fBm(vec2 point, float H, float lacunarity, int octaves, float gain, float offset);
-float fBm(vec2 point, float H, float lacunarity, int octaves, float gain);
+float fBm(vec2 point, float H, float lacunarity, int octaves, float gain, float offset);
 float perlin(vec2 uv);
 vec2 hash(vec2 p);
 float smooth_interpolation(float t);
@@ -17,13 +17,20 @@ float mix(float x, float y, float alpha);
 float HybridMultifractal(vec2 point, float H, float lacunarity,
                          float octaves, float offset);
 
+void main() {
 
-float fBm(vec2 point, float H, float lacunarity, int octaves, float gain){
+    color=vec3(ridged_fBm(uv, 1.2, 1.8, 10, 1, 0.02));
+    //color=vec3(fBm(uv, 1.2, 1.8, 10, 1, 0.02));
+    //color = vec3(HybridMultifractal(uv, 0.1, 3.7, 2.0, 0.));
+}
+
+
+float fBm(vec2 point, float H, float lacunarity, int octaves, float gain, float offset){
     float value = 0.0;
     /* inner loop of fractal construction */
     for (int i = 0; i < octaves; i++) {
         value += gain * perlin(point) * pow(lacunarity, -H*i);
-        //value += perlin(point) * 0.7;
+        value -= offset;
         point *= lacunarity;
     }
     return value;
@@ -34,7 +41,7 @@ float ridged_fBm(vec2 point, float H, float lacunarity, int octaves, float gain,
     float value = 0.0;
     /* inner loop of fractal construction */
     for (int i = 0; i < octaves; i++) {
-        value += gain * 1.0 - abs(perlin(point))* pow(lacunarity, -H*i);
+        value += gain * (1.0 - abs(perlin(point)))* pow(lacunarity, -H*i);
         value-=offset;
         point *= lacunarity;
     }
@@ -151,12 +158,6 @@ float mix(float x, float y, float alpha){
     return (1-alpha)*x + alpha*y;
 }
 
-void main() {
-
-    color=vec3(fBm(uv, 1.9, 1, 5, 0.6, 0.4));
-    //color=vec3(ridged_fBm(uv, 1.2, 1.8, 100, 1));
-    //color = vec3(HybridMultifractal(uv, 0.1, 3.7, 2.0, 0.));
-}
 
 
 /* ULTIMATE DEBUG TECHNIQUE

@@ -38,14 +38,10 @@ void main() {
     //float forest_level = 0.75;
     float mountains_level = 0.8;
 
-    if(lake_height <= lake_level) {
-        // Lake level
-        color = vec3(0./255., 90/255., 170./255.);
-    } else {
         // Forest & snow level
        color = texture(tex_grass, uv).xyz;
         //color = texture(tex_coloring, norm_height).rgb;
-    }
+
 
     // PHONG SHADING
     //color=vec3(0);

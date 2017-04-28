@@ -24,7 +24,7 @@ void main() {
     // height goes from 0.55 -> 0.85
 
     // to have flat lakes
-    lake_height = max(height.x, 0.7);
+    lake_height = height.x;
 
     vec3 pos_3d = 1.5*vec3(position.x, lake_height, -position.y);
     gl_Position =  projection*MV * vec4(pos_3d, 1.0);
