@@ -134,10 +134,10 @@ static const glm::vec2 CubeUVs[] =
 class Sky {
 
 private:
-    GLuint vertex_array_id_;        // vertex array object
+    GLuint vertex_array_id_sky;        // vertex array object
     GLuint program_id_;             // GLSL shader program ID
     GLuint vertex_buffer_object_;   // memory buffer
-    GLuint texture_id_;             // texture ID
+    GLuint texture_id_sky;             // texture ID
 
 public:
     void Init() {
@@ -151,8 +151,8 @@ public:
         glUseProgram(program_id_);
 
         // vertex one vertex array
-        glGenVertexArrays(1, &vertex_array_id_);
-        glBindVertexArray(vertex_array_id_);
+        glGenVertexArrays(1, &vertex_array_id_sky);
+        glBindVertexArray(vertex_array_id_sky);
 
         // vertex coordinates
         {
@@ -199,8 +199,8 @@ public:
                 throw(std::string("Failed to load texture"));
             }
 
-            glGenTextures(1, &texture_id_);
-            glBindTexture(GL_TEXTURE_2D, texture_id_);
+            glGenTextures(1, &texture_id_sky);
+            glBindTexture(GL_TEXTURE_2D, texture_id_sky);
             glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
             glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
             glTexParameteri (GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
@@ -214,7 +214,7 @@ public:
                              GL_RGBA, GL_UNSIGNED_BYTE, image);
             }
 
-            GLuint tex_id = glGetUniformLocation(program_id_, "tex");
+            GLuint tex_id = glGetUniformLocation(program_id_, "tex_sky");
             glUniform1i(tex_id, 0 /*GL_TEXTURE0*/);
 
             // cleanup
@@ -233,27 +233,28 @@ public:
         glUseProgram(0);
         glDeleteBuffers(1, &vertex_buffer_object_);
         glDeleteProgram(program_id_);
-        glDeleteVertexArrays(1, &vertex_array_id_);
-        glDeleteTextures(1, &texture_id_);
+        glDeleteVertexArrays(1, &vertex_array_id_sky);
+        glDeleteTextures(1, &texture_id_sky);
     }
 
-    void Draw(const glm::mat4& model,
+    void Draw(float time,
+              const glm::mat4& model,
               const glm::mat4& view,
               const glm::mat4& projection) {
         glUseProgram(program_id_);
-        glBindVertexArray(vertex_array_id_);
+        glBindVertexArray(vertex_array_id_sky);
 
         // bind textures
         glActiveTexture(GL_TEXTURE0);
-        glBindTexture(GL_TEXTURE_2D, texture_id_);
+        glBindTexture(GL_TEXTURE_2D, texture_id_sky);
 
         // time
-        glUniform1f(glGetUniformLocation(program_id_, "time"), glfwGetTime());
+        glUniform1f(glGetUniformLocation(program_id_, "time"), time);
 
         // setup MVP
         glm::mat4 MVP = projection * view * model;
         GLuint MVP_id = glGetUniformLocation(program_id_, "MVP");
-        glUniformMatrix4fv(MVP_id, 1, GL_FALSE, value_ptr(MVP));
+        glUniformMatrix4fv(MVP_id, 1, GL_FALSE, glm::value_ptr(MVP));
 
         // draw (notice the difference between this draw call and the one in
         //       the other version of the cube, where we have indices and we

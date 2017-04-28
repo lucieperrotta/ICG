@@ -61,7 +61,7 @@ private:
     GLuint vertex_buffer_object_index_;     // memory buffer for indices
     GLuint program_id_;                     // GLSL shader program ID
 
-    GLuint texture_id_;                     // texture ID
+    GLuint texture_id_grid;                     // texture ID
     GLuint tex_coloring_;                  // texture for coloring
 
     GLuint tex_sand_;                        // texture of the sand
@@ -155,12 +155,12 @@ private:
         int nb_component;
         string filename;
 
-        glGenTextures(1, &texture_id_);
-        glBindTexture(GL_TEXTURE_2D, texture_id_);
+        glGenTextures(1, &texture_id_grid);
+        glBindTexture(GL_TEXTURE_2D, texture_id_grid);
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
 
-        GLuint tex_id = glGetUniformLocation(program_id_, "tex");
+        GLuint tex_id = glGetUniformLocation(program_id_, "tex_grid");
         glUniform1i(tex_id, 0 /*GL_TEXTURE0*/);
 
         // cleanup
@@ -313,7 +313,7 @@ private:
     }
 
 public:
-    void Init(GLuint framebuffer_texture_id_) {
+    void Init(GLuint framebuffer_texture_id_grid) {
         // compile the shaders.
         program_id_ = icg_helper::LoadShaders("grid_vshader.glsl",
                                               "grid_fshader.glsl");

@@ -3,7 +3,7 @@ uniform mat4 projection;
 uniform mat4 model;
 uniform mat4 view;
 uniform float time;
-uniform sampler2D tex;
+uniform sampler2D tex_grid;
 
 in vec2 position;
 
@@ -20,7 +20,7 @@ void main() {
     MV = view * model;
 
     // use the texture to obtain z axis
-    vec4 height = texture(tex, uv);
+    vec4 height = texture(tex_grid, uv);
     // height goes from 0.55 -> 0.85
 
     // to have flat lakes

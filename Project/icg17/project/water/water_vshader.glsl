@@ -3,7 +3,7 @@ uniform mat4 projection;
 uniform mat4 model;
 uniform mat4 view;
 uniform float time;
-uniform sampler2D tex;
+uniform sampler2D tex_water;
 
 in vec2 position;
 

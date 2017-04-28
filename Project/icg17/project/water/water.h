@@ -108,7 +108,7 @@ public:
 
             reflection_texture_id_ = framebuffer_texture_id_;
 
-            GLuint tex_id = glGetUniformLocation(program_id_, "tex");
+            GLuint tex_id = glGetUniformLocation(program_id_, "tex_water");
             glUniform1i(tex_id, 0 /*GL_TEXTURE0*/);
 
             // cleanup
