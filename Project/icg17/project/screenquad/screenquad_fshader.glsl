@@ -8,18 +8,15 @@ uniform float tex_width;
 uniform float tex_height;
 
 // Functions headers
-float ridged_fBm(vec2 point, float H, float lacunarity, int octaves, float gain);
+float ridged_fBm(vec2 point, float H, float lacunarity, int octaves, float gain, float offset);
 float fBm(vec2 point, float H, float lacunarity, int octaves, float gain);
 float perlin(vec2 uv);
 vec2 hash(vec2 p);
 float smooth_interpolation(float t);
 float mix(float x, float y, float alpha);
+float HybridMultifractal(vec2 point, float H, float lacunarity,
+                         float octaves, float offset);
 
-void main() {
-
-    color=vec3(fBm(uv, 0.9, 1.8, 20, 0.6)+0.05);
-    //color=vec3(ridged_fBm(uv, 1.2, 1.8, 100, 1));
-}
 
 float fBm(vec2 point, float H, float lacunarity, int octaves, float gain){
     float value = 0.0;
@@ -32,16 +29,69 @@ float fBm(vec2 point, float H, float lacunarity, int octaves, float gain){
     return value;
 }
 
-float ridged_fBm(vec2 point, float H, float lacunarity, int octaves, float gain){
+
+float ridged_fBm(vec2 point, float H, float lacunarity, int octaves, float gain, float offset){
     float value = 0.0;
     /* inner loop of fractal construction */
     for (int i = 0; i < octaves; i++) {
-        value += gain * (1.0 - abs(perlin(point))) * pow(lacunarity, -H*i);
-        //value += perlin(point) * 0.7;
+        value += gain * 1.0 - abs(perlin(point))* pow(lacunarity, -H*i);
+        value-=offset;
         point *= lacunarity;
     }
     return value;
 }
+
+float HybridMultifractal(vec2 point, float H, float lacunarity,
+                         float octaves, float offset){
+    float frequency, result, signal, weight, remainder;
+    int i;
+    bool first = true;
+    float exponent_array[10]; //octaves_max = 10;
+
+    /* precompute and store spectral weights */
+    if (first) {
+        /* seize required memory for exponent_array */
+        frequency = 1.0;
+        for (i = 0; i<octaves; i++) {
+            /* compute weight for each frequency */
+            exponent_array[i] = pow(frequency, -H);
+            frequency *= lacunarity;
+        }
+        first = false;
+    }
+
+    /* get first octave of function */
+    result = (perlin(point) + offset) * exponent_array[0];
+    weight = result;
+
+    /* increase frequency */
+    point[0] = point[0] * lacunarity;
+    point[1] = point[1] * lacunarity;
+
+    /* spectral construction inner loop, where the fractal is built */
+    for (i = 1; i<octaves; i++) {
+        /* prevent divergence */
+        if (weight > 1.0) weight = 1.0;
+        /* get next higher frequency */
+        signal = (perlin(point) + offset) * exponent_array[i];
+        /* add it in, weighted by previous freq's local value */
+        result += weight * signal;
+        /* update the (monotonically decreasing) weighting value */
+        /* (this is why H must specify a high fractal dimension) */
+        weight *= signal;
+        /* increase frequency */
+        point[0] = point[0] * lacunarity;
+        point[1] = point[1] * lacunarity;
+    }
+
+    /* take care of remainder in “octaves” */
+    remainder = octaves - int(octaves);
+    if (remainder != 0)
+        /* “i” and spatial freq. are preset in loop above */
+        result += remainder * perlin(point) * exponent_array[i];
+    return(result);
+}
+
 
 float perlin(vec2 uv){
     // Grid size in squares
@@ -100,6 +150,14 @@ float smooth_interpolation(float t){
 float mix(float x, float y, float alpha){
     return (1-alpha)*x + alpha*y;
 }
+
+void main() {
+
+    color=vec3(fBm(uv, 1.9, 1, 5, 0.6, 0.4));
+    //color=vec3(ridged_fBm(uv, 1.2, 1.8, 100, 1));
+    //color = vec3(HybridMultifractal(uv, 0.1, 3.7, 2.0, 0.));
+}
+
 
 /* ULTIMATE DEBUG TECHNIQUE
 if (bl_diff.x < -1.0 || bl_diff.y < -1.0 || bl_diff.x > 1.0 || bl_diff.y > 1.0 ) {
