@@ -10,20 +10,19 @@ uniform float tex_height;
 // Functions headers
 float ridged_fBm(vec2 point, float H, float lacunarity, int octaves, float gain, float offset);
 float fBm(vec2 point, float H, float lacunarity, int octaves, float gain, float offset);
+float HybridMultifractal(vec2 point, float H, float lacunarity, float octaves, float offset);
+
 float perlin(vec2 uv);
+float simplex(vec2 uv);
+
 vec2 hash(vec2 p);
 float smooth_interpolation(float t);
 float mix(float x, float y, float alpha);
-float HybridMultifractal(vec2 point, float H, float lacunarity,
-                         float octaves, float offset);
 
 void main() {
-
-    color=vec3(ridged_fBm(uv, 1.2, 1.8, 10, 1, 0.02));
-    //color=vec3(fBm(uv, 1.2, 1.8, 10, 1, 0.02));
+    color=vec3(ridged_fBm(uv, 1.5, 1.5, 10, 0.5, 0.0));
     //color = vec3(HybridMultifractal(uv, 0.1, 3.7, 2.0, 0.));
 }
-
 
 float fBm(vec2 point, float H, float lacunarity, int octaves, float gain, float offset){
     float value = 0.0;
@@ -36,20 +35,18 @@ float fBm(vec2 point, float H, float lacunarity, int octaves, float gain, float 
     return value;
 }
 
-
 float ridged_fBm(vec2 point, float H, float lacunarity, int octaves, float gain, float offset){
     float value = 0.0;
     /* inner loop of fractal construction */
     for (int i = 0; i < octaves; i++) {
-        value += gain * (1.0 - abs(perlin(point)))* pow(lacunarity, -H*i);
+        value += gain * (1.0 - abs(simplex(point)))* pow(lacunarity, -H*i);
         value-=offset;
         point *= lacunarity;
     }
     return value;
 }
 
-float HybridMultifractal(vec2 point, float H, float lacunarity,
-                         float octaves, float offset){
+float HybridMultifractal(vec2 point, float H, float lacunarity, float octaves, float offset){
     float frequency, result, signal, weight, remainder;
     int i;
     bool first = true;
@@ -99,6 +96,71 @@ float HybridMultifractal(vec2 point, float H, float lacunarity,
     return(result);
 }
 
+// Inspired by Ashima
+float simplex(vec2 uv){
+
+    // Corner 1
+    vec2 x0 = floor(uv + (uv.x+uv.y)*(0.5*(sqrt(3.0)-1.0)));
+    vec2 p0 = uv - x0 + (x0.x+x0.y)*0.211324865f; // 0.211324865f = (3 - sqrt(3)) / 6
+
+    // Corner 2
+    vec2 x1;
+    if (p0.x > p0.y){ // determine if x1 is in lower or upper simplex
+        x1= vec2(1.0, 0.0); // lower
+    }else{
+        x1 =vec2(0.0, 1.0); // upper
+    };
+    vec2 p1 = p0 + 0.211324865f - x1; // 0.211324865f = (3 - sqrt(3)) / 6
+
+    // Corner 3
+    vec2 p2 = p0 -1.0 + 2.0 * 0.211324865f; // 0.211324865f = (3 - sqrt(3)) / 6
+
+    // Offset
+    x0 = x0 - floor(x0 * (1.0 / 289.0)) * 289.0; // mod 289
+    vec3 offset = x0.y + vec3(0.0, x1.y, 1.0 );
+
+    // First iteration
+    offset = ((offset*34.0)+1.0)*offset;
+    offset = offset - floor(offset * (1.0 / 289.0)) * 289.0;
+
+    offset = offset + x0.x + vec3(0.0, x1.x, 1.0 );
+
+    // Second iteration
+    offset = ((offset*34.0)+1.0)*offset;
+    offset = offset - floor(offset * (1.0 / 289.0)) * 289.0;
+
+    // p0 is computed independently
+    float fr0 = 2.0 * fract(offset.x * 1./41.) - 1.0;
+    float p0y = abs(fr0) - 0.5;
+    float p0x = fr0 - floor(fr0 + 0.5);
+
+    float f0 = p0x  * p0.x  +p0y  * p0.y;
+
+    // p1 and p2 are computed together
+    float fr1 = 2.0 * fract(offset.y * 1./41.) - 1.0;
+    float p1y = abs(fr1) - 0.5;
+    float p1x = fr1 - floor(fr1 + 0.5);
+
+    float fr2 = 2.0 * fract(offset.z * 1./41.) - 1.0;
+    float p2y = abs(fr2) - 0.5;
+    float p2x = fr2 - floor(fr2 + 0.5);
+
+    float f1 = (vec2(p1x, p2x) * vec2(p1.x, p2.x) + vec2(p1y, p2y) * vec2(p1.y, p2.y)).x;
+    float f2 = (vec2(p1x, p2x) * vec2(p1.x, p2.x) + vec2(p1y, p2y) * vec2(p1.y, p2.y)).y;
+
+    // Contributions of all 3 corners
+    vec3 final = vec3(dot(p0,p0), dot(p1,p1), dot(p2,p2));
+    final = 0.5 - final;
+
+    int FLATNESS = 2;
+    for(int i=0; i<FLATNESS; ++i){
+        final *= final;
+    }
+    final *= 1.7928429140015f - 0.8537347209531f * ( vec3(p0x, p1x, p2x)*vec3(p0x, p1x, p2x) + vec3(p0y, p1y, p2y)*vec3(p0y, p1y, p2y) ); // Numerical approximation of inverse sqrt by Stefan Gustavson
+
+    // Noise is between 0 and 1/130 and we want it between 0 and 1
+    return 130.0 * dot(final, vec3(f0, f1, f2));
+}
 
 float perlin(vec2 uv){
     // Grid size in squares
