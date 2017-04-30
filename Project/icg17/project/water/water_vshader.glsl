@@ -17,7 +17,7 @@ void main() {
     // (position + vec2(1.0, 1.0)) * 0.5;
     uv = position;
 
-    float height = 0.71;
+    float height = 0.55;
 
     // model view matrix -> used for perspective and stuff like this
     MV = view * model;
