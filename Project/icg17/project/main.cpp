@@ -17,6 +17,7 @@
 #include "displaytexture/displaytexture.h"
 
 #include "trackball.h"
+#include "keyboard.h"
 
 int window_width = 800;
 int window_height = 600;
@@ -41,6 +42,23 @@ mat4 view_matrix;
 mat4 quad_model_matrix;
 mat4 trackball_matrix;
 mat4 old_trackball_matrix;
+
+vec3 cam_pos = vec3(2.0f, 2.0f, 2.0f);
+vec3 cam_look = vec3(0.0f, 0.0f, 0.0f);
+vec3 cam_up = vec3(0.0f, 1.0f, 0.0f);
+
+
+void setMVPmatrices() {
+    // setup view and projection matrices
+    view_matrix = lookAt(cam_pos, cam_look, cam_up);
+    float ratio = window_width / (float) window_height;
+    projection_matrix = perspective(45.0f, ratio, 0.1f, 10.0f);
+
+    // create the model matrix (remember OpenGL is right handed)
+    // accumulated transformation
+    quad_model_matrix = translate(mat4(1.0f), vec3(0.0f, -0.25f, 0.0f));
+    trackball_matrix = IDENTITY_MATRIX;
+}
 
 mat4 PerspectiveProjection(float fovy, float aspect, float near, float far) {
     // TODO 1: Create a perspective projection matrix given the field of view,
@@ -68,19 +86,6 @@ void Init(GLFWwindow* window) {
     glClearColor(1,1, 1, 1.0 /*solid*/);
     glEnable(GL_DEPTH_TEST);
 
-    // setup view and projection matrices
-    vec3 cam_pos(2.0f, 2.0f, 2.0f);
-    vec3 cam_look(0.0f, 0.0f, 0.0f);
-    vec3 cam_up(0.0f, 1.0f, 0.0f);
-    view_matrix = lookAt(cam_pos, cam_look, cam_up);
-    float ratio = window_width / (float) window_height;
-    projection_matrix = perspective(45.0f, ratio, 0.1f, 10.0f);
-
-    // create the model matrix (remember OpenGL is right handed)
-    // accumulated transformation
-    quad_model_matrix = translate(mat4(1.0f), vec3(0.0f, -0.25f, 0.0f));
-    trackball_matrix = IDENTITY_MATRIX;
-
     // on retina/hidpi displays, pixels != screen coordinates
     // this unsures that the framebuffer has the same size as the window
     // (see http://www.glfw.org/docs/latest/window.html#window_fbsize)
@@ -96,8 +101,8 @@ void Init(GLFWwindow* window) {
 
     sky.Init();
 
-   //displayTexture1.Init(framebuffer_texture_id, 0);
-   // displayTexture2.Init(water_texture_id, 0.5f);
+   displayTexture1.Init(framebuffer_texture_id, 0);
+   displayTexture2.Init(water_texture_id, 0.5f);
 
 }
 
@@ -106,6 +111,8 @@ void Display() {
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
     double time = 0;  //glfwGetTime();
+
+    setMVPmatrices();
 
     // render to framebuffer
     framebuffer.Bind();
@@ -123,14 +130,14 @@ void Display() {
     }
     waterFramebuffer.Unbind();
 
-    //displayTexture1.Draw();
-    //displayTexture2.Draw();
+    displayTexture1.Draw();
+    displayTexture2.Draw();
 
     // render to Window
     glViewport(0, 0, window_width, window_height);
 
     sky.Draw(time, quad_model_matrix, trackball_matrix*view_matrix, projection_matrix);
-    grid.Draw(time, quad_model_matrix, trackball_matrix*view_matrix, projection_matrix);
+    grid.Draw(time, quad_model_matrix, trackball_matrix*view_matrix, projection_matrix, 1);
     water.Draw(time, quad_model_matrix, trackball_matrix*view_matrix, projection_matrix);
 
 }
@@ -223,8 +230,30 @@ void ErrorCallback(int error, const char* description) {
 }
 
 void KeyCallback(GLFWwindow* window, int key, int scancode, int action, int mods) {
+    // escape to close window
     if (key == GLFW_KEY_ESCAPE && action == GLFW_PRESS) {
         glfwSetWindowShouldClose(window, GL_TRUE);
+    }
+    // only act on release
+    if(action != GLFW_RELEASE) {
+        return;
+    }
+
+    switch(key) {
+    case GLFW_KEY_LEFT:
+        cam_pos += vec3(0,0,0.5);
+        break;
+    case GLFW_KEY_RIGHT:
+        cam_pos -= vec3(0,0,0.5);
+        break;
+    case GLFW_KEY_DOWN:
+        cam_pos -= vec3(0,0.5,0);
+        break;
+    case GLFW_KEY_UP:
+        cam_pos += vec3(0,0.5,0);
+        break;
+    default:
+        break;
     }
 }
 
@@ -257,7 +286,7 @@ int main(int argc, char *argv[]) {
     // makes the OpenGL context of window current on the calling thread
     glfwMakeContextCurrent(window);
 
-    // set the callback for escape key
+    // keyboard controls
     glfwSetKeyCallback(window, KeyCallback);
 
     // set the framebuffer resize callback
@@ -298,8 +327,8 @@ int main(int argc, char *argv[]) {
     screenquad.Cleanup();
     water.Cleanup();
     sky.Cleanup();
-    //displayTexture1.Cleanup();
-    //displayTexture2.Cleanup();
+    displayTexture1.Cleanup();
+    displayTexture2.Cleanup();
 
     // close OpenGL window and terminate GLFW
     glfwDestroyWindow(window);

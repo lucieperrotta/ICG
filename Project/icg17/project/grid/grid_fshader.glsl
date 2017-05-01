@@ -23,24 +23,68 @@ out vec3 color;
 
 void main() {
     // height normalization from 0 to 1 (lake_height is from 0.55 to 0.85)
-    float norm_height = (lake_height - 0.71)/0.6;
-
-    // initialize RGB colors
-    vec3 yellow = vec3(1.0, 1.0, 0.0);
-    vec3 green = vec3(0.0, 1.0, 0.0);
-    vec3 grey = vec3(0.0);
-
-    mat3 table = mat3(yellow, green, grey);
+    float norm_height = (lake_height - 0.55)/(0.85 - 0.55);
 
     // initialize height limits (lake, forest and mountains)
     // the values can be changed here
-    float lake_level = 0.7;
-    //float forest_level = 0.75;
-    float mountains_level = 0.8;
+    float sand_level = 0.;
+    float grass_level = 0.4;
+    float mountains_level = 0.6;
 
-        // Forest & snow level
-       color = texture(tex_rock, uv).xyz; // CHANGED
-        //color = texture(tex_coloring, norm_height).rgb;
+    // Initalize the texture vectors and the blending factor
+    vec4 t1 = vec4(0.0);
+    vec4 t2 = vec4(0.0);
+    float blend_factor = 0.0;
+
+    if(norm_height <= sand_level) {
+        // Sand & Lake level
+        /*t1 = texture(tex_sand, uv);
+        t2 = texture(tex_grass, uv);
+
+        // Compute the blend factor which depends on the height
+        blend_factor = (norm_height - sand_level)/(grass_level - sand_level);
+
+        // Equivalent to color = (t1*(1-grass_height) + t2*grass_height).xyz;
+        color = mix(t1, t2, blend_factor).xyz;*/
+        //printf(norm_height);
+        color = texture(tex_sand, uv).xyz;
+    } else if(norm_height <= grass_level) {
+        // Grass & Forest level
+        t1 = texture(tex_sand, uv);
+        t2 = texture(tex_grass, uv);
+
+        // Compute the blend factor which depends on the height
+        blend_factor = (norm_height - sand_level)/(grass_level - sand_level);
+
+        // Equivalent to color = (t1*(1-grass_height) + t2*grass_height).xyz;
+        color = mix(t1, t2, blend_factor).xyz;
+    } else if(norm_height <= mountains_level) {
+        // Rock & Mountains Level
+        t1 = texture(tex_grass, uv);
+        t2 = texture(tex_rock, uv);
+
+        // Compute
+        blend_factor = (norm_height - grass_level)/(mountains_level - grass_level);
+
+        color = mix(t1, t2, blend_factor).xyz;
+    } else {
+        // Snow of moutains level
+        t1 = texture(tex_rock, uv);
+        t2 = texture(tex_snow, uv);
+
+        // Compute
+        float snow_height = (norm_height - mountains_level)/(1.0 - mountains_level);
+
+        color = mix(t1, t2, snow_height).xyz;
+    }
+
+    //color = mix();
+
+
+    // Forest & snow level
+    //color = texture(tex_grass, uv).xyz; // CHANGED
+    //color = texture(tex_coloring, norm_height).rgb;
+
 
 
     // PHONG SHADING
@@ -71,7 +115,7 @@ void main() {
 
     if(lambert > 0.0) {
 
-       // diffuse term
+        // diffuse term
         vec3 diffuse = Ld*kd*lambert;
         color += diffuse;
 
