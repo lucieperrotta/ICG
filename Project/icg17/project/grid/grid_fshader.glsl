@@ -39,7 +39,7 @@ void main() {
     float mountains_level = 0.8;
 
         // Forest & snow level
-       color = texture(tex_grass, uv).xyz;
+       color = texture(tex_rock, uv).xyz; // CHANGED
         //color = texture(tex_coloring, norm_height).rgb;
 
 

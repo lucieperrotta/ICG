@@ -23,6 +23,7 @@ file(GLOB SHADERS
     water/*.glsl
     #quad/*.glsl
     screenquad/*.glsl
+    displaytexture/*.glsl
     grid/*.glsl
         )
 deploy_shaders_to_build_dir(${SHADERS})

@@ -13,6 +13,9 @@
 #include "water/water.h"
 #include "sky/sky.h"
 
+
+#include "displaytexture/displaytexture.h"
+
 #include "trackball.h"
 
 int window_width = 800;
@@ -27,6 +30,9 @@ Sky sky;
 
 Trackball trackball;
 float previousZ = 0.;
+
+DisplayTexture displayTexture1;
+DisplayTexture displayTexture2;
 
 using namespace glm;
 
@@ -81,43 +87,52 @@ void Init(GLFWwindow* window) {
     glfwGetFramebufferSize(window, &window_width, &window_height);
 
     GLuint framebuffer_texture_id = framebuffer.Init(window_width, window_height);
+    GLuint water_texture_id = waterFramebuffer.Init(window_width, window_height);
+
+    water.Init(water_texture_id);
     screenquad.Init(window_width, window_height, framebuffer_texture_id);
     grid.Init(framebuffer_texture_id);
 
-    GLuint water_texture_id = waterFramebuffer.Init(window_width, window_height);
-    water.Init(water_texture_id);
+
     sky.Init();
+
+   //displayTexture1.Init(framebuffer_texture_id, 0);
+   // displayTexture2.Init(water_texture_id, 0.5f);
+
 }
 
 void Display() {
 
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-   double time = 0;  //glfwGetTime();
+    double time = 0;  //glfwGetTime();
 
-   // render to framebuffer
-   framebuffer.Bind();
-   {
-       glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-       screenquad.Draw();
-   }
-   framebuffer.Unbind();
+    // render to framebuffer
+    framebuffer.Bind();
+    {
+        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+        screenquad.Draw();
+    }
+    framebuffer.Unbind();
 
-   // render to framebuffer
-   waterFramebuffer.Bind();
-   {
-       glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-       grid.Draw(time, quad_model_matrix, view_matrix, projection_matrix);
-   }
-   waterFramebuffer.Unbind();
+    // render to framebuffer
+    waterFramebuffer.Bind();
+    {
+        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+        grid.Draw(time, quad_model_matrix, view_matrix, projection_matrix);
+    }
+    waterFramebuffer.Unbind();
+
+    //displayTexture1.Draw();
+    //displayTexture2.Draw();
 
     // render to Window
     glViewport(0, 0, window_width, window_height);
 
-    grid.Draw(time, quad_model_matrix, trackball_matrix*view_matrix, projection_matrix);
     sky.Draw(time, quad_model_matrix, trackball_matrix*view_matrix, projection_matrix);
-    //screenquad.Draw();
+    grid.Draw(time, quad_model_matrix, trackball_matrix*view_matrix, projection_matrix);
     water.Draw(time, quad_model_matrix, trackball_matrix*view_matrix, projection_matrix);
+
 }
 
 
@@ -282,7 +297,9 @@ int main(int argc, char *argv[]) {
     framebuffer.Cleanup();
     screenquad.Cleanup();
     water.Cleanup();
-    //sky.Cleanup();
+    sky.Cleanup();
+    //displayTexture1.Cleanup();
+    //displayTexture2.Cleanup();
 
     // close OpenGL window and terminate GLFW
     glfwDestroyWindow(window);
