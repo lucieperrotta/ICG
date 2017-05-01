@@ -39,8 +39,7 @@ public:
         {
             std::vector<GLfloat> vertices;
             std::vector<GLuint> indices;
-            // TODO 5: make a triangle grid with dimension 100x100.
-            // always two subsequent entries in 'vertices' form a 2D vertex position.
+
             float grid_dim = 1000;
 
             // the given code below are the vertices for a simple quad.
@@ -85,26 +84,22 @@ public:
             // position buffer
             glGenBuffers(1, &vertex_buffer_object_position_);
             glBindBuffer(GL_ARRAY_BUFFER, vertex_buffer_object_position_);
-            glBufferData(GL_ARRAY_BUFFER, vertices.size() * sizeof(GLfloat),
-                         &vertices[0], GL_STATIC_DRAW);
+            glBufferData(GL_ARRAY_BUFFER, vertices.size() * sizeof(GLfloat), &vertices[0], GL_STATIC_DRAW);
 
             // vertex indices
             glGenBuffers(1, &vertex_buffer_object_index_);
             glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, vertex_buffer_object_index_);
-            glBufferData(GL_ELEMENT_ARRAY_BUFFER, indices.size() * sizeof(GLuint),
-                         &indices[0], GL_STATIC_DRAW);
+            glBufferData(GL_ELEMENT_ARRAY_BUFFER, indices.size() * sizeof(GLuint), &indices[0], GL_STATIC_DRAW);
 
             // position shader attribute
             GLuint loc_position = glGetAttribLocation(program_id_, "position");
             glEnableVertexAttribArray(loc_position);
-            glVertexAttribPointer(loc_position, 2, GL_FLOAT, DONT_NORMALIZE,
-                                  ZERO_STRIDE, ZERO_BUFFER_OFFSET);
+            glVertexAttribPointer(loc_position, 2, GL_FLOAT, DONT_NORMALIZE, ZERO_STRIDE, ZERO_BUFFER_OFFSET);
 
         }
 
         // load texture
         {
-
             reflection_texture_id_ = framebuffer_texture_id_;
 
             // cleanup
@@ -130,8 +125,7 @@ public:
         glDeleteTextures(1, &reflection_texture_id_);
     }
 
-    void Draw(float time, const glm::mat4 &model = IDENTITY_MATRIX,
-              const glm::mat4 &view = IDENTITY_MATRIX,
+    void Draw(float time, const glm::mat4 &model = IDENTITY_MATRIX, const glm::mat4 &view = IDENTITY_MATRIX,
               const glm::mat4 &projection = IDENTITY_MATRIX) {
         glUseProgram(program_id_);
         glBindVertexArray(vertex_array_id_);
@@ -147,7 +141,6 @@ public:
             GLuint tex_id = glGetUniformLocation(program_id_, "tex_water");
             glUniform1i(tex_id, 20 /*GL_TEXTURE0*/);
 
-
             glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
             glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
             glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
@@ -162,14 +155,11 @@ public:
         GLint projection_id = glGetUniformLocation(program_id_, "projection");
         glUniformMatrix4fv(projection_id, ONE, DONT_TRANSPOSE, glm::value_ptr(projection));
 
-
         // pass the current time stamp to the shader.
         glUniform1f(glGetUniformLocation(program_id_, "time"), time);
 
         // draw
-        // You can do that by uncommenting the next line.
         //glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
-        // might have to change GL_TRIANGLE_STRIP to GL_TRIANGLES.
         glDrawElements(GL_TRIANGLE_STRIP, num_indices_, GL_UNSIGNED_INT, 0);
 
         glBindVertexArray(0);

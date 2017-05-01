@@ -14,8 +14,7 @@ class DisplayTexture {
         void Init(GLuint texture_id, float delay_y) {
 
             // compile the shaders
-            program_id_ = icg_helper::LoadShaders("displaytexture_vshader.glsl",
-                                                  "displaytexture_fshader.glsl");
+            program_id_ = icg_helper::LoadShaders("displaytexture_vshader.glsl", "displaytexture_fshader.glsl");
             if(!program_id_) {
                 exit(EXIT_FAILURE);
             }
@@ -40,8 +39,7 @@ class DisplayTexture {
                 // attribute
                 GLuint vertex_point_id = glGetAttribLocation(program_id_, "vpoint");
                 glEnableVertexAttribArray(vertex_point_id);
-                glVertexAttribPointer(vertex_point_id, 3, GL_FLOAT, DONT_NORMALIZE,
-                                      ZERO_STRIDE, ZERO_BUFFER_OFFSET);
+                glVertexAttribPointer(vertex_point_id, 3, GL_FLOAT, DONT_NORMALIZE, ZERO_STRIDE, ZERO_BUFFER_OFFSET);
             }
 
             // texture coordinates
@@ -54,16 +52,12 @@ class DisplayTexture {
                 // buffer
                 glGenBuffers(1, &vertex_buffer_object_);
                 glBindBuffer(GL_ARRAY_BUFFER, vertex_buffer_object_);
-                glBufferData(GL_ARRAY_BUFFER, sizeof(vertex_texture_coordinates),
-                             vertex_texture_coordinates, GL_STATIC_DRAW);
+                glBufferData(GL_ARRAY_BUFFER, sizeof(vertex_texture_coordinates), vertex_texture_coordinates, GL_STATIC_DRAW);
 
                 // attribute
-                GLuint vertex_texture_coord_id = glGetAttribLocation(program_id_,
-                                                                     "vtexcoord");
+                GLuint vertex_texture_coord_id = glGetAttribLocation(program_id_, "vtexcoord");
                 glEnableVertexAttribArray(vertex_texture_coord_id);
-                glVertexAttribPointer(vertex_texture_coord_id, 2, GL_FLOAT,
-                                      DONT_NORMALIZE, ZERO_STRIDE,
-                                      ZERO_BUFFER_OFFSET);
+                glVertexAttribPointer(vertex_texture_coord_id, 2, GL_FLOAT, DONT_NORMALIZE, ZERO_STRIDE, ZERO_BUFFER_OFFSET);
             }
 
             // texture
@@ -99,7 +93,6 @@ class DisplayTexture {
             // bind textures
             //glActiveTexture(GL_TEXTURE0);
             glBindTexture(GL_TEXTURE_2D, texture_id_);
-
 
             // draw
             glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);

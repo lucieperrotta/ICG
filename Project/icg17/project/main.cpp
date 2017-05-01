@@ -78,7 +78,7 @@ mat4 PerspectiveProjection(float fovy, float aspect, float near, float far) {
 
 void Init(GLFWwindow* window) {
     // sets background color
-    glClearColor(1,1, 1, 1.0 /*solid*/);
+    glClearColor(1,1, 1, 1.0);
     glEnable(GL_DEPTH_TEST);
 
     // on retina/hidpi displays, pixels != screen coordinates
@@ -217,16 +217,20 @@ void KeyCallback(GLFWwindow* window, int key, int scancode, int action, int mods
 
     switch(key) {
     case GLFW_KEY_LEFT:
-        cam_pos += vec3(0,0,0.5);
+        cam_pos -= vec3(0.5,0,-0.5);
+        cam_look -= vec3(0.5,0,-0.5);
         break;
     case GLFW_KEY_RIGHT:
-        cam_pos -= vec3(0,0,0.5);
+        cam_pos += vec3(0.5,0,-0.5);
+        cam_look += vec3(0.5,0,-0.5);
         break;
     case GLFW_KEY_DOWN:
-        cam_pos -= vec3(0,0.5,0);
+        cam_pos += vec3(0.5,0.0,0.5);
+        cam_look += vec3(0.5,0.0,0.5);
         break;
     case GLFW_KEY_UP:
-        cam_pos += vec3(0,0.5,0);
+        cam_pos -= vec3(0.5,0.0,0.5);
+        cam_look -= vec3(0.5,0.0,0.5);
         break;
     default:
         break;
@@ -243,15 +247,12 @@ int main(int argc, char *argv[]) {
     glfwSetErrorCallback(ErrorCallback);
 
     // hint GLFW that we would like an OpenGL 3 context (at least)
-    // http://www.glfw.org/faq.html#how-do-i-create-an-opengl-30-context
     glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
     glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 2);
     glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE);
     glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
 
     // attempt to open the window: fails if required version unavailable
-    // note some Intel GPUs do not support OpenGL 3.2
-    // note update the driver of your graphic card
     GLFWwindow* window = glfwCreateWindow(window_width, window_height, "framebuffer", NULL, NULL);
     if(!window) {
         glfwTerminate();
@@ -275,7 +276,6 @@ int main(int argc, char *argv[]) {
     glfwSetCursorPosCallback(window, MousePos);
 
     // GLEW Initialization (must have a context)
-    // https://www.opengl.org/wiki/OpenGL_Loading_Library
     glewExperimental = GL_TRUE; // fixes glew error (see above link)
     if(glewInit() != GLEW_NO_ERROR) {
         fprintf( stderr, "Failed to initialize GLEW\n");

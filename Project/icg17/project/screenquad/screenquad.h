@@ -13,16 +13,14 @@ class ScreenQuad {
         float screenquad_height_;
 
     public:
-        void Init(float screenquad_width, float screenquad_height,
-                  GLuint texture) {
+        void Init(float screenquad_width, float screenquad_height, GLuint texture) {
 
             // set screenquad size
             this->screenquad_width_ = screenquad_width;
             this->screenquad_height_ = screenquad_height;
 
             // compile the shaders
-            program_id_ = icg_helper::LoadShaders("screenquad_vshader.glsl",
-                                                  "screenquad_fshader.glsl");
+            program_id_ = icg_helper::LoadShaders("screenquad_vshader.glsl", "screenquad_fshader.glsl");
             if(!program_id_) {
                 exit(EXIT_FAILURE);
             }
@@ -42,14 +40,12 @@ class ScreenQuad {
                 // buffer
                 glGenBuffers(1, &vertex_buffer_object_);
                 glBindBuffer(GL_ARRAY_BUFFER, vertex_buffer_object_);
-                glBufferData(GL_ARRAY_BUFFER, sizeof(vertex_point),
-                             vertex_point, GL_STATIC_DRAW);
+                glBufferData(GL_ARRAY_BUFFER, sizeof(vertex_point), vertex_point, GL_STATIC_DRAW);
 
                 // attribute
                 GLuint vertex_point_id = glGetAttribLocation(program_id_, "vpoint");
                 glEnableVertexAttribArray(vertex_point_id);
-                glVertexAttribPointer(vertex_point_id, 3, GL_FLOAT, DONT_NORMALIZE,
-                                      ZERO_STRIDE, ZERO_BUFFER_OFFSET);
+                glVertexAttribPointer(vertex_point_id, 3, GL_FLOAT, DONT_NORMALIZE, ZERO_STRIDE, ZERO_BUFFER_OFFSET);
             }
 
             // texture coordinates
@@ -58,19 +54,15 @@ class ScreenQuad {
                                                                /*V2*/ 1.0f, 0.0f,
                                                                /*V3*/ 0.0f, 1.0f,
                                                                /*V4*/ 1.0f, 1.0f};
-
                 // buffer
                 glGenBuffers(1, &vertex_buffer_object_);
                 glBindBuffer(GL_ARRAY_BUFFER, vertex_buffer_object_);
-                glBufferData(GL_ARRAY_BUFFER, sizeof(vertex_texture_coordinates),
-                             vertex_texture_coordinates, GL_STATIC_DRAW);
+                glBufferData(GL_ARRAY_BUFFER, sizeof(vertex_texture_coordinates), vertex_texture_coordinates, GL_STATIC_DRAW);
 
                 // attribute
                 GLuint vertex_texture_coord_id = glGetAttribLocation(program_id_, "vtexcoord");
                 glEnableVertexAttribArray(vertex_texture_coord_id);
-                glVertexAttribPointer(vertex_texture_coord_id, 2, GL_FLOAT,
-                                      DONT_NORMALIZE, ZERO_STRIDE,
-                                      ZERO_BUFFER_OFFSET);
+                glVertexAttribPointer(vertex_texture_coord_id, 2, GL_FLOAT, DONT_NORMALIZE, ZERO_STRIDE, ZERO_BUFFER_OFFSET);
             }
 
             // load/Assign texture
@@ -104,10 +96,8 @@ class ScreenQuad {
             glBindVertexArray(vertex_array_id_);
 
             // window size uniforms
-            glUniform1f(glGetUniformLocation(program_id_, "tex_width"),
-                        this->screenquad_width_);
-            glUniform1f(glGetUniformLocation(program_id_, "tex_height"),
-                        this->screenquad_height_);
+            glUniform1f(glGetUniformLocation(program_id_, "tex_width"), this->screenquad_width_);
+            glUniform1f(glGetUniformLocation(program_id_, "tex_height"), this->screenquad_height_);
 
             // bind texture
             glActiveTexture(GL_TEXTURE0);

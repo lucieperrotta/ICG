@@ -142,8 +142,7 @@ private:
 public:
     void Init() {
         // compile the shaders.
-        program_id_ = icg_helper::LoadShaders("sky_vshader.glsl",
-                                              "sky_fshader.glsl");
+        program_id_ = icg_helper::LoadShaders("sky_vshader.glsl", "sky_fshader.glsl");
         if(!program_id_) {
             exit(EXIT_FAILURE);
         }
@@ -159,14 +158,12 @@ public:
             // buffer
             glGenBuffers(1, &vertex_buffer_object_);
             glBindBuffer(GL_ARRAY_BUFFER, vertex_buffer_object_);
-            glBufferData(GL_ARRAY_BUFFER, NbCubeVertices * sizeof(glm::vec3),
-                         &CubeVertices[0], GL_STATIC_DRAW);
+            glBufferData(GL_ARRAY_BUFFER, NbCubeVertices * sizeof(glm::vec3), &CubeVertices[0], GL_STATIC_DRAW);
 
             // attribute
             GLuint vertex_point_id = glGetAttribLocation(program_id_, "vpoint");
             glEnableVertexAttribArray(vertex_point_id);
-            glVertexAttribPointer(vertex_point_id, 3, GL_FLOAT, DONT_NORMALIZE,
-                                  ZERO_STRIDE, ZERO_BUFFER_OFFSET);
+            glVertexAttribPointer(vertex_point_id, 3, GL_FLOAT, DONT_NORMALIZE, ZERO_STRIDE, ZERO_BUFFER_OFFSET);
         }
 
         // texture coordinates
@@ -174,15 +171,12 @@ public:
             // buffer
             glGenBuffers(1, &vertex_buffer_object_);
             glBindBuffer(GL_ARRAY_BUFFER, vertex_buffer_object_);
-            glBufferData(GL_ARRAY_BUFFER, NbCubeUVs * sizeof(glm::vec2),
-                         &CubeUVs[0], GL_STATIC_DRAW);
+            glBufferData(GL_ARRAY_BUFFER, NbCubeUVs * sizeof(glm::vec2), &CubeUVs[0], GL_STATIC_DRAW);
 
             // attribute
-            GLuint vertex_texture_coord_id = glGetAttribLocation(program_id_,
-                                                                 "vtexcoord");
+            GLuint vertex_texture_coord_id = glGetAttribLocation(program_id_, "vtexcoord");
             glEnableVertexAttribArray(vertex_texture_coord_id);
-            glVertexAttribPointer(vertex_texture_coord_id, 2, GL_FLOAT,
-                                  DONT_NORMALIZE, ZERO_STRIDE, ZERO_BUFFER_OFFSET);
+            glVertexAttribPointer(vertex_texture_coord_id, 2, GL_FLOAT, DONT_NORMALIZE, ZERO_STRIDE, ZERO_BUFFER_OFFSET);
         }
 
         // load texture
@@ -192,8 +186,7 @@ public:
             int nb_component;
             string texture_filename = "sky_texture_2.tga";
             stbi_set_flip_vertically_on_load(1);
-            unsigned char* image = stbi_load(texture_filename.c_str(),
-                                             &width, &height, &nb_component, 0);
+            unsigned char* image = stbi_load(texture_filename.c_str(), &width, &height, &nb_component, 0);
 
             if(image == nullptr) {
                 throw(std::string("Failed to load texture"));
@@ -207,11 +200,9 @@ public:
             glTexParameteri (GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
 
             if(nb_component == 3) {
-                glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0,
-                             GL_RGB, GL_UNSIGNED_BYTE, image);
+                glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, image);
             } else if(nb_component == 4) {
-                glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, width, height, 0,
-                             GL_RGBA, GL_UNSIGNED_BYTE, image);
+                glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, image);
             }
 
             GLuint tex_id = glGetUniformLocation(program_id_, "tex_sky");
@@ -258,8 +249,7 @@ public:
         glUniformMatrix4fv(MVP_id, 1, GL_FALSE, glm::value_ptr(MVP));
 
         // draw (notice the difference between this draw call and the one in
-        //       the other version of the cube, where we have indices and we
-        //       use glDrawElements)
+        // the other version of the cube, where we have indices and we use glDrawElements)
         glDrawArrays(GL_TRIANGLES,0,NbCubeVertices);
 
         glEnable(GL_DEPTH_TEST);
