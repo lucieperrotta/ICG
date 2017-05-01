@@ -35,27 +35,25 @@ DisplayTexture displayTexture2;
 
 using namespace glm;
 
-mat4 projection_matrix;
-mat4 view_matrix;
-mat4 quad_model_matrix;
-mat4 trackball_matrix;
-mat4 old_trackball_matrix;
+float ratio = window_width / (float) window_height;
 
 vec3 cam_pos = vec3(2.0f, 2.0f, 2.0f);
 vec3 cam_look = vec3(0.0f, 0.0f, 0.0f);
 vec3 cam_up = vec3(0.0f, 1.0f, 0.0f);
 
+mat4 projection_matrix;
+mat4 view_matrix;
+mat4 quad_model_matrix = translate(mat4(1.0f), vec3(0.0f, -0.25f, 0.0f));
+mat4 trackball_matrix;
+mat4 old_trackball_matrix;
+
 
 void setMVPmatrices() {
     // setup view and projection matrices
     view_matrix = lookAt(cam_pos, cam_look, cam_up);
-    float ratio = window_width / (float) window_height;
     projection_matrix = perspective(45.0f, ratio, 0.1f, 10.0f);
-
-    // create the model matrix (remember OpenGL is right handed)
-    // accumulated transformation
-    quad_model_matrix = translate(mat4(1.0f), vec3(0.0f, -0.25f, 0.0f));
 }
+
 
 mat4 PerspectiveProjection(float fovy, float aspect, float near, float far) {
     float top = near*tan(fovy/2.f);
@@ -75,6 +73,7 @@ mat4 PerspectiveProjection(float fovy, float aspect, float near, float far) {
 
     return perspective;
 }
+
 
 void Init(GLFWwindow* window) {
     // sets background color
@@ -100,6 +99,7 @@ void Init(GLFWwindow* window) {
 
 }
 
+
 void Display() {
 
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
@@ -108,7 +108,7 @@ void Display() {
 
     setMVPmatrices();
 
-    // render to framebuffer
+    // heightmap for grid
     framebuffer.Bind();
     {
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
@@ -116,7 +116,7 @@ void Display() {
     }
     framebuffer.Unbind();
 
-    // render to framebuffer
+    // water reflection
     waterFramebuffer.Bind();
     {
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
@@ -156,6 +156,7 @@ void MouseButton(GLFWwindow* window, int button, int action, int mod) {
     }
 }
 
+
 void MousePos(GLFWwindow* window, double x, double y) {
     vec2 p = TransformScreenCoords(window, x, y);
     if (glfwGetMouseButton(window, GLFW_MOUSE_BUTTON_LEFT) == GLFW_PRESS) {
@@ -173,6 +174,7 @@ void MousePos(GLFWwindow* window, double x, double y) {
     previousZ = p.y; // for not going infinitely fast
 }
 
+
 // Gets called when the windows/framebuffer is resized.
 void SetupProjection(GLFWwindow* window, int width, int height) {
     window_width = width;
@@ -184,6 +186,7 @@ void SetupProjection(GLFWwindow* window, int width, int height) {
 
     projection_matrix = PerspectiveProjection(45.0f, (GLfloat)window_width / window_height, 0.1f, 100.f);
 }
+
 
 // gets called when the windows/framebuffer is resized.
 void ResizeCallback(GLFWwindow* window, int width, int height) {
@@ -201,9 +204,11 @@ void ResizeCallback(GLFWwindow* window, int width, int height) {
     screenquad.UpdateSize(window_width, window_height);
 }
 
+
 void ErrorCallback(int error, const char* description) {
     fputs(description, stderr);
 }
+
 
 void KeyCallback(GLFWwindow* window, int key, int scancode, int action, int mods) {
     // escape to close window
@@ -215,27 +220,30 @@ void KeyCallback(GLFWwindow* window, int key, int scancode, int action, int mods
         return;
     }
 
+    float delta = 0.03;
+
     switch(key) {
     case GLFW_KEY_LEFT:
-        cam_pos -= vec3(0.5,0,-0.5);
-        cam_look -= vec3(0.5,0,-0.5);
+        cam_pos -= vec3(delta,0,-delta);
+        cam_look -= vec3(delta,0,-delta);
         break;
     case GLFW_KEY_RIGHT:
-        cam_pos += vec3(0.5,0,-0.5);
-        cam_look += vec3(0.5,0,-0.5);
+        cam_pos += vec3(delta,0,-delta);
+        cam_look += vec3(delta,0,-delta);
         break;
     case GLFW_KEY_DOWN:
-        cam_pos += vec3(0.5,0.0,0.5);
-        cam_look += vec3(0.5,0.0,0.5);
+        cam_pos += vec3(delta,0.0,delta);
+        cam_look += vec3(delta,0.0,delta);
         break;
     case GLFW_KEY_UP:
-        cam_pos -= vec3(0.5,0.0,0.5);
-        cam_look -= vec3(0.5,0.0,0.5);
+        cam_pos -= vec3(delta,0.0,delta);
+        cam_look -= vec3(delta,0.0,delta);
         break;
     default:
         break;
     }
 }
+
 
 int main(int argc, char *argv[]) {
     // GLFW Initialization
