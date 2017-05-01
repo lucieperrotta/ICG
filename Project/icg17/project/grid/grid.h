@@ -76,10 +76,10 @@ private:
     void BindShader(GLuint program_id_) {
         // Bind grid texture
         {
-            glActiveTexture(GL_TEXTURE0);
+            glActiveTexture(GL_TEXTURE10);
             glBindTexture(GL_TEXTURE_2D, texture_id_grid);
             GLuint texture_id_grid_ = glGetUniformLocation(program_id_, "tex_grid");
-            glUniform1i(texture_id_grid_, 0 /*GL_TEXTURE0*/);
+            glUniform1i(texture_id_grid_, 10);
 
             glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
             glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
@@ -89,10 +89,10 @@ private:
 
         // Bind sand texture
         {
-            glActiveTexture(GL_TEXTURE1);
+            glActiveTexture(GL_TEXTURE14);
             glBindTexture(GL_TEXTURE_2D, tex_sand_);
             GLuint tex_sand_id = glGetUniformLocation(program_id_, "tex_sand");
-            glUniform1i(tex_sand_id, 1 /*GL_TEXTURE1*/);
+            glUniform1i(tex_sand_id, 14 );
 
             glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
             glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
@@ -105,7 +105,7 @@ private:
             glActiveTexture(GL_TEXTURE11);
             glBindTexture(GL_TEXTURE_2D, tex_grass_);
             GLuint tex_grass_id = glGetUniformLocation(program_id_, "tex_grass");
-            glUniform1i(tex_grass_id, 2 /*GL_TEXTURE2*/);
+            glUniform1i(tex_grass_id, 11);
 
             glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
             glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
@@ -118,7 +118,7 @@ private:
             glActiveTexture(GL_TEXTURE12);
             glBindTexture(GL_TEXTURE_2D, tex_rock_);
             GLuint tex_rock_id = glGetUniformLocation(program_id_, "tex_rock");
-            glUniform1i(tex_rock_id, 3 /*GL_TEXTURE3*/);
+            glUniform1i(tex_rock_id, 12 /*GL_TEXTURE3*/);
 
             glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
             glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
@@ -131,7 +131,7 @@ private:
             glActiveTexture(GL_TEXTURE13);
             glBindTexture(GL_TEXTURE_2D, tex_snow_);
             GLuint tex_snow_id = glGetUniformLocation(program_id_, "tex_snow");
-            glUniform1i(tex_snow_id, 4 /*GL_TEXTURE4*/);
+            glUniform1i(tex_snow_id, 13);
 
             glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
             glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
@@ -158,8 +158,7 @@ private:
 
             // set stb_image to have the same coordinates as OpenGL
             stbi_set_flip_vertically_on_load(1);
-            unsigned char* sand_image = stbi_load(filename.c_str(), &width,
-                                                  &height, &nb_component, 0);
+            unsigned char* sand_image = stbi_load(filename.c_str(), &width, &height, &nb_component, 0);
 
             // if the image is null
             if(sand_image == nullptr) {
@@ -179,11 +178,9 @@ private:
 
             // check image features
             if(nb_component == 3) {
-                glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0,
-                             GL_RGB, GL_UNSIGNED_BYTE, sand_image);
+                glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, sand_image);
             } else if(nb_component == 4) {
-                glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, width, height, 0,
-                             GL_RGBA, GL_UNSIGNED_BYTE, sand_image);
+                glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, sand_image);
             }
 
             // cleanup
@@ -197,8 +194,7 @@ private:
 
             // set stb_image to have the same coordinates as OpenGL
             stbi_set_flip_vertically_on_load(1);
-            unsigned char* grass_image = stbi_load(filename.c_str(), &width,
-                                                   &height, &nb_component, 0);
+            unsigned char* grass_image = stbi_load(filename.c_str(), &width, &height, &nb_component, 0);
 
             glGenTextures(1, &tex_grass_);
             glActiveTexture(GL_TEXTURE2);
@@ -212,11 +208,9 @@ private:
 
             // check image features
             if(nb_component == 3) {
-                glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0,
-                             GL_RGB, GL_UNSIGNED_BYTE, grass_image);
+                glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, grass_image);
             } else if(nb_component == 4) {
-                glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, width, height, 0,
-                             GL_RGBA, GL_UNSIGNED_BYTE, grass_image);
+                glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, grass_image);
             }
 
             // cleanup
@@ -229,8 +223,7 @@ private:
 
             // set stb_image to have the same coordinates as OpenGL
             stbi_set_flip_vertically_on_load(1);
-            unsigned char* rock_image = stbi_load(filename.c_str(), &width,
-                                                  &height, &nb_component, 0);
+            unsigned char* rock_image = stbi_load(filename.c_str(), &width, &height, &nb_component, 0);
 
             // PROBLEM ! IAMGE IS NULL !!
             if(rock_image == nullptr) {
@@ -249,11 +242,9 @@ private:
 
             // check image features
             if(nb_component == 3) {
-                glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0,
-                             GL_RGB, GL_UNSIGNED_BYTE, rock_image);
+                glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, rock_image);
             } else if(nb_component == 4) {
-                glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, width, height, 0,
-                             GL_RGBA, GL_UNSIGNED_BYTE, rock_image);
+                glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, rock_image);
             }
 
             // cleanup
@@ -266,8 +257,7 @@ private:
 
             // set stb_image to have the same coordinates as OpenGL
             stbi_set_flip_vertically_on_load(1);
-            unsigned char* snow_image = stbi_load(filename.c_str(), &width,
-                                                  &height, &nb_component, 0);
+            unsigned char* snow_image = stbi_load(filename.c_str(), &width, &height, &nb_component, 0);
 
             // PROBLEM ! IAMGE IS NULL !!
             if(snow_image == nullptr) {
@@ -286,11 +276,9 @@ private:
 
             // check image features
             if(nb_component == 3) {
-                glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0,
-                             GL_RGB, GL_UNSIGNED_BYTE, snow_image);
+                glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, snow_image);
             } else if(nb_component == 4) {
-                glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, width, height, 0,
-                             GL_RGBA, GL_UNSIGNED_BYTE, snow_image);
+                glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, snow_image);
             }
 
             // cleanup
@@ -367,20 +355,17 @@ public:
             // position buffer
             glGenBuffers(1, &vertex_buffer_object_position_);
             glBindBuffer(GL_ARRAY_BUFFER, vertex_buffer_object_position_);
-            glBufferData(GL_ARRAY_BUFFER, vertices.size() * sizeof(GLfloat),
-                         &vertices[0], GL_STATIC_DRAW);
+            glBufferData(GL_ARRAY_BUFFER, vertices.size() * sizeof(GLfloat), &vertices[0], GL_STATIC_DRAW);
 
             // vertex indices
             glGenBuffers(1, &vertex_buffer_object_index_);
             glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, vertex_buffer_object_index_);
-            glBufferData(GL_ELEMENT_ARRAY_BUFFER, indices.size() * sizeof(GLuint),
-                         &indices[0], GL_STATIC_DRAW);
+            glBufferData(GL_ELEMENT_ARRAY_BUFFER, indices.size() * sizeof(GLuint), &indices[0], GL_STATIC_DRAW);
 
             // position shader attribute
             GLuint loc_position = glGetAttribLocation(program_id_, "position");
             glEnableVertexAttribArray(loc_position);
-            glVertexAttribPointer(loc_position, 2, GL_FLOAT, DONT_NORMALIZE,
-                                  ZERO_STRIDE, ZERO_BUFFER_OFFSET);
+            glVertexAttribPointer(loc_position, 2, GL_FLOAT, DONT_NORMALIZE, ZERO_STRIDE, ZERO_BUFFER_OFFSET);
 
         }
 
@@ -405,12 +390,11 @@ public:
         glDeleteTextures(1, &tex_grass_);
         glDeleteTextures(1, &tex_rock_);
         glDeleteTextures(1, &tex_snow_);
+        glBindTexture(GL_TEXTURE_2D, 0);
     }
 
-    void Draw(float time, const glm::mat4 &model = IDENTITY_MATRIX,
-              const glm::mat4 &view = IDENTITY_MATRIX,
-              const glm::mat4 &projection = IDENTITY_MATRIX,
-              int upper = 1) {
+    void Draw(float time, const glm::mat4 &model = IDENTITY_MATRIX, const glm::mat4 &view = IDENTITY_MATRIX,
+              const glm::mat4 &projection = IDENTITY_MATRIX, int upper = 1) {
         glUseProgram(program_id_);
         glBindVertexArray(vertex_array_id_);
 

@@ -17,8 +17,7 @@ private:
 public:
     void Init(GLuint framebuffer_texture_id_) {
         // compile the shaders.
-        program_id_ = icg_helper::LoadShaders("water_vshader.glsl",
-                                              "water_fshader.glsl");
+        program_id_ = icg_helper::LoadShaders("water_vshader.glsl", "water_fshader.glsl");
 
         // forest texture
         const int colormap_size = 9;
@@ -108,26 +107,10 @@ public:
 
             reflection_texture_id_ = framebuffer_texture_id_;
 
-            GLuint tex_id = glGetUniformLocation(program_id_, "tex_water");
-            glUniform1i(tex_id, 0 /*GL_TEXTURE0*/);
-
             // cleanup
             glBindTexture(GL_TEXTURE_2D, 0);
             //stbi_image_free(image);
         }
-
-        // 1D texture for forest texture
-        /*
-        glGenTextures(1, &texture_1d_id_);
-        glActiveTexture(GL_TEXTURE0);
-        glBindTexture(GL_TEXTURE_1D, texture_1d_id_);
-        glTexImage1D(GL_TEXTURE_1D, 0, GL_RGB, colormap_size, 0, GL_RGB, GL_FLOAT, texture_forest);
-
-        glTexParameteri(GL_TEXTURE_1D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-        glTexParameteri(GL_TEXTURE_1D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-        glTexParameteri( GL_TEXTURE_1D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
-        glTexParameteri( GL_TEXTURE_1D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
-        */
 
         // other uniforms
         //MVP_id_ = glGetUniformLocation(program_id_, "MVP");
@@ -157,9 +140,19 @@ public:
         glEnable(GL_BLEND);
         glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
-        // bind textures
-        glActiveTexture(GL_TEXTURE0);
-        glBindTexture(GL_TEXTURE_2D, reflection_texture_id_);
+        // Bind reflection texture
+        {
+            glActiveTexture(GL_TEXTURE20);
+            glBindTexture(GL_TEXTURE_2D, reflection_texture_id_);
+            GLuint tex_id = glGetUniformLocation(program_id_, "tex_water");
+            glUniform1i(tex_id, 20 /*GL_TEXTURE0*/);
+
+
+            glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+            glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+            glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
+            glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+        }
 
         // setup matrix stack - model, view, projection
         GLint model_id = glGetUniformLocation(program_id_, "model");

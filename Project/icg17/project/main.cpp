@@ -92,8 +92,8 @@ void Init(GLFWwindow* window) {
     grid.Init(framebuffer_texture_id);
     sky.Init();
 
-    displayTexture1.Init(framebuffer_texture_id, 0);
-    displayTexture2.Init(water_texture_id, 0.5f);
+    displayTexture1.Init(10, 0);
+    displayTexture2.Init(20, 0.5f);
 
     // trackball
     trackball_matrix = IDENTITY_MATRIX;
@@ -124,15 +124,15 @@ void Display() {
     }
     waterFramebuffer.Unbind();
 
-    //displayTexture1.Draw();
-    //displayTexture2.Draw();
-
     // render to Window
     glViewport(0, 0, window_width, window_height);
 
     sky.Draw(time, quad_model_matrix, trackball_matrix*view_matrix, projection_matrix);
     grid.Draw(time, quad_model_matrix, trackball_matrix*view_matrix, projection_matrix, 1);
     water.Draw(time, quad_model_matrix, trackball_matrix*view_matrix, projection_matrix);
+
+    displayTexture1.Draw();
+    displayTexture2.Draw();
 
 }
 
