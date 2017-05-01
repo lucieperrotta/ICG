@@ -35,8 +35,7 @@ class DisplayTexture {
                 // buffer
                 glGenBuffers(1, &vertex_buffer_object_);
                 glBindBuffer(GL_ARRAY_BUFFER, vertex_buffer_object_);
-                glBufferData(GL_ARRAY_BUFFER, sizeof(vertex_point),
-                             vertex_point, GL_STATIC_DRAW);
+                glBufferData(GL_ARRAY_BUFFER, sizeof(vertex_point), vertex_point, GL_STATIC_DRAW);
 
                 // attribute
                 GLuint vertex_point_id = glGetAttribLocation(program_id_, "vpoint");
@@ -98,7 +97,7 @@ class DisplayTexture {
             glBindVertexArray(vertex_array_id_);
 
             // bind textures
-            glActiveTexture(GL_TEXTURE0);
+            //glActiveTexture(GL_TEXTURE0);
             glBindTexture(GL_TEXTURE_2D, texture_id_);
 
 

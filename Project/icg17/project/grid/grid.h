@@ -325,8 +325,7 @@ public:
 
         // tex grid - height map
         this->texture_id_grid = framebuffer_texture_id_grid;
-        /*GLuint tex_id = glGetUniformLocation(program_id_, "tex_grid");
-        glUniform1i(tex_id, f_texture_grid_id);*/
+        // -> uniform in bind with the others
 
 
         // vertex one vertex array
@@ -425,7 +424,8 @@ public:
 
     void Draw(float time, const glm::mat4 &model = IDENTITY_MATRIX,
               const glm::mat4 &view = IDENTITY_MATRIX,
-              const glm::mat4 &projection = IDENTITY_MATRIX) {
+              const glm::mat4 &projection = IDENTITY_MATRIX,
+              int upper = 1) {
         glUseProgram(program_id_);
         glBindVertexArray(vertex_array_id_);
 
@@ -440,6 +440,10 @@ public:
         glUniformMatrix4fv(view_id, ONE, DONT_TRANSPOSE, glm::value_ptr(view));
         GLint projection_id = glGetUniformLocation(program_id_, "projection");
         glUniformMatrix4fv(projection_id, ONE, DONT_TRANSPOSE, glm::value_ptr(projection));
+
+
+        // uniform : which part of the mountains to draw
+        glUniform1i(glGetUniformLocation(program_id_, "upper"), upper);
 
 
         BindShader(program_id_);

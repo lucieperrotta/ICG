@@ -4,6 +4,7 @@ uniform mat4 model;
 uniform mat4 view;
 uniform float time;
 uniform sampler2D tex_grid;
+uniform int upper;
 
 in vec2 position;
 
@@ -14,6 +15,7 @@ out vec2 uv;
 
 
 void main() {
+
     uv = (position + vec2(1.0, 1.0)) * 0.5;
 
     // model view matrix -> used for perspective and stuff like this
@@ -26,10 +28,18 @@ void main() {
     // to have flat lakes
     lake_height = height.x;
 
-    vec3 pos_3d = 1.5*vec3(position.x, lake_height, -position.y);
-    gl_Position =  projection*MV * vec4(pos_3d, 1.0);
+    float upper_limit = 0.55;
 
-    // point position to send to fshader for shading
-    vpoint_mv = MV * vec4(pos_3d, 1.0);
+    if(
+            (((upper==1)) && (lake_height > upper_limit)) ||
+            ((upper==0)) && (lake_height <= upper_limit)
+            ){
+
+        vec3 pos_3d = 1.5*vec3(position.x, lake_height, -position.y);
+        gl_Position =  projection*MV * vec4(pos_3d, 1.0);
+
+        // point position to send to fshader for shading
+        vpoint_mv = MV * vec4(pos_3d, 1.0);
+    }
 
 }
