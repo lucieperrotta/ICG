@@ -7,17 +7,15 @@
 #include "glm/gtc/matrix_transform.hpp"
 
 #include "framebuffer.h"
+#include "trackball.h"
 
 #include "grid/grid.h"
 #include "screenquad/screenquad.h"
 #include "water/water.h"
 #include "sky/sky.h"
 
-
 #include "displaytexture/displaytexture.h"
 
-#include "trackball.h"
-#include "keyboard.h"
 
 int window_width = 800;
 int window_height = 600;
@@ -57,17 +55,14 @@ void setMVPmatrices() {
     // create the model matrix (remember OpenGL is right handed)
     // accumulated transformation
     quad_model_matrix = translate(mat4(1.0f), vec3(0.0f, -0.25f, 0.0f));
-    trackball_matrix = IDENTITY_MATRIX;
 }
 
 mat4 PerspectiveProjection(float fovy, float aspect, float near, float far) {
-    // TODO 1: Create a perspective projection matrix given the field of view,
-    // aspect ratio, and near and far plane distances.
-
     float top = near*tan(fovy/2.f);
     float bottom = -top;
     float right = top*aspect;
     float left = -right;
+
     mat4 perspective = mat4(1.0f);
     perspective[0][0] = 2.f*near/(right-left);
     perspective[1][1] = 2.f*near/(top-bottom);
@@ -87,8 +82,6 @@ void Init(GLFWwindow* window) {
     glEnable(GL_DEPTH_TEST);
 
     // on retina/hidpi displays, pixels != screen coordinates
-    // this unsures that the framebuffer has the same size as the window
-    // (see http://www.glfw.org/docs/latest/window.html#window_fbsize)
     glfwGetFramebufferSize(window, &window_width, &window_height);
 
     GLuint framebuffer_texture_id = framebuffer.Init(window_width, window_height);
@@ -97,12 +90,13 @@ void Init(GLFWwindow* window) {
     water.Init(water_texture_id);
     screenquad.Init(window_width, window_height, framebuffer_texture_id);
     grid.Init(framebuffer_texture_id);
-
-
     sky.Init();
 
-   displayTexture1.Init(framebuffer_texture_id, 0);
-   displayTexture2.Init(water_texture_id, 0.5f);
+    displayTexture1.Init(framebuffer_texture_id, 0);
+    displayTexture2.Init(water_texture_id, 0.5f);
+
+    // trackball
+    trackball_matrix = IDENTITY_MATRIX;
 
 }
 
@@ -130,8 +124,8 @@ void Display() {
     }
     waterFramebuffer.Unbind();
 
-    displayTexture1.Draw();
-    displayTexture2.Draw();
+    //displayTexture1.Draw();
+    //displayTexture2.Draw();
 
     // render to Window
     glViewport(0, 0, window_width, window_height);
@@ -146,12 +140,10 @@ void Display() {
 // transforms glfw screen coordinates into normalized OpenGL coordinates.
 vec2 TransformScreenCoords(GLFWwindow* window, int x, int y) {
     // the framebuffer and the window doesn't necessarily have the same size
-    // i.e. hidpi screens. so we need to get the correct one
     int width;
     int height;
     glfwGetWindowSize(window, &width, &height);
-    return vec2(2.0f * (float)x / width - 1.0f,
-                1.0f - 2.0f * (float)y / height);
+    return vec2(2.0f * (float)x / width - 1.0f, 1.0f - 2.0f * (float)y / height);
 }
 
 void MouseButton(GLFWwindow* window, int button, int action, int mod) {
@@ -161,7 +153,6 @@ void MouseButton(GLFWwindow* window, int button, int action, int mod) {
         vec2 p = TransformScreenCoords(window, x_i, y_i);
         trackball.BeingDrag(p.x, p.y);
         old_trackball_matrix = trackball_matrix;
-        // Store the current state of the model matrix.
     }
 }
 
@@ -171,18 +162,11 @@ void MousePos(GLFWwindow* window, double x, double y) {
         double x_i, y_i;
         glfwGetCursorPos(window, &x_i, &y_i);
         p = TransformScreenCoords(window, x_i, y_i);
-        // TODO 3: Calculate 'trackball_matrix' given the return value of
-        // trackball.Drag(...) and the value stored in 'old_trackball_matrix'.
-        // See also the mouse_button(...) function.
         trackball_matrix = trackball.Drag(p.x,p.y) * old_trackball_matrix;
     }
 
     // zoom
     if (glfwGetMouseButton(window, GLFW_MOUSE_BUTTON_RIGHT) == GLFW_PRESS) {
-        // TODO 4 DONE: Implement zooming. When the right mouse button is pressed,
-        // moving the mouse cursor up and down (along the screen's y axis)
-        // should zoom out and it. For that you have to update the current
-        // 'view_matrix' with a translation along the z axis.
         vec3 newVec = vec3(0., 0., p.y-previousZ);
         view_matrix=translate(view_matrix, newVec);
     }
@@ -194,18 +178,11 @@ void SetupProjection(GLFWwindow* window, int width, int height) {
     window_width = width;
     window_height = height;
 
-    cout << "Window has been resized to "
-         << window_width << "x" << window_height << "." << endl;
+    cout << "Window has been resized to " << window_width << "x" << window_height << "." << endl;
 
     glViewport(0, 0, window_width, window_height);
 
-    // TODO 1 DONE: Use a perspective projection instead;
-    //GLfloat top = 1.0f;
-    //GLfloat right = (GLfloat)window_width / window_height * top;
-    //projection_matrix = OrthographicProjection(-right, right, -top, top, -10.0, 10.0f);
-    projection_matrix = PerspectiveProjection(45.0f,
-                                              (GLfloat)window_width / window_height,
-                                              0.1f, 100.f);
+    projection_matrix = PerspectiveProjection(45.0f, (GLfloat)window_width / window_height, 0.1f, 100.f);
 }
 
 // gets called when the windows/framebuffer is resized.
@@ -218,8 +195,7 @@ void ResizeCallback(GLFWwindow* window, int width, int height) {
 
     glViewport(0, 0, window_width, window_height);
 
-    // when the window is resized, the framebuffer and the screenquad
-    // should also be resized
+    // when the window is resized, the framebuffer and the screenquad should also be resized
     framebuffer.Cleanup();
     framebuffer.Init(window_width, window_height);
     screenquad.UpdateSize(window_width, window_height);
@@ -276,8 +252,7 @@ int main(int argc, char *argv[]) {
     // attempt to open the window: fails if required version unavailable
     // note some Intel GPUs do not support OpenGL 3.2
     // note update the driver of your graphic card
-    GLFWwindow* window = glfwCreateWindow(window_width, window_height,
-                                          "framebuffer", NULL, NULL);
+    GLFWwindow* window = glfwCreateWindow(window_width, window_height, "framebuffer", NULL, NULL);
     if(!window) {
         glfwTerminate();
         return EXIT_FAILURE;
@@ -319,7 +294,6 @@ int main(int argc, char *argv[]) {
         glfwSwapBuffers(window);
         glfwPollEvents();
     }
-
 
     // cleanup
     grid.Cleanup();
