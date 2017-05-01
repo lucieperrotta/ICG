@@ -46,7 +46,7 @@ void main() {
 
         // Equivalent to color = (t1*(1-grass_height) + t2*grass_height).xyz;
         color = mix(t1, t2, blend_factor).xyz;*/
-        printf(norm_height);
+        //printf(norm_height);
         color = texture(tex_sand, uv).xyz;
     } else if(norm_height <= grass_level) {
         // Grass & Forest level

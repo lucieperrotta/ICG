@@ -243,6 +243,7 @@ public:
               const glm::mat4& projection) {
         glUseProgram(program_id_);
         glBindVertexArray(vertex_array_id_sky);
+        glDisable(GL_DEPTH_TEST); // sky always in background
 
         // bind textures
         glActiveTexture(GL_TEXTURE0);
@@ -261,6 +262,7 @@ public:
         //       use glDrawElements)
         glDrawArrays(GL_TRIANGLES,0,NbCubeVertices);
 
+        glEnable(GL_DEPTH_TEST);
         glBindVertexArray(0);
         glUseProgram(0);
     }
