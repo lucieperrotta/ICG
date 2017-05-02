@@ -318,7 +318,7 @@ public:
             // reach from [-1, -1] to [1, 1].
 
             float c = grid_dim/5;
-            float count = 0;
+            int count = 0;
 
             for(int j = 0; j < c; j++) { // y
                 for(int i = 0; i < c; i++) { // x
@@ -335,14 +335,14 @@ public:
                     vertices.push_back(-1.0f + x); vertices.push_back(1.0f - y1);
 
                     // and indices.
-                    indices.push_back(0 + 4.f*count);
-                    indices.push_back(1 + 4.f*count);
-                    indices.push_back(3 + 4.f*count);
-                    indices.push_back(2 + 4.f*count);
+                    indices.push_back(0 + 4*count);
+                    indices.push_back(1 + 4*count);
+                    indices.push_back(3 + 4*count);
+                    indices.push_back(2 + 4*count);
 
                     if(i==c-1) { // to avoid having intermediate lines between rows
-                        indices.push_back(2 + 4.f*count);
-                        indices.push_back(0 + 4.f*(count+1));
+                        indices.push_back(2 + 4*count);
+                        indices.push_back(0 + 4*(count+1));
                     }
 
                     count++;

@@ -91,8 +91,8 @@ void Init(GLFWwindow* window) {
     grid.Init(framebuffer_texture_id);
     sky.Init();
 
-    displayTexture1.Init(10, 0);
-    displayTexture2.Init(20, 0.5f);
+    displayTexture1.Init(20, 0);
+    displayTexture2.Init(10, 0.5f);
 
     // trackball
     trackball_matrix = IDENTITY_MATRIX;
@@ -120,7 +120,10 @@ void Display() {
     waterFramebuffer.Bind();
     {
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-        grid.Draw(time, quad_model_matrix, view_matrix, projection_matrix);
+        vec3 cam_pos_mirror = cam_pos;
+        cam_pos_mirror.y = -cam_pos_mirror.y;
+        mat4 view_matrix_mirror = lookAt(cam_pos_mirror, cam_look, cam_up);
+        grid.Draw(time, quad_model_matrix, view_matrix_mirror, projection_matrix);
     }
     waterFramebuffer.Unbind();
 
