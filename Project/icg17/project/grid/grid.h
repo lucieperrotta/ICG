@@ -76,10 +76,10 @@ private:
     void BindShader(GLuint program_id_) {
         // Bind grid texture
         {
-            glActiveTexture(GL_TEXTURE10);
+            glActiveTexture(GL_TEXTURE0);
             glBindTexture(GL_TEXTURE_2D, texture_id_grid);
             GLuint texture_id_grid_ = glGetUniformLocation(program_id_, "tex_grid");
-            glUniform1i(texture_id_grid_, 10);
+            glUniform1i(texture_id_grid_, 0);
 
             glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
             glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
@@ -89,10 +89,10 @@ private:
 
         // Bind sand texture
         {
-            glActiveTexture(GL_TEXTURE14);
+            glActiveTexture(GL_TEXTURE1);
             glBindTexture(GL_TEXTURE_2D, tex_sand_);
             GLuint tex_sand_id = glGetUniformLocation(program_id_, "tex_sand");
-            glUniform1i(tex_sand_id, 14);
+            glUniform1i(tex_sand_id, 1 /*GL_TEXTURE1*/);
 
             glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
             glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
@@ -102,10 +102,10 @@ private:
 
         // Bind grass texture
         {
-            glActiveTexture(GL_TEXTURE11);
+            glActiveTexture(GL_TEXTURE2);
             glBindTexture(GL_TEXTURE_2D, tex_grass_);
             GLuint tex_grass_id = glGetUniformLocation(program_id_, "tex_grass");
-            glUniform1i(tex_grass_id, 11);
+            glUniform1i(tex_grass_id, 2 /*GL_TEXTURE2*/);
 
             glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
             glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
@@ -115,10 +115,10 @@ private:
 
         // Bind rock texture
         {
-            glActiveTexture(GL_TEXTURE12);
+            glActiveTexture(GL_TEXTURE3);
             glBindTexture(GL_TEXTURE_2D, tex_rock_);
             GLuint tex_rock_id = glGetUniformLocation(program_id_, "tex_rock");
-            glUniform1i(tex_rock_id, 12 /*GL_TEXTURE3*/);
+            glUniform1i(tex_rock_id, 3 /*GL_TEXTURE3*/);
 
             glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
             glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
@@ -128,15 +128,15 @@ private:
 
         // Bind snow texture
         {
-            glActiveTexture(GL_TEXTURE13);
+            glActiveTexture(GL_TEXTURE4);
             glBindTexture(GL_TEXTURE_2D, tex_snow_);
             GLuint tex_snow_id = glGetUniformLocation(program_id_, "tex_snow");
-            glUniform1i(tex_snow_id, 13);
+            glUniform1i(tex_snow_id, 4 /*GL_TEXTURE4*/);
 
             glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
             glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-            glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
-            glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+            glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
+            glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
         }
 
         // Cleanup
@@ -167,14 +167,13 @@ private:
             }
 
             glGenTextures(1, &tex_sand_);
-            glActiveTexture(GL_TEXTURE14);
+            glActiveTexture(GL_TEXTURE1);
             glBindTexture(GL_TEXTURE_2D, tex_sand_);
 
             glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
             glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
             glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
             glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
-            //glfwLoadTexture("sand_texture.tga", 1);
 
             // check image features
             if(nb_component == 3) {
@@ -200,18 +199,17 @@ private:
             glActiveTexture(GL_TEXTURE2);
             glBindTexture(GL_TEXTURE_2D, tex_grass_);
 
-            glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-            glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-            glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
-            glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
-            //glfwLoadTexture2D("grass_texture.tga", 2);
-
             // check image features
             if(nb_component == 3) {
                 glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, grass_image);
             } else if(nb_component == 4) {
                 glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, grass_image);
             }
+
+            glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+            glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+            glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
+            glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
 
             // cleanup
             stbi_image_free(grass_image);
@@ -225,7 +223,6 @@ private:
             stbi_set_flip_vertically_on_load(1);
             unsigned char* rock_image = stbi_load(filename.c_str(), &width, &height, &nb_component, 0);
 
-            // PROBLEM ! IAMGE IS NULL !!
             if(rock_image == nullptr) {
                 throw(string("Failed to load texture"));
                 printf("OMG GIRL THERE IS A BIG FAILURE RIGHT HERE !!!\n");
@@ -238,7 +235,6 @@ private:
             glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
             glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
             glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
-            //glfwLoadTexture2D("rock_texture.tga", 3);
 
             // check image features
             if(nb_component == 3) {
@@ -259,20 +255,9 @@ private:
             stbi_set_flip_vertically_on_load(1);
             unsigned char* snow_image = stbi_load(filename.c_str(), &width, &height, &nb_component, 0);
 
-            // PROBLEM ! IAMGE IS NULL !!
-            if(snow_image == nullptr) {
-                throw(string("Failed to load texture"));
-                printf("OMG GIRL THERE IS A BIG FAILURE RIGHT HERE !!!\n");
-            }
             glGenTextures(1, &tex_snow_);
             glActiveTexture(GL_TEXTURE4);
             glBindTexture(GL_TEXTURE_2D, tex_snow_);
-
-            glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-            glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-            glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
-            glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
-            //glfwLoadTexture2D("snow_texture.tga", 4);
 
             // check image features
             if(nb_component == 3) {
@@ -280,6 +265,11 @@ private:
             } else if(nb_component == 4) {
                 glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, snow_image);
             }
+
+            glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+            glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+            glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
+            glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
 
             // cleanup
             stbi_image_free(snow_image);
@@ -370,7 +360,7 @@ public:
         // Load the textures
         LoadTextures();
 
-        glUniform1f(glGetUniformLocation(program_id_, "lake_level"), lake_level);
+        //glUniform1f(glGetUniformLocation(program_id_, "lake_level"), lake_level);
 
         // to avoid the current object being polluted
         glBindVertexArray(0);
@@ -385,7 +375,6 @@ public:
         glDeleteVertexArrays(1, &vertex_array_id_);
         glDeleteProgram(program_id_);
 
-        glDeleteTextures(1, &tex_coloring_);
         glDeleteTextures(1, &tex_sand_);
         glDeleteTextures(1, &tex_grass_);
         glDeleteTextures(1, &tex_rock_);
