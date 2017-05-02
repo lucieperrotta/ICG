@@ -37,7 +37,7 @@ using namespace glm;
 
 float ratio = window_width / (float) window_height;
 
-float lake_level = 0.6;
+float lake_level = 0.6f;
 
 vec3 cam_pos = vec3(1.0f, 1.0f, 1.0f);
 vec3 cam_look = vec3(0.0f, 0.0f, 0.0f);
@@ -129,7 +129,12 @@ void Display() {
         cam_look_mirror.y = cam_look.y + 2*abs(cam_look.y-lake_level);
         mat4 view_matrix_mirror = lookAt(cam_pos_mirror, cam_look_mirror, cam_up);
 
-        sky.Draw(time, quad_model_matrix, trackball_matrix*view_matrix_mirror, projection_matrix);
+        mat4 axis_invert = mat4(vec4(-1,0,0,0),
+                                vec4(0,1,0,0),
+                                vec4(0,0,1,0),
+                                vec4(0,0,0,1));
+
+        sky.Draw(time, quad_model_matrix, inverse(trackball_matrix*axis_invert)*view_matrix_mirror, projection_matrix);
         grid.Draw(time, quad_model_matrix, trackball_matrix*view_matrix_mirror, projection_matrix);
     }
     waterFramebuffer.Unbind();
