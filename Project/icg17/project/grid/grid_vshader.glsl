@@ -25,18 +25,16 @@ void main() {
     MV = view * model;
 
     // use the texture to obtain z axis
-    vec4 height = texture(tex_grid, uv);
-    // height goes from 0.55 -> 0.85
+    float height = texture(tex_grid, uv).x;
 
-    // to have flat lakes
-    lake_height = height.x;
-
+    // draw above lake if upper == 1
+    // draw below lake if upper == 0
     if(
-            (((upper==1)) && (lake_height > lake_level)) ||
-            ((upper==0)) && (lake_height <= lake_level)
+            (((upper==1)) && (height > lake_level)) ||
+            ((upper==0)) && (height <= lake_level)
             ){
 
-        vec3 pos_3d = vec3(position.x, lake_height, -position.y);
+        vec3 pos_3d = vec3(position.x, height, -position.y);
         gl_Position =  projection*MV * vec4(pos_3d, 1.0);
 
         // point position to send to fshader for shading

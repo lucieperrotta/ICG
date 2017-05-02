@@ -92,7 +92,7 @@ private:
             glActiveTexture(GL_TEXTURE14);
             glBindTexture(GL_TEXTURE_2D, tex_sand_);
             GLuint tex_sand_id = glGetUniformLocation(program_id_, "tex_sand");
-            glUniform1i(tex_sand_id, 14 );
+            glUniform1i(tex_sand_id, 14);
 
             glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
             glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
@@ -167,7 +167,7 @@ private:
             }
 
             glGenTextures(1, &tex_sand_);
-            glActiveTexture(GL_TEXTURE1);
+            glActiveTexture(GL_TEXTURE14);
             glBindTexture(GL_TEXTURE_2D, tex_sand_);
 
             glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);

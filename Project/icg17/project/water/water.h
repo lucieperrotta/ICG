@@ -12,7 +12,6 @@ private:
     GLuint program_id_;                     // GLSL shader program ID
     GLuint reflection_texture_id_;          // texture ID
     GLuint num_indices_;                    // number of vertices to render
-    //GLuint MVP_id_;                         // model, view, proj matrix ID
 
 public:
     void Init(GLuint framebuffer_texture_id_, float lake_level) {
@@ -106,9 +105,6 @@ public:
             glBindTexture(GL_TEXTURE_2D, 0);
             //stbi_image_free(image);
         }
-
-        // other uniforms
-        //MVP_id_ = glGetUniformLocation(program_id_, "MVP");
 
         glUniform1f(glGetUniformLocation(program_id_, "lake_level"), lake_level);
 

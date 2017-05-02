@@ -39,13 +39,14 @@ float ratio = window_width / (float) window_height;
 
 float lake_level = 0.6f;
 
-vec3 cam_pos = vec3(1.0f, 1.0f, 1.0f);
+vec3 cam_pos = vec3(1.5f, 1.5f, 0.0f);
 vec3 cam_look = vec3(0.0f, 0.0f, 0.0f);
 vec3 cam_up = vec3(0.0f, 1.0f, 0.0f);
 
 mat4 projection_matrix;
 mat4 view_matrix;
-mat4 quad_model_matrix = translate(mat4(1.0f), vec3(0.0f, -0.0f, 0.0f));
+//mat4 quad_model_matrix = translate(mat4(1.0f), vec3(0.0f, -0.0f, 0.0f));
+mat4 quad_model_matrix = IDENTITY_MATRIX;
 mat4 trackball_matrix;
 mat4 old_trackball_matrix;
 
@@ -93,7 +94,7 @@ void Init(GLFWwindow* window) {
     grid.Init(framebuffer_texture_id, lake_level);
     sky.Init();
 
-    displayTexture1.Init(20, 0);
+    displayTexture1.Init(14, 0);
     displayTexture2.Init(10, 0.5f);
 
     // trackball
@@ -123,8 +124,10 @@ void Display() {
     waterFramebuffer.Bind();
     {
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
+        // inverse cam position and look up depending on lake level
         vec3 cam_pos_mirror = cam_pos;
-        cam_pos_mirror.y = cam_pos.y - 2*abs(cam_pos.y-lake_level); // inverse cam pos depending on lake level
+        cam_pos_mirror.y = cam_pos.y - 2*abs(cam_pos.y-lake_level);
         vec3 cam_look_mirror = cam_look;
         cam_look_mirror.y = cam_look.y + 2*abs(cam_look.y-lake_level);
         mat4 view_matrix_mirror = lookAt(cam_pos_mirror, cam_look_mirror, cam_up);
@@ -236,24 +239,45 @@ void KeyCallback(GLFWwindow* window, int key, int scancode, int action, int mods
         return;
     }
 
-    float delta = 0.05;
+    float delta = 0.06;
+    float deltaLook = 0.15;
 
     switch(key) {
     case GLFW_KEY_LEFT:
-        cam_pos -= vec3(delta,0,-delta);
-        cam_look -= vec3(delta,0,-delta);
+        cam_pos += vec3(0,0.0,delta);
+        cam_look += vec3(0,0.0,delta);
         break;
     case GLFW_KEY_RIGHT:
-        cam_pos += vec3(delta,0,-delta);
-        cam_look += vec3(delta,0,-delta);
+        cam_pos -= vec3(0,0.0,delta);
+        cam_look -= vec3(0,0.0,delta);
         break;
     case GLFW_KEY_DOWN:
-        cam_pos += vec3(delta,0.0,delta);
-        cam_look += vec3(delta,0.0,delta);
+        cam_pos += vec3(delta,0,0);
+        cam_look += vec3(delta,0,0);
         break;
     case GLFW_KEY_UP:
-        cam_pos -= vec3(delta,0.0,delta);
-        cam_look -= vec3(delta,0.0,delta);
+        cam_pos -= vec3(delta,0,0);
+        cam_look -= vec3(delta,0,0);
+        break;
+    case 65: // A
+        cam_look += vec3(0,0,deltaLook);
+        break;
+    case 68: // D
+        cam_look -= vec3(0,0,deltaLook);
+        break;
+    case 87: // W
+        cam_look += vec3(0,deltaLook,0);
+        break;
+    case 83: // S
+        cam_look -= vec3(0,deltaLook,0);
+        break;
+    case 88: // X
+        cam_look -= vec3(0,delta,0);
+        cam_pos -= vec3(0,delta,0);
+        break;
+    case 90: // Y
+        cam_look += vec3(0,delta,0);
+        cam_pos += vec3(0,delta,0);
         break;
     default:
         break;

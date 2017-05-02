@@ -14,8 +14,6 @@ void main() {
     float _u = gl_FragCoord.x/window_width;
     float _v = gl_FragCoord.y/window_height;
 
-    /// NOTE: you will have to flip the "v" coordinate as framebuffer is upside/down
     vec4 blue = vec4(27./255., 41./255., 92./255., 0.8);
-    //color = mix(blue, texture(tex,vec2(_u,_v)).rrra, vec4(0.1));
-    color = vec4(mix(blue,texture(tex_water,vec2(_u,1-_v)).rrra,vec4(0.3)).rgb,0.5);
+    color = vec4(mix(blue,texture(tex_water,vec2(_u,1-_v)).rrra,vec4(0.3)).rgb,0.6);
 }
