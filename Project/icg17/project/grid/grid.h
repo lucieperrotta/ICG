@@ -287,7 +287,7 @@ private:
     }
 
 public:
-    void Init(GLuint framebuffer_texture_id_grid, float lake_level) {
+    void Init(GLuint framebuffer_texture_id_grid, float lake_level, int LengthSegmentArea) {
         // compile the shaders.
         program_id_ = icg_helper::LoadShaders("grid_vshader.glsl", "grid_fshader.glsl");
         if(!program_id_) {
@@ -309,20 +309,18 @@ public:
         {
             std::vector<GLfloat> vertices;
             std::vector<GLuint> indices;
-            // TODO 5: make a triangle grid with dimension 100x100.
-            // always two subsequent entries in 'vertices' form a 2D vertex position.
-            float grid_dim = 1000;
 
-            // the given code below are the vertices for a simple quad.
-            // your grid should have the same dimension as that quad, i.e.,
-            // reach from [-1, -1] to [1, 1].
+            // nb of quad/square -> make the grid more precize
+            float grid_dim = 2000;
 
             float c = grid_dim/5;
             int count = 0;
 
+            // length of segment (square side)
+            float d = LengthSegmentArea/c;
+
             for(int j = 0; j < c; j++) { // y
                 for(int i = 0; i < c; i++) { // x
-                    float d = 2.f/c; // where 2.f is the area of the [-1,-1] to [1,1] original square
                     float x = i*d;
                     float y = j*d;
                     float x1 = (i + 1.0f)*d;

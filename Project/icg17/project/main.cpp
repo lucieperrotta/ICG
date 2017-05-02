@@ -38,6 +38,7 @@ using namespace glm;
 float ratio = window_width / (float) window_height;
 
 float lake_level = 0.6f;
+int LengthSegmentArea = 2; // grid side length
 
 vec3 cam_pos = vec3(1.5f, 1.5f, 0.0f);
 vec3 cam_look = vec3(0.0f, 0.0f, 0.0f);
@@ -89,9 +90,9 @@ void Init(GLFWwindow* window) {
     GLuint framebuffer_texture_id = framebuffer.Init(window_width, window_height);
     GLuint water_texture_id = waterFramebuffer.Init(window_width, window_height);
 
-    water.Init(water_texture_id, lake_level);
+    water.Init(water_texture_id, LengthSegmentArea, lake_level);
     screenquad.Init(window_width, window_height, framebuffer_texture_id);
-    grid.Init(framebuffer_texture_id, lake_level);
+    grid.Init(framebuffer_texture_id, lake_level, LengthSegmentArea);
     sky.Init();
 
     displayTexture1.Init(14, 0);
