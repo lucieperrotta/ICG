@@ -14,6 +14,8 @@ uniform sampler2D tex_grass;
 uniform sampler2D tex_rock;
 uniform sampler2D tex_snow;
 
+uniform float lake_level;
+
 in float lake_height;
 in vec2 uv;
 in vec4 vpoint_mv;
@@ -23,7 +25,7 @@ out vec3 color;
 
 void main() {
     // height normalization from 0 to 1 (lake_height is from 0.55 to 0.85)
-    float norm_height = (lake_height - 0.55)/(0.85 - 0.55);
+    float norm_height = (lake_height - lake_level)/(0.85 - lake_level);
 
     // initialize height limits (lake, forest and mountains)
     // the values can be changed here

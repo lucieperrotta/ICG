@@ -4,6 +4,7 @@ uniform mat4 model;
 uniform mat4 view;
 uniform float time;
 uniform sampler2D tex_water;
+uniform float lake_level;
 
 in vec2 position;
 
@@ -17,12 +18,12 @@ void main() {
     // (position + vec2(1.0, 1.0)) * 0.5;
     uv = position;
 
-    float height = 0.55;
+    float height = lake_level;
 
     // model view matrix -> used for perspective and stuff like this
     MV = view * model;
 
-    vec3 pos_3d = 1.5*vec3(position.x, height, -position.y);
+    vec3 pos_3d = vec3(position.x, height, -position.y);
     gl_Position =  projection*MV * vec4(pos_3d, 1.0);
 
 }

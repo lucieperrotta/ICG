@@ -37,13 +37,15 @@ using namespace glm;
 
 float ratio = window_width / (float) window_height;
 
-vec3 cam_pos = vec3(2.0f, 2.0f, 2.0f);
+float lake_level = 0.6;
+
+vec3 cam_pos = vec3(1.0f, 1.0f, 1.0f);
 vec3 cam_look = vec3(0.0f, 0.0f, 0.0f);
 vec3 cam_up = vec3(0.0f, 1.0f, 0.0f);
 
 mat4 projection_matrix;
 mat4 view_matrix;
-mat4 quad_model_matrix = translate(mat4(1.0f), vec3(0.0f, -0.25f, 0.0f));
+mat4 quad_model_matrix = translate(mat4(1.0f), vec3(0.0f, -0.0f, 0.0f));
 mat4 trackball_matrix;
 mat4 old_trackball_matrix;
 
@@ -86,9 +88,9 @@ void Init(GLFWwindow* window) {
     GLuint framebuffer_texture_id = framebuffer.Init(window_width, window_height);
     GLuint water_texture_id = waterFramebuffer.Init(window_width, window_height);
 
-    water.Init(water_texture_id);
+    water.Init(water_texture_id, lake_level);
     screenquad.Init(window_width, window_height, framebuffer_texture_id);
-    grid.Init(framebuffer_texture_id);
+    grid.Init(framebuffer_texture_id, lake_level);
     sky.Init();
 
     displayTexture1.Init(20, 0);
@@ -104,8 +106,9 @@ void Display() {
 
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-    double time = 0;  //glfwGetTime();
+    float time = 0;  //glfwGetTime();
 
+    // set up matrices for MVP
     setMVPmatrices();
 
     // heightmap for grid
@@ -121,9 +124,13 @@ void Display() {
     {
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
         vec3 cam_pos_mirror = cam_pos;
-        cam_pos_mirror.y = -cam_pos_mirror.y;
-        mat4 view_matrix_mirror = lookAt(cam_pos_mirror, cam_look, cam_up);
-        grid.Draw(time, quad_model_matrix, view_matrix_mirror, projection_matrix);
+        cam_pos_mirror.y = cam_pos.y - 2*abs(cam_pos.y-lake_level); // inverse cam pos depending on lake level
+        vec3 cam_look_mirror = cam_look;
+        cam_look_mirror.y = cam_look.y + 2*abs(cam_look.y-lake_level);
+        mat4 view_matrix_mirror = lookAt(cam_pos_mirror, cam_look_mirror, cam_up);
+
+        sky.Draw(time, quad_model_matrix, trackball_matrix*view_matrix_mirror, projection_matrix);
+        grid.Draw(time, quad_model_matrix, trackball_matrix*view_matrix_mirror, projection_matrix);
     }
     waterFramebuffer.Unbind();
 
@@ -131,11 +138,12 @@ void Display() {
     glViewport(0, 0, window_width, window_height);
 
     sky.Draw(time, quad_model_matrix, trackball_matrix*view_matrix, projection_matrix);
-    grid.Draw(time, quad_model_matrix, trackball_matrix*view_matrix, projection_matrix, 1);
+    grid.Draw(time, quad_model_matrix, trackball_matrix*view_matrix, projection_matrix);
+    grid.Draw(time, quad_model_matrix, trackball_matrix*view_matrix, projection_matrix,0);
     water.Draw(time, quad_model_matrix, trackball_matrix*view_matrix, projection_matrix);
 
-    displayTexture1.Draw();
-    displayTexture2.Draw();
+    //displayTexture1.Draw();
+    //displayTexture2.Draw();
 
 }
 
@@ -223,7 +231,7 @@ void KeyCallback(GLFWwindow* window, int key, int scancode, int action, int mods
         return;
     }
 
-    float delta = 0.03;
+    float delta = 0.05;
 
     switch(key) {
     case GLFW_KEY_LEFT:

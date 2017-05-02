@@ -15,7 +15,7 @@ private:
     //GLuint MVP_id_;                         // model, view, proj matrix ID
 
 public:
-    void Init(GLuint framebuffer_texture_id_) {
+    void Init(GLuint framebuffer_texture_id_, float lake_level) {
         // compile the shaders.
         program_id_ = icg_helper::LoadShaders("water_vshader.glsl", "water_fshader.glsl");
 
@@ -109,6 +109,8 @@ public:
 
         // other uniforms
         //MVP_id_ = glGetUniformLocation(program_id_, "MVP");
+
+        glUniform1f(glGetUniformLocation(program_id_, "lake_level"), lake_level);
 
         // to avoid the current object being polluted
         glBindVertexArray(0);
