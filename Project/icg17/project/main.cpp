@@ -10,7 +10,7 @@
 #include "trackball.h"
 
 #include "grid/grid.h"
-#include "screenquad/screenquad.h"
+#include "noise/noise.h"
 #include "water/water.h"
 #include "sky/sky.h"
 
@@ -22,7 +22,7 @@ int window_height = 600;
 
 FrameBuffer framebuffer;
 FrameBuffer waterFramebuffer;
-ScreenQuad screenquad;
+Noise noise;
 Grid grid;
 Water water;
 Sky sky;
@@ -91,7 +91,7 @@ void Init(GLFWwindow* window) {
     GLuint water_texture_id = waterFramebuffer.Init(window_width, window_height);
 
     water.Init(water_texture_id, LengthSegmentArea, lake_level);
-    screenquad.Init(window_width, window_height, framebuffer_texture_id);
+    noise.Init(window_width, window_height, framebuffer_texture_id);
     grid.Init(framebuffer_texture_id, lake_level, LengthSegmentArea);
     sky.Init();
 
@@ -117,7 +117,7 @@ void Display() {
     framebuffer.Bind();
     {
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-        screenquad.Draw();
+        noise.Draw();
     }
     framebuffer.Unbind();
 
@@ -218,10 +218,10 @@ void ResizeCallback(GLFWwindow* window, int width, int height) {
 
     glViewport(0, 0, window_width, window_height);
 
-    // when the window is resized, the framebuffer and the screenquad should also be resized
+    // when the window is resized, the framebuffer and the noise should also be resized
     framebuffer.Cleanup();
     framebuffer.Init(window_width, window_height);
-    screenquad.UpdateSize(window_width, window_height);
+    noise.UpdateSize(window_width, window_height);
 }
 
 
@@ -347,7 +347,7 @@ int main(int argc, char *argv[]) {
     // cleanup
     grid.Cleanup();
     framebuffer.Cleanup();
-    screenquad.Cleanup();
+    noise.Cleanup();
     water.Cleanup();
     sky.Cleanup();
     displayTexture1.Cleanup();

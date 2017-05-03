@@ -1,7 +1,7 @@
 #pragma once
 #include "icg_helper.h"
 
-class ScreenQuad {
+class Noise {
 
     private:
         GLuint vertex_array_id_;        // vertex array object
@@ -9,18 +9,18 @@ class ScreenQuad {
         GLuint vertex_buffer_object_;   // memory buffer
         GLuint texture_id_;             // texture ID
 
-        float screenquad_width_;
-        float screenquad_height_;
+        float noise_width_;
+        float noise_height_;
 
     public:
-        void Init(float screenquad_width, float screenquad_height, GLuint texture) {
+        void Init(float noise_width, float noise_height, GLuint texture) {
 
-            // set screenquad size
-            this->screenquad_width_ = screenquad_width;
-            this->screenquad_height_ = screenquad_height;
+            // set noise size
+            this->noise_width_ = noise_width;
+            this->noise_height_ = noise_height;
 
             // compile the shaders
-            program_id_ = icg_helper::LoadShaders("screenquad_vshader.glsl", "screenquad_fshader.glsl");
+            program_id_ = icg_helper::LoadShaders("noise_vshader.glsl", "noise_fshader.glsl");
             if(!program_id_) {
                 exit(EXIT_FAILURE);
             }
@@ -86,9 +86,9 @@ class ScreenQuad {
             glDeleteTextures(1, &texture_id_);
         }
 
-        void UpdateSize(int screenquad_width, int screenquad_height) {
-            this->screenquad_width_ = screenquad_width;
-            this->screenquad_height_ = screenquad_height;
+        void UpdateSize(int noise_width, int noise_height) {
+            this->noise_width_ = noise_width;
+            this->noise_height_ = noise_height;
         }
 
         void Draw() {
@@ -96,8 +96,8 @@ class ScreenQuad {
             glBindVertexArray(vertex_array_id_);
 
             // window size uniforms
-            glUniform1f(glGetUniformLocation(program_id_, "tex_width"), this->screenquad_width_);
-            glUniform1f(glGetUniformLocation(program_id_, "tex_height"), this->screenquad_height_);
+            glUniform1f(glGetUniformLocation(program_id_, "tex_width"), this->noise_width_);
+            glUniform1f(glGetUniformLocation(program_id_, "tex_height"), this->noise_height_);
 
             // bind texture
             glActiveTexture(GL_TEXTURE0);
