@@ -37,7 +37,7 @@ using namespace glm;
 
 float window_ratio = window_width / (float) window_height;
 
-float lake_level = 0.6f;
+float lake_level = 0.55f;
 int LengthSegmentArea = 2; // grid side length
 
 vec3 cam_pos = vec3(1.5f, 1.5f, 0.0f);
@@ -95,8 +95,8 @@ void Init(GLFWwindow* window) {
     grid.Init(framebuffer_texture_id, lake_level, LengthSegmentArea);
     sky.Init();
 
-    displayTexture1.Init(14, 0);
-    displayTexture2.Init(10, 0.5f);
+    displayTexture1.Init(0, 0);
+    displayTexture2.Init(0, 0.5f);
 
     // trackball
     trackball_matrix = IDENTITY_MATRIX;
@@ -152,8 +152,7 @@ void Display() {
     water.Draw(time, quad_model_matrix, trackball_matrix*view_matrix, projection_matrix);
 
     //displayTexture1.Draw();
-    //displayTexture2.Draw();
-
+    displayTexture2.Draw();
 }
 
 
@@ -218,7 +217,7 @@ void ResizeCallback(GLFWwindow* window, int width, int height) {
 
     glViewport(0, 0, window_width, window_height);
 
-    // when the window is resized, the framebuffer and the noise should also be resized
+    // when the window is resized, the framebuffer and the screenquad should also be resized
     framebuffer.Cleanup();
     framebuffer.Init(window_width, window_height);
     noise.UpdateSize(window_width, window_height);
