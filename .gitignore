@@ -6,3 +6,7 @@ hw2-NgyuenPhanhoangPerrotta_config/
 */*/build-icg17-Desktop-Default/
 *.user
 *build*
+*lock*
+
+hw*
+lab*
