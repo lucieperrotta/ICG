@@ -18,7 +18,7 @@ uniform sampler2D tex_snow;
 uniform float lake_level;
 float sand_level = lake_level;
 float grass_level = sand_level + 0.08;
-float mountains_level = grass_level + 0.1;
+float mountains_level = grass_level + 0.15;
 
 in vec2 uv;
 in vec4 vpoint_mv;

@@ -37,7 +37,7 @@ using namespace glm;
 
 float window_ratio = window_width / (float) window_height;
 
-float lake_level = 0.6f;
+float lake_level = 0.55f;
 int LengthSegmentArea = 2; // grid side length
 
 vec3 cam_pos = vec3(1.5f, 1.5f, 0.0f);
@@ -218,7 +218,7 @@ void ResizeCallback(GLFWwindow* window, int width, int height) {
 
     glViewport(0, 0, window_width, window_height);
 
-    // when the window is resized, the framebuffer and the noise should also be resized
+    // when the window is resized, the framebuffer and the screenquad should also be resized
     framebuffer.Cleanup();
     framebuffer.Init(window_width, window_height);
     noise.UpdateSize(window_width, window_height);
