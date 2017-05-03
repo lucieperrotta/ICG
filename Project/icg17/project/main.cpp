@@ -108,7 +108,7 @@ void Display() {
 
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-    float time = 0;  //glfwGetTime();
+    float time = glfwGetTime();
 
     // set up matrices for MVP
     setMVPmatrices();
@@ -152,7 +152,7 @@ void Display() {
     water.Draw(time, quad_model_matrix, trackball_matrix*view_matrix, projection_matrix);
 
     //displayTexture1.Draw();
-    displayTexture2.Draw();
+    //displayTexture2.Draw();
 }
 
 

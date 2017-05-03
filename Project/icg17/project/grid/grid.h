@@ -10,7 +10,7 @@ struct Light {
     glm::vec3 Ld = glm::vec3(1.0f, 1.0f, 1.0f);
     glm::vec3 Ls = glm::vec3(1.0f, 1.0f, 1.0f);
 
-    glm::vec3 light_pos = glm::vec3(0.0f, 0.0f, 2.0f);
+    glm::vec3 light_pos = glm::vec3(0.0f, 10.0f, 10.0f);
 
     // pass light properties to the shader
     void Setup(GLuint program_id) {
@@ -73,6 +73,9 @@ private:
     GLuint num_indices_;                    // number of vertices to render
     //GLuint MVP_id_;                         // model, view, proj matrix ID
 
+
+
+    // BIND TEXTURE https://openclassrooms.com/courses/creez-des-programmes-en-3d-avec-opengl/les-textures-3
 
     void BindShader(GLuint program_id_) {
         // Bind grid texture
@@ -138,7 +141,7 @@ private:
         // load sand texture
 
         {
-            filename = "sand_texture.tga";
+            filename = "sand.tga";
 
             // set stb_image to have the same coordinates as OpenGL
             stbi_set_flip_vertically_on_load(1);
@@ -173,7 +176,7 @@ private:
 
         // load grass texture
         {
-            filename = "grass_texture.tga";
+            filename = "grass.tga";
 
             // set stb_image to have the same coordinates as OpenGL
             stbi_set_flip_vertically_on_load(1);
@@ -233,7 +236,7 @@ private:
 
         // load snow texture
         {
-            filename = "snow_texture.tga";
+            filename = "snow.tga";
 
             // set stb_image to have the same coordinates as OpenGL
             stbi_set_flip_vertically_on_load(1);
@@ -259,7 +262,7 @@ private:
             stbi_image_free(snow_image);
         }
 
-        // load snow texture
+        // load lol texture
         {
             filename = "snow_texture.tga";
 

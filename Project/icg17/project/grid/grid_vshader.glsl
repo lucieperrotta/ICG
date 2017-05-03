@@ -30,7 +30,7 @@ void main() {
     // draw above lake if upper == 1
     // draw below lake if upper == 0
     if(
-            (((upper==1)) && (height > lake_level)) ||
+            (((upper==1)) && (height >= lake_level)) ||
             ((upper==0)) && (height <= lake_level)
             ){
 

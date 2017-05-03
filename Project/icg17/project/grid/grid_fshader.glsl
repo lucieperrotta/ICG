@@ -16,9 +16,9 @@ uniform sampler2D tex_snow;
 // initialize height limits (lake, forest and mountains)
 // the values can be changed here
 uniform float lake_level;
-float sand_level = lake_level;
-float grass_level = sand_level + 0.08;
-float mountains_level = grass_level + 0.15;
+float sand_level = lake_level+0.015;
+float grass_level = sand_level + 0.02;
+float mountains_level = grass_level + 0.18;
 
 in vec2 uv;
 in vec4 vpoint_mv;
@@ -33,7 +33,7 @@ void chooseColorOnHeight(float height) {
     vec4 t1 = vec4(0.0);
     vec4 t2 = vec4(0.0);
     float blend_factor = 0.0;
-    float scale_factor = 4; // used to make textures smaller so we can repeat them
+    float scale_factor = 5; // used to make textures smaller so we can repeat them
 
 
     if(height <= sand_level) {
@@ -64,7 +64,7 @@ void chooseColorOnHeight(float height) {
         t2 = texture(tex_snow, uv*scale_factor);
 
         // Compute the blend factor which depends on the height
-        float snow_height = (1.05*height - mountains_level)/(1.0 - mountains_level);
+        float snow_height = (height - mountains_level)/(1.0 - mountains_level);
 
         color = mix(t1, t2, snow_height).xyz;
     }
@@ -107,7 +107,7 @@ void main() {
 
         // diffuse term
         vec3 diffuse = Ld*kd*lambert;
-        //color += diffuse;
+        color += diffuse;
 
         // specular term
         vec3 v = normalize(view_dir);

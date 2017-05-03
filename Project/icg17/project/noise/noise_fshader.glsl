@@ -20,8 +20,8 @@ float smooth_interpolation(float t);
 float mix(float x, float y, float alpha);
 
 void main() {
-    //color=vec3(ridged_fBm(uv, 1.5, 1.5, 10, 0.5, 0.0));
-    color = vec3(multifractal(uv, 0.5, 3.7, 7.0, 0.));
+    color=vec3(ridged_fBm(uv, 1.5, 1.5, 10, 0.5, 0.0));
+    //color = vec3(multifractal(uv, 0.5, 3.7, 7.0, 0.));
 }
 
 float fBm(vec2 point, float H, float lacunarity, int octaves, float gain, float offset){

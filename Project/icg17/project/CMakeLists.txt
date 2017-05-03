@@ -7,9 +7,13 @@ file(GLOB TEXTURES
     sky/sky_texture.tga
     sky/sky_texture_2.tga
     grid/grid_texture.tga
+    grid/rock.tga
     grid/rock_texture.tga
     grid/sand_texture.tga
+    grid/sand.tga
+    grid/snow.tga
     grid/snow_texture.tga
+    grid/grass.tga
     grid/grass_texture.tga
     #quad/quad_texture.tga
     )
