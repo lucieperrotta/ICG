@@ -22,7 +22,7 @@ file(GLOB SHADERS
     cube/*.glsl
     water/*.glsl
     #quad/*.glsl
-    screenquad/*.glsl
+    noise/*.glsl
     displaytexture/*.glsl
     grid/*.glsl
         )
