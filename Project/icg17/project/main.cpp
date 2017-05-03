@@ -95,8 +95,8 @@ void Init(GLFWwindow* window) {
     grid.Init(framebuffer_texture_id, lake_level, LengthSegmentArea);
     sky.Init();
 
-    displayTexture1.Init(14, 0);
-    displayTexture2.Init(10, 0.5f);
+    displayTexture1.Init(0, 0);
+    displayTexture2.Init(0, 0.5f);
 
     // trackball
     trackball_matrix = IDENTITY_MATRIX;
@@ -152,8 +152,7 @@ void Display() {
     water.Draw(time, quad_model_matrix, trackball_matrix*view_matrix, projection_matrix);
 
     //displayTexture1.Draw();
-    //displayTexture2.Draw();
-
+    displayTexture2.Draw();
 }
 
 
