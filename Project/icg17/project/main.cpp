@@ -35,7 +35,7 @@ DisplayTexture displayTexture2;
 
 using namespace glm;
 
-float ratio = window_width / (float) window_height;
+float window_ratio = window_width / (float) window_height;
 
 float lake_level = 0.6f;
 int LengthSegmentArea = 2; // grid side length
@@ -55,7 +55,7 @@ mat4 old_trackball_matrix;
 void setMVPmatrices() {
     // setup view and projection matrices
     view_matrix = lookAt(cam_pos, cam_look, cam_up);
-    projection_matrix = perspective(45.0f, ratio, 0.1f, 10.0f);
+    projection_matrix = perspective(45.0f, window_ratio, 0.1f, 10.0f);
 }
 
 
@@ -213,8 +213,8 @@ void ResizeCallback(GLFWwindow* window, int width, int height) {
     window_width = width;
     window_height = height;
 
-    float ratio = window_width / (float) window_height;
-    projection_matrix = perspective(45.0f, ratio, 0.1f, 10.0f);
+    float window_ratio = window_width / (float) window_height;
+    projection_matrix = perspective(45.0f, window_ratio, 0.1f, 10.0f);
 
     glViewport(0, 0, window_width, window_height);
 
