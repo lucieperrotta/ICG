@@ -10,7 +10,7 @@ uniform float tex_height;
 // Functions headers
 float ridged_fBm(vec2 point, float H, float lacunarity, int octaves, float gain, float offset);
 float fBm(vec2 point, float H, float lacunarity, int octaves, float gain, float offset);
-float multifractal(vec2 point, float H, float lacunarity, float octaves, float offset);
+float multifractal(vec2 point, float H, float lacunarity, float octaves, float gain, float offset);
 
 float perlin(vec2 uv);
 float simplex(vec2 uv);
@@ -20,8 +20,8 @@ float smooth_interpolation(float t);
 float mix(float x, float y, float alpha);
 
 void main() {
-    //color=vec3(ridged_fBm(uv, 1.5, 1.5, 10, 0.5, 0.0));
-    color = vec3(multifractal(uv, 0.5, 3.7, 7.0, 0.));
+    color=vec3(ridged_fBm(uv, 1.5, 1.5, 10, 0.5, 0.0));
+    // color = vec3(multifractal(uv, 0.5, 2.5, 10, 0.17, 1));
 }
 
 float fBm(vec2 point, float H, float lacunarity, int octaves, float gain, float offset){
@@ -46,7 +46,7 @@ float ridged_fBm(vec2 point, float H, float lacunarity, int octaves, float gain,
     return value;
 }
 
-float multifractal(vec2 point, float H, float lacunarity, float octaves, float offset){
+float multifractal(vec2 point, float H, float lacunarity, float octaves, float gain, float offset){
     // We have to fix the max size because a GLSL array can't take variable size
     float value[20];
 
@@ -60,7 +60,7 @@ float multifractal(vec2 point, float H, float lacunarity, float octaves, float o
     }
 
     float weight = (simplex(point)+offset) * value[0];
-    float result = weight;
+    float result = weight * gain;
     point *= lacunarity;
 
     int i;
@@ -69,14 +69,14 @@ float multifractal(vec2 point, float H, float lacunarity, float octaves, float o
 
         float signal = (simplex(point)+offset) * value[i];
 
-        result += signal * weight;
+        result += gain * signal * weight;
         weight *= signal;
         point *= lacunarity;
     }
 
     float remainder = octaves - int(octaves);
     if ( floor(remainder) == remainder ){ // check if remainder is integer
-        result += remainder * simplex(point) * value[i];
+        result += gain * remainder * simplex(point) * value[i];
     }
     return(result);
 }
