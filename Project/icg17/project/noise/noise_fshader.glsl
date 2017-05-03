@@ -10,7 +10,7 @@ uniform float tex_height;
 // Functions headers
 float ridged_fBm(vec2 point, float H, float lacunarity, int octaves, float gain, float offset);
 float fBm(vec2 point, float H, float lacunarity, int octaves, float gain, float offset);
-float HybridMultifractal(vec2 point, float H, float lacunarity, float octaves, float offset);
+float multifractal(vec2 point, float H, float lacunarity, float octaves, float offset);
 
 float perlin(vec2 uv);
 float simplex(vec2 uv);
@@ -20,8 +20,8 @@ float smooth_interpolation(float t);
 float mix(float x, float y, float alpha);
 
 void main() {
-    color=vec3(ridged_fBm(uv, 1.5, 1.5, 10, 0.5, 0.0));
-    //color = vec3(HybridMultifractal(uv, 0.1, 3.7, 2.0, 0.));
+    //color=vec3(ridged_fBm(uv, 1.5, 1.5, 10, 0.5, 0.0));
+    color = vec3(multifractal(uv, 0.5, 3.7, 7.0, 0.));
 }
 
 float fBm(vec2 point, float H, float lacunarity, int octaves, float gain, float offset){
@@ -46,58 +46,45 @@ float ridged_fBm(vec2 point, float H, float lacunarity, int octaves, float gain,
     return value;
 }
 
-float HybridMultifractal(vec2 point, float H, float lacunarity, float octaves, float offset){
-    float frequency, result, signal, weight, remainder;
-    int i;
-    bool first = true;
-    float exponent_array[10]; //octaves_max = 10;
+float multifractal(vec2 point, float H, float lacunarity, float octaves, float offset){
+    // We have to fix the max size because a GLSL array can't take variable size
+    float value[20];
 
-    /* precompute and store spectral weights */
-    if (first) {
-        /* seize required memory for exponent_array */
-        frequency = 1.0;
-        for (i = 0; i<octaves; i++) {
-            /* compute weight for each frequency */
-            exponent_array[i] = pow(frequency, -H);
+    // Fill exponent_array
+    for(int i =0; i<2; ++i){
+        float frequency = 1.0;
+        for (int j = 0; j<octaves; ++j) {
+            value[j] = pow(frequency, -H);
             frequency *= lacunarity;
         }
-        first = false;
     }
 
-    /* get first octave of function */
-    result = (perlin(point) + offset) * exponent_array[0];
-    weight = result;
+    float weight = (simplex(point)+offset) * value[0];
+    float result = weight;
+    point *= lacunarity;
 
-    /* increase frequency */
-    point[0] = point[0] * lacunarity;
-    point[1] = point[1] * lacunarity;
+    int i;
+    for (i =1; i<octaves; ++i) {
+        clamp(weight, 1.0, 0.0);
 
-    /* spectral construction inner loop, where the fractal is built */
-    for (i = 1; i<octaves; i++) {
-        /* prevent divergence */
-        if (weight > 1.0) weight = 1.0;
-        /* get next higher frequency */
-        signal = (perlin(point) + offset) * exponent_array[i];
-        /* add it in, weighted by previous freq's local value */
-        result += weight * signal;
-        /* update the (monotonically decreasing) weighting value */
-        /* (this is why H must specify a high fractal dimension) */
+        float signal = (simplex(point)+offset) * value[i];
+
+        result += signal * weight;
         weight *= signal;
-        /* increase frequency */
-        point[0] = point[0] * lacunarity;
-        point[1] = point[1] * lacunarity;
+        point *= lacunarity;
     }
 
-    /* take care of remainder in “octaves” */
-    remainder = octaves - int(octaves);
-    if (remainder != 0)
-        /* “i” and spatial freq. are preset in loop above */
-        result += remainder * perlin(point) * exponent_array[i];
+    float remainder = octaves - int(octaves);
+    if ( floor(remainder) == remainder ){ // check if remainder is integer
+        result += remainder * simplex(point) * value[i];
+    }
     return(result);
 }
 
 // Inspired by Ashima
 float simplex(vec2 uv){
+
+    float N = 289.;
 
     // Corner 1
     vec2 x0 = floor(uv + (uv.x+uv.y)*(0.5*(sqrt(3.0)-1.0)));
@@ -116,18 +103,18 @@ float simplex(vec2 uv){
     vec2 p2 = p0 -1.0 + 2.0 * 0.211324865f; // 0.211324865f = (3 - sqrt(3)) / 6
 
     // Offset
-    x0 = x0 - floor(x0 * (1.0 / 289.0)) * 289.0; // mod 289
+    x0 = x0 - floor(x0 * (1.0 / N)) * N; // mod 289
     vec3 offset = x0.y + vec3(0.0, x1.y, 1.0 );
 
     // First iteration
     offset = ((offset*34.0)+1.0)*offset;
-    offset = offset - floor(offset * (1.0 / 289.0)) * 289.0;
+    offset = offset - floor(offset * (1.0 / N)) * N;
 
     offset = offset + x0.x + vec3(0.0, x1.x, 1.0 );
 
     // Second iteration
     offset = ((offset*34.0)+1.0)*offset;
-    offset = offset - floor(offset * (1.0 / 289.0)) * 289.0;
+    offset = offset - floor(offset * (1.0 / N)) * N;
 
     // p0 is computed independently
     float fr0 = 2.0 * fract(offset.x * 1./41.) - 1.0;
