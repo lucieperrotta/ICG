@@ -1,0 +1,4 @@
+- camera : tim
+- infinite terrain : lucie 
+- saison / nuit/jour(changer couleur), neige
+- height map

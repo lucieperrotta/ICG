@@ -13,6 +13,8 @@ uniform sampler2D tex_grass;
 uniform sampler2D tex_rock;
 uniform sampler2D tex_snow;
 
+uniform int upper;
+
 // initialize height limits (lake, forest and mountains)
 // the values can be changed here
 uniform float lake_level;
@@ -27,7 +29,6 @@ in mat4 MV;
 out vec3 color;
 
 void chooseColorOnHeight(float height) {
-
 
     // Initalize the texture vectors and the blending factor
     vec4 t1 = vec4(0.0);
@@ -72,8 +73,13 @@ void chooseColorOnHeight(float height) {
 }
 
 void main() {
-    // height normalization from 0 to 1 (lake_height is from 0.55 to 0.85)
+
     float height = texture(tex_grid, uv).x;
+
+    if(
+            (((upper==0)) && (height >= lake_level)) ||
+            ((upper==1)) && (height <= lake_level)
+            ) discard;
 
     chooseColorOnHeight(height);
 
