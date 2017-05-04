@@ -37,7 +37,7 @@ using namespace glm;
 
 float window_ratio = window_width / (float) window_height;
 
-float lake_level = 0.55f;
+float lake_level = 0.35f;
 int LengthSegmentArea = 2; // grid side length
 
 vec3 cam_pos = vec3(1.5f, 1.5f, 0.0f);
@@ -103,12 +103,31 @@ void Init(GLFWwindow* window) {
 
 }
 
+vec3 bezierCurves(float time){
+
+    // deCasteljau algorithm
+    vec3 b0 = vec3(1.5f, 1.5f, 0.0f);
+    vec3 b1 = vec3(4,1.5f,0);
+    vec3 b2 = vec3(4,1.5f,3);
+
+    // make it work until s seconds -> time should go from 0 to 1
+    float s = 100;
+    float t = time/s;
+
+    vec3 b0_1 = (1-t)*b0 + t*b1;
+    vec3 b1_1 = (1-t)*b1 + t*b2;
+    vec3 b0_2 = (1-t)*b0_1 + t*b1_1;
+
+    return b0_2;
+}
 
 void Display() {
 
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
     float time = glfwGetTime();
+
+    //cam_pos = bezierCurves(time);
 
     // set up matrices for MVP
     setMVPmatrices();
@@ -278,6 +297,12 @@ void KeyCallback(GLFWwindow* window, int key, int scancode, int action, int mods
     case 90: // Y
         cam_look += vec3(0,delta,0);
         cam_pos += vec3(0,delta,0);
+        break;
+    case 81: // Q
+        cam_up -= vec3(0,delta,0);
+        break;
+    case 69: // E
+        cam_up += vec3(0,delta,0);
         break;
     default:
         break;

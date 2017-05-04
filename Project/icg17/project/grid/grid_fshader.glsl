@@ -62,7 +62,7 @@ void chooseColorOnHeight(float height) {
     } else {
         // Snow of moutains level
         t1 = texture(tex_rock, uv*scale_factor);
-        t2 = texture(tex_snow, uv*scale_factor);
+        t2 = texture(tex_rock, uv*scale_factor);
 
         // Compute the blend factor which depends on the height
         float snow_height = (height - mountains_level)/(1.0 - mountains_level);
