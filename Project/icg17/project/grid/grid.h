@@ -204,7 +204,7 @@ private:
 
         // load rock texture
         {
-            filename = "rock_texture.tga";
+            filename = "rock.tga";
 
             // set stb_image to have the same coordinates as OpenGL
             stbi_set_flip_vertically_on_load(1);
