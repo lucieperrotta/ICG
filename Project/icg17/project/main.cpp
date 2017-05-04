@@ -16,6 +16,9 @@
 
 #include "displaytexture/displaytexture.h"
 
+#undef M_PI
+#define M_PI 3.14159
+float currentAngle = 0;
 
 int window_width = 800;
 int window_height = 600;
@@ -258,31 +261,33 @@ void KeyCallback(GLFWwindow* window, int key, int scancode, int action, int mods
         return;
     }
 
-    float delta = 0.06;
-    float deltaLook = 0.15;
+    float delta = 0.03;
+    float deltaLR = 0.05;
+    float deltaLook = M_PI/10;
+    vec3 direction = cam_look - cam_pos;
 
     switch(key) {
-    case GLFW_KEY_LEFT:
-        cam_pos += vec3(0,0.0,delta);
-        cam_look += vec3(0,0.0,delta);
+    case GLFW_KEY_LEFT: // décale à gauche
+        cam_pos -=  cross(direction, vec3(0.0,1.0,0))*delta;
+        cam_look -= cross(direction, vec3(0.0,1.0,0))*delta;
         break;
     case GLFW_KEY_RIGHT:
-        cam_pos -= vec3(0,0.0,delta);
-        cam_look -= vec3(0,0.0,delta);
+        cam_pos +=  cross(direction, vec3(0.0,1.0,0))*delta;
+        cam_look += cross(direction, vec3(0.0,1.0,0))*delta;
         break;
     case GLFW_KEY_DOWN:
-        cam_pos += vec3(delta,0,0);
-        cam_look += vec3(delta,0,0);
+        cam_pos -= direction*delta;
+        cam_look -= direction*delta;
         break;
     case GLFW_KEY_UP:
-        cam_pos -= vec3(delta,0,0);
-        cam_look -= vec3(delta,0,0);
+        cam_pos += direction*delta;
+        cam_look += direction*delta;
         break;
     case 65: // A
-        cam_look += vec3(0,0,deltaLook);
+        cam_look -= cross(direction, vec3(0.0,1.0,0))*deltaLR;
         break;
     case 68: // D
-        cam_look -= vec3(0,0,deltaLook);
+        cam_look += cross(direction, vec3(0.0,1.0,0))*deltaLR;
         break;
     case 87: // W
         cam_look += vec3(0,deltaLook,0);
