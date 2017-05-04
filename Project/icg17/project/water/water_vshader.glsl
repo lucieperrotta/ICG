@@ -14,7 +14,6 @@ out vec2 uv;
 
 
 void main() {
-<<<<<<< HEAD
     //uv = position;
     //float height = lake_level ;//+ sin(time*uv.x)/30;
     uv = (position + vec2(1.0, 1.0)) * 0.5;
