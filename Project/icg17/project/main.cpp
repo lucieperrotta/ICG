@@ -40,7 +40,7 @@ using namespace glm;
 
 float window_ratio = window_width / (float) window_height;
 
-float lake_level = 0.35f;
+float lake_level = 0.55f;
 int LengthSegmentArea = 2; // grid side length
 
 vec3 cam_pos = vec3(1.5f, 1.5f, 0.0f);

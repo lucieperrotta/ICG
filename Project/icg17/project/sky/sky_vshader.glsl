@@ -26,7 +26,7 @@ mat4 S(float tx, float ty, float tz){
 
 void main() {
     // center of the cube
-    gl_Position =  MVP * T(0,1,0) * S(6,6,6) *vec4(vpoint,1);
+    gl_Position =  MVP * T(0,1,0) * S(16,16,16) *vec4(vpoint,1);
 
     uv = vtexcoord;
 }

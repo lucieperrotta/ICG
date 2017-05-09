@@ -324,12 +324,15 @@ public:
             // length of segment (square side)
             float d = LengthSegmentArea/c;
 
+            // SHIFT THE MOUNTAINS HORIZONTALLY
+            float horizontal_shift = 0;
+
             for(int j = 0; j < c; j++) { // y
                 for(int i = 0; i < c; i++) { // x
-                    float x = i*d;
-                    float y = j*d;
-                    float x1 = (i + 1.0f)*d;
-                    float y1 = (j + 1.0f)*d;
+                    float x = i*d+horizontal_shift;
+                    float y = j*d+horizontal_shift;
+                    float x1 = (i + 1.0f)*d+horizontal_shift;
+                    float y1 = (j + 1.0f)*d+horizontal_shift;
 
                     // vertex position of the triangles.
                     vertices.push_back(-1.0f + x); vertices.push_back(1.0f - y);

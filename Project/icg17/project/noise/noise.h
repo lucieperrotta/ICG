@@ -49,11 +49,13 @@ class Noise {
             }
 
             // texture coordinates
-            {
+            {   // SIZE OF MOUNTAINES (HOW STRECHED THEY ARE)
+                float strech = 3.5;
+
                 const GLfloat vertex_texture_coordinates[] = { /*V1*/ 0.0f, 0.0f,
-                                                               /*V2*/ 1.0f, 0.0f,
-                                                               /*V3*/ 0.0f, 1.0f,
-                                                               /*V4*/ 1.0f, 1.0f};
+                                                               /*V2*/ strech, 0.0f,
+                                                               /*V3*/ 0.0f, strech,
+                                                               /*V4*/ strech, strech};
                 // buffer
                 glGenBuffers(1, &vertex_buffer_object_);
                 glBindBuffer(GL_ARRAY_BUFFER, vertex_buffer_object_);
