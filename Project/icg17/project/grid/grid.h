@@ -70,6 +70,8 @@ private:
     GLuint tex_snow_;                        // texture of the snow
     GLuint tex_lol_;                        // texture to load all others -> make it work o/w last one is failing
 
+    GLuint noise_snow_;
+
     GLuint num_indices_;                    // number of vertices to render
     //GLuint MVP_id_;                         // model, view, proj matrix ID
 
@@ -80,50 +82,58 @@ private:
     void BindShader(GLuint program_id_) {
         // Bind grid texture
         {
-            glActiveTexture(GL_TEXTURE0);
+            glActiveTexture(GL_TEXTURE1);
             glBindTexture(GL_TEXTURE_2D, texture_id_grid);
             GLuint texture_id_grid_ = glGetUniformLocation(program_id_, "tex_grid");
-            glUniform1i(texture_id_grid_, 0);
+            glUniform1i(texture_id_grid_, 1);
+        }
+
+        // Bind snow noise texture
+        {
+            glActiveTexture(GL_TEXTURE10);
+            glBindTexture(GL_TEXTURE_2D, noise_snow_);
+            GLuint snow_noise_id_ = glGetUniformLocation(program_id_, "noise_snow");
+            glUniform1i(snow_noise_id_, 10);
         }
 
         // Bind sand texture
         {
-            glActiveTexture(GL_TEXTURE1);
+            glActiveTexture(GL_TEXTURE11);
             glBindTexture(GL_TEXTURE_2D, tex_sand_);
             GLuint tex_sand_id = glGetUniformLocation(program_id_, "tex_sand");
-            glUniform1i(tex_sand_id, 1 /*GL_TEXTURE1*/);
+            glUniform1i(tex_sand_id, 11 /*GL_TEXTURE1*/);
         }
 
         // Bind grass texture
         {
-            glActiveTexture(GL_TEXTURE2);
+            glActiveTexture(GL_TEXTURE12);
             glBindTexture(GL_TEXTURE_2D, tex_grass_);
             GLuint tex_grass_id = glGetUniformLocation(program_id_, "tex_grass");
-            glUniform1i(tex_grass_id, 2 /*GL_TEXTURE2*/);
+            glUniform1i(tex_grass_id, 12 /*GL_TEXTURE2*/);
         }
 
         // Bind rock texture
         {
-            glActiveTexture(GL_TEXTURE3);
+            glActiveTexture(GL_TEXTURE13);
             glBindTexture(GL_TEXTURE_2D, tex_rock_);
             GLuint tex_rock_id = glGetUniformLocation(program_id_, "tex_rock");
-            glUniform1i(tex_rock_id, 3 /*GL_TEXTURE3*/);
+            glUniform1i(tex_rock_id, 13 /*GL_TEXTURE3*/);
         }
 
         // Bind snow texture
         {
-            glActiveTexture(GL_TEXTURE4);
+            glActiveTexture(GL_TEXTURE14);
             glBindTexture(GL_TEXTURE_2D, tex_snow_);
             GLuint tex_snow_id = glGetUniformLocation(program_id_, "tex_snow");
-            glUniform1i(tex_snow_id, 4 /*GL_TEXTURE4*/);
+            glUniform1i(tex_snow_id, 14 /*GL_TEXTURE4*/);
         }
 
-        // Bind snow texture
+        // Bind unused texture, to avoid non binding last texture
         {
-            glActiveTexture(GL_TEXTURE5);
+            glActiveTexture(GL_TEXTURE15);
             glBindTexture(GL_TEXTURE_2D, tex_lol_);
             GLuint tex_snow_id = glGetUniformLocation(program_id_, "tex_lol");
-            glUniform1i(tex_snow_id, 5 /*GL_TEXTURE4*/);
+            glUniform1i(tex_snow_id, 15 /*GL_TEXTURE4*/);
         }
 
         // Cleanup
@@ -174,6 +184,43 @@ private:
         }
 
 
+
+        // load snow noise
+
+        {
+            filename = "snow_noise.tga";
+
+            // set stb_image to have the same coordinates as OpenGL
+            stbi_set_flip_vertically_on_load(1);
+            unsigned char* snow_noise_image = stbi_load(filename.c_str(), &width, &height, &nb_component, 0);
+
+            // if the image is null
+            if(snow_noise_image == nullptr) {
+                throw(string("Failed to load texture"));
+                printf("OMG GIRL THERE IS A BIG FAILURE RIGHT HERE !!!\n");
+            }
+
+            glGenTextures(1, &noise_snow_);
+            glActiveTexture(GL_TEXTURE10);
+            glBindTexture(GL_TEXTURE_2D, noise_snow_);
+
+            glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+            glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+            glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
+            glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+
+            // check image features
+            if(nb_component == 3) {
+                glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, snow_noise_image);
+            } else if(nb_component == 4) {
+                glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, snow_noise_image);
+            }
+
+            // cleanup
+            stbi_image_free(snow_noise_image);
+        }
+
+
         // load grass texture
         {
             filename = "grass.tga";
@@ -183,7 +230,7 @@ private:
             unsigned char* grass_image = stbi_load(filename.c_str(), &width, &height, &nb_component, 0);
 
             glGenTextures(1, &tex_grass_);
-            glActiveTexture(GL_TEXTURE2);
+            glActiveTexture(GL_TEXTURE12);
             glBindTexture(GL_TEXTURE_2D, tex_grass_);
 
             // check image features
@@ -215,7 +262,7 @@ private:
                 printf("OMG GIRL THERE IS A BIG FAILURE RIGHT HERE !!!\n");
             }
             glGenTextures(1, &tex_rock_);
-            glActiveTexture(GL_TEXTURE3);
+            glActiveTexture(GL_TEXTURE13);
             glBindTexture(GL_TEXTURE_2D, tex_rock_);
 
             glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
@@ -243,7 +290,7 @@ private:
             unsigned char* snow_image = stbi_load(filename.c_str(), &width, &height, &nb_component, 0);
 
             glGenTextures(1, &tex_snow_);
-            glActiveTexture(GL_TEXTURE4);
+            glActiveTexture(GL_TEXTURE14);
             glBindTexture(GL_TEXTURE_2D, tex_snow_);
 
             // check image features
@@ -271,7 +318,7 @@ private:
             unsigned char* lol_image = stbi_load(filename.c_str(), &width, &height, &nb_component, 0);
 
             glGenTextures(1, &tex_lol_);
-            glActiveTexture(GL_TEXTURE5);
+            glActiveTexture(GL_TEXTURE15);
             glBindTexture(GL_TEXTURE_2D, tex_lol_);
 
             // check image features
@@ -292,7 +339,8 @@ private:
     }
 
 public:
-    void Init(GLuint framebuffer_texture_id_grid, float lake_level, int LengthSegmentArea) {
+    void Init(GLuint framebuffer_texture_id_grid, GLuint snow_framebuffer_texture_id,
+              float lake_level, int LengthSegmentArea) {
         // compile the shaders.
         program_id_ = icg_helper::LoadShaders("grid_vshader.glsl", "grid_fshader.glsl");
         if(!program_id_) {

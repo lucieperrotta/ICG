@@ -13,6 +13,8 @@ uniform sampler2D tex_grass;
 uniform sampler2D tex_rock;
 uniform sampler2D tex_snow;
 
+uniform sampler2D noise_snow;
+
 uniform int upper;
 
 // initialize height limits (lake, forest and mountains)
@@ -133,4 +135,7 @@ void main() {
         vec3 specular = Ls*ks*pow(max(dot(reflect,v), 0.0), alpha);
         //color += specular;
     }
+
+    //vec3 snow_noise = texture(noise_snow, uv).rrr;
+    //color = snow_noise.xxx;
 }

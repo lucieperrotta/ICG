@@ -15,6 +15,7 @@ file(GLOB TEXTURES
     grid/snow_texture.tga
     grid/grass.tga
     grid/grass_texture.tga
+    grid/snow_noise.tga
     #quad/quad_texture.tga
     )
 copy_files_once(${TEXTURES})

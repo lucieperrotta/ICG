@@ -25,7 +25,9 @@ int window_height = 600;
 
 FrameBuffer framebuffer;
 FrameBuffer waterFramebuffer;
+FrameBuffer snowFramebuffer;
 Noise noise;
+Noise snowNoise;
 Grid grid;
 Water water;
 Sky sky;
@@ -92,13 +94,15 @@ void Init(GLFWwindow* window) {
 
     GLuint framebuffer_texture_id = framebuffer.Init(window_width, window_height);
     GLuint water_texture_id = waterFramebuffer.Init(window_width, window_height);
+    GLuint snow_framebuffer_texture_id = snowFramebuffer.Init(window_width, window_height);
 
     water.Init(water_texture_id, LengthSegmentArea, lake_level);
     noise.Init(window_width, window_height, framebuffer_texture_id);
-    grid.Init(framebuffer_texture_id, lake_level, LengthSegmentArea);
+    snowNoise.Init(window_width, window_height, snow_framebuffer_texture_id);
+    grid.Init(framebuffer_texture_id, snow_framebuffer_texture_id, lake_level, LengthSegmentArea);
     sky.Init();
 
-    displayTexture1.Init(0, 0);
+    displayTexture1.Init(3, 0);
     displayTexture2.Init(0, 0.5f);
 
     // trackball
@@ -165,6 +169,12 @@ void Display() {
     }
     waterFramebuffer.Unbind();
 
+    snowFramebuffer.Bind();
+    {
+        snowNoise.Draw();
+    }
+    snowFramebuffer.Unbind();
+
     // render to Window
     glViewport(0, 0, window_width, window_height);
 
@@ -173,7 +183,6 @@ void Display() {
     grid.Draw(time, quad_model_matrix, trackball_matrix*view_matrix, projection_matrix,0);
     water.Draw(time, quad_model_matrix, trackball_matrix*view_matrix, projection_matrix);
 
-    //displayTexture1.Draw();
     //displayTexture2.Draw();
 }
 
