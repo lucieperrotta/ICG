@@ -292,7 +292,7 @@ private:
     }
 
 public:
-    void Init(GLuint framebuffer_texture_id_grid, float lake_level, int LengthSegmentArea) {
+    void Init(GLuint framebuffer_texture_id_grid, float lake_level, float height_scale, int LengthSegmentArea) {
         // compile the shaders.
         program_id_ = icg_helper::LoadShaders("grid_vshader.glsl", "grid_fshader.glsl");
         if(!program_id_) {
@@ -376,6 +376,7 @@ public:
         LoadTextures();
 
         glUniform1f(glGetUniformLocation(program_id_, "lake_level"), lake_level);
+        glUniform1f(glGetUniformLocation(program_id_, "height_scale"), height_scale);
 
         // to avoid the current object being polluted
         glBindVertexArray(0);
