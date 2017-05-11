@@ -8,9 +8,10 @@ uniform float time;
 
 uniform sampler2D tex_grid;
 
+uniform float height_scale;
+
 in vec2 position;
 
-out float lake_height;
 out vec4 vpoint_mv;
 out mat4 MV;
 out vec2 uv;
@@ -29,12 +30,14 @@ void main() {
     // draw above lake if upper == 1
     // draw below lake if upper == 0
 
+    float height_scale = 1.8;
 
-        vec3 pos_3d = vec3(position.x, height, -position.y);
-        gl_Position =  projection*MV * vec4(pos_3d, 1.0);
 
-        // point position to send to fshader for shading
-        vpoint_mv = MV * vec4(pos_3d, 1.0);
+    vec3 pos_3d = vec3(position.x, height/height_scale, -position.y);
+    gl_Position =  projection*MV * vec4(pos_3d, 1.0);
+
+    // point position to send to fshader for shading
+    vpoint_mv = MV * vec4(pos_3d, 1.0);
 
 
 }

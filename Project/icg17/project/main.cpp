@@ -40,11 +40,12 @@ using namespace glm;
 
 float window_ratio = window_width / (float) window_height;
 
-float lake_level = 0.35f;
+float lake_level = 0.25f;
 int LengthSegmentArea = 2; // grid side length
+float height_scale = 1.8;
 
-vec3 cam_pos = vec3(1.5f, 1.5f, 0.0f);
-vec3 cam_look = vec3(0.0f, 0.0f, 0.0f);
+vec3 cam_pos = vec3(0.1, 0.5f, 0.0f);
+vec3 cam_look = vec3(0.0f, 0.5f, 0.0f);
 vec3 cam_up = vec3(0.0f, 1.0f, 0.0f);
 
 mat4 projection_matrix;
@@ -54,6 +55,7 @@ mat4 quad_model_matrix = IDENTITY_MATRIX;
 mat4 trackball_matrix;
 mat4 old_trackball_matrix;
 
+vec2 offset = vec2(0., 0.);
 
 void setMVPmatrices() {
     // setup view and projection matrices
@@ -139,7 +141,7 @@ void Display() {
     framebuffer.Bind();
     {
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-        noise.Draw();
+        noise.Draw(offset);
     }
     framebuffer.Unbind();
 
@@ -265,26 +267,27 @@ void KeyCallback(GLFWwindow* window, int key, int scancode, int action, int mods
     float deltaLR = 0.05;
     float deltaLook = M_PI/10;
     vec3 direction = cam_look - cam_pos;
+    vec3 fwefwef ;
 
     switch(key) {
     case GLFW_KEY_LEFT: // décale à gauche
-        cam_pos -=  cross(direction, vec3(0.0,1.0,0))*delta;
-        cam_look -= cross(direction, vec3(0.0,1.0,0))*delta;
+        offset+= vec2(0., -0.1);
         break;
     case GLFW_KEY_RIGHT:
-        cam_pos +=  cross(direction, vec3(0.0,1.0,0))*delta;
-        cam_look += cross(direction, vec3(0.0,1.0,0))*delta;
+        offset+= vec2(0., 0.1);
         break;
     case GLFW_KEY_DOWN:
-        cam_pos -= direction*delta;
-        cam_look -= direction*delta;
+        offset+= vec2(0.1, 0.);
         break;
     case GLFW_KEY_UP:
-        cam_pos += direction*delta;
-        cam_look += direction*delta;
+        offset+= vec2(-0.1, 0.);
         break;
     case 65: // A
-        cam_look -= cross(direction, vec3(0.0,1.0,0))*deltaLR;
+       // cam_look -= cross(direction, vec3(0.0,1.0,0))*deltaLR;
+        fwefwef = (cross(direction, vec3(0.0,1.0,0))*deltaLR);
+        offset.x -= fwefwef.x;
+            offset.y -= fwefwef.z;
+        std::cout << cam_look.x << " ";
         break;
     case 68: // D
         cam_look += cross(direction, vec3(0.0,1.0,0))*deltaLR;

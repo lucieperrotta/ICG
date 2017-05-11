@@ -376,6 +376,7 @@ public:
         LoadTextures();
 
         glUniform1f(glGetUniformLocation(program_id_, "lake_level"), lake_level);
+        //glUniform1f(glGetUniformLocation(program_id_, "height_scale"), height_scale);
 
         // to avoid the current object being polluted
         glBindVertexArray(0);
