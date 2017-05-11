@@ -40,7 +40,8 @@ using namespace glm;
 
 float window_ratio = window_width / (float) window_height;
 
-float lake_level = 0.25f;
+float lake_level = 0.4f;
+float height_scale = 0.7;
 int LengthSegmentArea = 2; // grid side length
 float height_scale = 1.8;
 
@@ -97,7 +98,7 @@ void Init(GLFWwindow* window) {
 
     water.Init(water_texture_id, LengthSegmentArea, lake_level);
     noise.Init(window_width, window_height, framebuffer_texture_id);
-    grid.Init(framebuffer_texture_id, lake_level, LengthSegmentArea);
+    grid.Init(framebuffer_texture_id, lake_level, height_scale, LengthSegmentArea);
     sky.Init();
 
     displayTexture1.Init(0, 0);

@@ -1,4 +1,5 @@
 #version 330
+// values for brightness
 uniform vec3 La, Ld, Ls;
 uniform vec3 ka, kd, ks;
 uniform float alpha;
@@ -6,8 +7,8 @@ uniform vec3 light_pos;
 
 uniform float time;
 
+// textures
 uniform sampler2D tex_grid;
-
 uniform sampler2D tex_sand;
 uniform sampler2D tex_grass;
 uniform sampler2D tex_rock;
@@ -15,12 +16,9 @@ uniform sampler2D tex_snow;
 
 uniform int upper;
 
-// initialize height limits (lake, forest and mountains)
-// the values can be changed here
+// lanscape values
 uniform float lake_level;
-float sand_level = lake_level+0.015;
-float grass_level = sand_level + 0.02;
-float mountains_level = grass_level + 0.18;
+uniform float height_scale;
 
 in vec2 uv;
 in vec4 vpoint_mv;
@@ -28,13 +26,18 @@ in mat4 MV;
 
 out vec3 color;
 
-void chooseColorOnHeight(float height, vec3 normal) {
+
+void chooseColorOnHeight(float height, vec3 normal_mv) {
+
+    float sand_level = lake_level + 0.05*height_scale;
+    float grass_level = sand_level + 0.15*height_scale;
+    float mountains_level = grass_level + 0.2*height_scale;
 
     // Initalize the texture vectors and the blending factor
     vec4 t1 = vec4(0.0);
     vec4 t2 = vec4(0.0);
     float blend_factor = 0.0;
-    float scale_factor = 5; // used to make textures smaller so we can repeat them
+    float scale_factor = 14; // used to make textures smaller so we can repeat them
 
     if(height < lake_level) {
         // Compute the blend factor which depends on the height
@@ -54,7 +57,7 @@ void chooseColorOnHeight(float height, vec3 normal) {
         // Compute the blend factor which depends on the height
         blend_factor = (height - sand_level)/(grass_level - sand_level);
 
-        if(normal.x < 0.5) {
+        if(normal_mv.x < 0.2) {
             color = t1.xyz;
         } else {
             color = t2.xyz;
@@ -86,6 +89,8 @@ void chooseColorOnHeight(float height, vec3 normal) {
 
 void main() {
 
+    float height = texture(tex_grid, uv).x;
+
     // compute normal : compute
     float delta = 0.09; // how much we want to be precize : distance between 2 points we take to compute gradient
     // vectors of difference of elevation (r coordinate of texture) between 2 points
@@ -95,8 +100,6 @@ void main() {
     vec3 y = vec3(0, delta, yz);
     vec3 normal = normalize(cross(x,y));
     vec3 normal_mv = vec3(MV * vec4(normal, 0));
-
-    float height = texture(tex_grid, uv).x;
 
     if(
             (((upper==0)) && (height >= lake_level)) ||
