@@ -43,7 +43,6 @@ float window_ratio = window_width / (float) window_height;
 float lake_level = 0.4f;
 float height_scale = 0.7;
 int LengthSegmentArea = 2; // grid side length
-float height_scale = 1.8;
 
 vec3 cam_pos = vec3(0.1, 0.5f, 0.0f);
 vec3 cam_look = vec3(0.0f, 0.5f, 0.0f);
@@ -265,30 +264,29 @@ void KeyCallback(GLFWwindow* window, int key, int scancode, int action, int mods
     }
 
     float delta = 0.03;
+    float delta_offset = 0.1;
     float deltaLR = 0.05;
     float deltaLook = M_PI/10;
     vec3 direction = cam_look - cam_pos;
-    vec3 fwefwef ;
+    vec2 dir = vec2(direction.x,direction.z);
+    vec3 cross_dir = cross(direction, vec3(0.0,1.0,0));
+    vec2 cross_dir2 = vec2(cross_dir.x, cross_dir.z);
 
     switch(key) {
-    case GLFW_KEY_LEFT: // décale à gauche
-        offset+= vec2(0., -0.1);
+    case GLFW_KEY_LEFT:
+        offset+= vec2(-delta_offset, delta_offset)*cross_dir2;
         break;
     case GLFW_KEY_RIGHT:
-        offset+= vec2(0., 0.1);
+        offset-= vec2(-delta_offset, delta_offset)*cross_dir2;
         break;
     case GLFW_KEY_DOWN:
-        offset+= vec2(0.1, 0.);
+        offset+= vec2(-delta_offset, delta_offset)*dir;
         break;
     case GLFW_KEY_UP:
-        offset+= vec2(-0.1, 0.);
+        offset -= vec2(-delta_offset, delta_offset)*dir;
         break;
     case 65: // A
-       // cam_look -= cross(direction, vec3(0.0,1.0,0))*deltaLR;
-        fwefwef = (cross(direction, vec3(0.0,1.0,0))*deltaLR);
-        offset.x -= fwefwef.x;
-            offset.y -= fwefwef.z;
-        std::cout << cam_look.x << " ";
+        cam_look -= cross(direction, vec3(0.0,1.0,0))*deltaLR;
         break;
     case 68: // D
         cam_look += cross(direction, vec3(0.0,1.0,0))*deltaLR;
