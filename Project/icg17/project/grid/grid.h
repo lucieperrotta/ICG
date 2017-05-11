@@ -164,7 +164,7 @@ private:
             }
 
             glGenTextures(1, &tex_sand_);
-            glActiveTexture(GL_TEXTURE1);
+            glActiveTexture(GL_TEXTURE11);
             glBindTexture(GL_TEXTURE_2D, tex_sand_);
 
             glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
@@ -472,6 +472,7 @@ public:
 
         // pass the current time stamp to the shader.
         glUniform1f(glGetUniformLocation(program_id_, "time"), time);
+
 
         // draw
         // You can do that by uncommenting the next line.

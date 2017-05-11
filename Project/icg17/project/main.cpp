@@ -45,7 +45,7 @@ float window_ratio = window_width / (float) window_height;
 float lake_level = 0.55f;
 int LengthSegmentArea = 2; // grid side length
 
-vec3 cam_pos = vec3(1.5f, 1.5f, 0.0f);
+vec3 cam_pos = vec3(3.f, 5.f, 0.0f);
 vec3 cam_look = vec3(0.0f, 0.0f, 0.0f);
 vec3 cam_up = vec3(0.0f, 1.0f, 0.0f);
 
