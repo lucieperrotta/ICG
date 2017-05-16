@@ -126,7 +126,7 @@ vec3 bezierCurves(float time){
     vec3 b2 = vec3(4,1.5f,3);
 
     // make it work until s seconds -> time should go from 0 to 1
-    float t = time/s;
+    float t = time/bezierLimit;
 
     vec3 b0_1 = (1-t)*b0 + t*b1;
     vec3 b1_1 = (1-t)*b1 + t*b2;
@@ -279,6 +279,7 @@ void KeyCallback(GLFWwindow* window, int key, int scancode, int action, int mods
         return;
     }
 
+
     float delta = 0.65;
     float deltaXY = 0.03;
     float delta_offset = 0.1;
@@ -371,6 +372,7 @@ void KeyCallback(GLFWwindow* window, int key, int scancode, int action, int mods
     default:
         break;
     }
+
 }
 
 
