@@ -44,7 +44,7 @@ float lake_level = 0.4f;
 float height_scale = 0.7;
 int LengthSegmentArea = 2; // grid side length
 
-vec3 defaultCamPos = vec3(0.1, 0.5f, 0.0f);
+vec3 defaultCamPos = vec3(0.1f, 0.5f, 0.0f); // 0.1 0.5 0.0
 vec3 defaultCamLook = vec3(0.0f, 0.5f, 0.0f);
 
 vec3 cam_pos = defaultCamPos;
@@ -63,9 +63,11 @@ vec2 offset = vec2(0., 0.);
 // [navigation, fps, bezier]
 float bezierLimit = 80; // limit
 float bezierCount = 0;
+int stop = 0;
 
 // camera mode
 vec3 cameraStatus = vec3(1,0,0);
+
 
 void setMVPmatrices() {
     // setup view and projection matrices
@@ -111,7 +113,7 @@ void Init(GLFWwindow* window) {
     sky.Init();
 
     displayTexture1.Init(0, 0);
-    displayTexture2.Init(0, 0.5f);
+    displayTexture2.Init(water_texture_id, 0.5f);
 
     // trackball
     trackball_matrix = IDENTITY_MATRIX;
@@ -142,8 +144,8 @@ void Display() {
     float time = glfwGetTime();
 
     // BEZIER CURVES
-    bezierCount += 0.1;
     if(cameraStatus.z == 1){
+        if(stop != 1) bezierCount += 0.1;
         cam_pos = bezierCurves(bezierCount);
     }
     // begin again if go too far
@@ -161,6 +163,9 @@ void Display() {
     }
     framebuffer.Unbind();
 
+    //displayTexture1.Draw();
+    //displayTexture2.Draw();
+
     // water reflection
     waterFramebuffer.Bind();
     {
@@ -173,13 +178,14 @@ void Display() {
         cam_look_mirror.y = cam_look.y + 2*abs(cam_look.y-lake_level);
         mat4 view_matrix_mirror = lookAt(cam_pos_mirror, cam_look_mirror, cam_up);
 
-        mat4 axis_invert = mat4(vec4(-1,0,0,0),
+        /*mat4 axis_invert = mat4(vec4(-1,0,0,0),
                                 vec4(0,1,0,0),
                                 vec4(0,0,1,0),
                                 vec4(0,0,0,1));
+        */
 
-        sky.Draw(time, quad_model_matrix, inverse(trackball_matrix*axis_invert)*view_matrix_mirror, projection_matrix);
-        grid.Draw(time, quad_model_matrix, trackball_matrix*view_matrix_mirror, projection_matrix);
+        //sky.Draw(time, quad_model_matrix, inverse(trackball_matrix*axis_invert)*view_matrix_mirror, projection_matrix);
+        grid.Draw(time, offset, quad_model_matrix, view_matrix_mirror, projection_matrix);
     }
     waterFramebuffer.Unbind();
 
@@ -187,12 +193,10 @@ void Display() {
     glViewport(0, 0, window_width, window_height);
 
     sky.Draw(time, quad_model_matrix, trackball_matrix*view_matrix, projection_matrix);
-    grid.Draw(time, quad_model_matrix, trackball_matrix*view_matrix, projection_matrix);
-    grid.Draw(time, quad_model_matrix, trackball_matrix*view_matrix, projection_matrix,0);
-    water.Draw(time, quad_model_matrix, trackball_matrix*view_matrix, projection_matrix);
+    grid.Draw(time, offset, quad_model_matrix, trackball_matrix*view_matrix, projection_matrix);
+    grid.Draw(time, offset, quad_model_matrix, trackball_matrix*view_matrix, projection_matrix,0);
+    water.Draw(time, offset, quad_model_matrix, trackball_matrix*view_matrix, projection_matrix);
 
-    //displayTexture1.Draw();
-    //displayTexture2.Draw();
 }
 
 
@@ -336,6 +340,8 @@ void KeyCallback(GLFWwindow* window, int key, int scancode, int action, int mods
     case GLFW_KEY_UP:
         if(cameraStatus.x == 1){
             offset -= vec2(-delta_offset, delta_offset)*dir;
+            std::cout << "--x:" << offset.x;
+            std::cout << "--y:" << offset.y;
             cam_pos.y += delta*direction.y;
             cam_look.y += delta*direction.y;
         }
@@ -357,12 +363,18 @@ void KeyCallback(GLFWwindow* window, int key, int scancode, int action, int mods
             cam_look -= vec3(0,deltaXY,0);
             cam_pos -= vec3(0,deltaXY,0);
         }
+        else if(cameraStatus.z==1){
+            stop = 1;
+        }
         break;
 
     case 90: // Y
         if(cameraStatus.x == 1){
             cam_look += vec3(0,deltaXY,0);
             cam_pos += vec3(0,deltaXY,0);
+        }
+        else if(cameraStatus.z==1){
+            stop = 0;
         }
         break;
     case 81: // Q

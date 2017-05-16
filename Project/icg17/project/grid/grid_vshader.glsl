@@ -30,10 +30,8 @@ void main() {
     // draw above lake if upper == 1
     // draw below lake if upper == 0
 
-    float height_scale = 1.8;
 
-
-    vec3 pos_3d = vec3(position.x, height/height_scale, -position.y);
+    vec3 pos_3d = vec3(position.x, height, -position.y);
     gl_Position =  projection*MV * vec4(pos_3d, 1.0);
 
     // point position to send to fshader for shading

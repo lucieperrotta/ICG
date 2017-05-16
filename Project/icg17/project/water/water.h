@@ -119,7 +119,7 @@ public:
         glDeleteTextures(1, &reflection_texture_id_);
     }
 
-    void Draw(float time, const glm::mat4 &model = IDENTITY_MATRIX, const glm::mat4 &view = IDENTITY_MATRIX,
+    void Draw(float time, vec2 offset, const glm::mat4 &model = IDENTITY_MATRIX, const glm::mat4 &view = IDENTITY_MATRIX,
               const glm::mat4 &projection = IDENTITY_MATRIX) {
         glUseProgram(program_id_);
         glBindVertexArray(vertex_array_id_);
@@ -151,6 +151,8 @@ public:
 
         // pass the current time stamp to the shader.
         glUniform1f(glGetUniformLocation(program_id_, "time"), time);
+        glUniform1f(glGetUniformLocation(program_id_, "offsetX"), offset.x);
+        glUniform1f(glGetUniformLocation(program_id_, "offsetY"), offset.y);
 
         // draw
         //glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);

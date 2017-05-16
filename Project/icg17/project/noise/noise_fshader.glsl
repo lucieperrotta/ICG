@@ -26,7 +26,8 @@ void main() {
 
     vec2 uv2 = uv + vec2(offset_x, offset_y);
 
-    color=vec3(ridged_fBm(uv2, 1.5, 1.5, 10, 0.5, 0.0));
+    float height_scale = 1.8;
+    color = vec3(ridged_fBm(uv2, 1.5, 1.5, 10, 0.5, 0.0))/height_scale;
     //color = vec3(multifractal(uv, 0.5, 3.7, 7.0, 0.));
     // color = vec3(multifractal(uv, 0.5, 2.5, 10, 0.17, 1));
 }

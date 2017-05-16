@@ -16,6 +16,9 @@ uniform sampler2D tex_snow;
 
 uniform int upper;
 
+uniform float offsetX;
+uniform float offsetY;
+
 // lanscape values
 uniform float lake_level;
 uniform float height_scale;
@@ -29,7 +32,7 @@ out vec3 color;
 
 void chooseColorOnHeight(float height, vec3 normal_mv) {
 
-    float sand_level = lake_level + 0.05*height_scale;
+    float sand_level = lake_level + 0.02*height_scale;
     float grass_level = sand_level + 0.15*height_scale;
     float mountains_level = grass_level + 0.2*height_scale;
 
@@ -39,20 +42,22 @@ void chooseColorOnHeight(float height, vec3 normal_mv) {
     float blend_factor = 0.0;
     float scale_factor = 14; // used to make textures smaller so we can repeat them
 
+    vec2 uv_offset_scale = (uv + vec2(offsetX, offsetY))*scale_factor;
+
     if(height < lake_level) {
         // Compute the blend factor which depends on the height
         blend_factor = (height - lake_level)/(sand_level - lake_level);
 
-        t1 = 0.85*texture(tex_sand, uv);
-        t2 = texture(tex_sand, uv);
+        t1 = 0.85*texture(tex_sand, uv_offset_scale);
+        t2 = texture(tex_sand, uv_offset_scale);
         color = mix(t1, t2, blend_factor).xyz;
     } else if(height <= sand_level) {
         // Sand & Lake level
-        color = texture(tex_sand, uv).xyz;
+        color = texture(tex_sand, uv_offset_scale).xyz;
     } else if(height <= grass_level) {
         // Grass & Forest level
-        t1 = texture(tex_sand, uv);
-        t2 = texture(tex_grass, uv*scale_factor);
+        t1 = texture(tex_sand, uv_offset_scale);
+        t2 = texture(tex_grass, uv_offset_scale);
 
         // Compute the blend factor which depends on the height
         blend_factor = (height - sand_level)/(grass_level - sand_level);
@@ -67,8 +72,8 @@ void chooseColorOnHeight(float height, vec3 normal_mv) {
         color = mix(t1, t2, blend_factor).xyz;
     } else if(height <= mountains_level) {
         // Rock & Mountains Level
-        t1 = texture(tex_grass, uv*scale_factor);
-        t2 = texture(tex_rock, uv*scale_factor);
+        t1 = texture(tex_grass, uv_offset_scale);
+        t2 = texture(tex_rock, uv_offset_scale);
 
         // Compute the blend factor which depends on the height
         blend_factor = (height - grass_level)/(mountains_level - grass_level);
@@ -76,8 +81,8 @@ void chooseColorOnHeight(float height, vec3 normal_mv) {
         color = mix(t1, t2, blend_factor).xyz;
     } else {
         // Snow of moutains level
-        t1 = texture(tex_rock, uv*scale_factor);
-        t2 = texture(tex_snow, uv*scale_factor);
+        t1 = texture(tex_rock, uv_offset_scale);
+        t2 = texture(tex_snow, uv_offset_scale);
 
         // Compute the blend factor which depends on the height
         float snow_height = (height - mountains_level)/(1.0 - mountains_level);
@@ -90,6 +95,10 @@ void chooseColorOnHeight(float height, vec3 normal_mv) {
 void main() {
 
     float height = texture(tex_grid, uv).x;
+    if(
+            (((upper==0)) && (height >= lake_level)) ||
+            ((upper==1)) && (height <= lake_level)
+            ) discard;
 
     // compute normal : compute
     float delta = 0.09; // how much we want to be precize : distance between 2 points we take to compute gradient
@@ -101,10 +110,6 @@ void main() {
     vec3 normal = normalize(cross(x,y));
     vec3 normal_mv = vec3(MV * vec4(normal, 0));
 
-    if(
-            (((upper==0)) && (height >= lake_level)) ||
-            ((upper==1)) && (height <= lake_level)
-            ) discard;
 
     chooseColorOnHeight(height, normal_mv);
 
@@ -128,7 +133,9 @@ void main() {
 
         // diffuse term
         vec3 diffuse = Ld*kd*lambert;
-        color += diffuse;
+        color += diffuse * 2;
+
+
 
         // specular term
         vec3 v = normalize(view_dir);
