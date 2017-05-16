@@ -10,11 +10,16 @@ uniform sampler2D tex_grid;
 
 uniform float height_scale;
 
+uniform float cam_pos_x;
+uniform float cam_pos_z;
+
 in vec2 position;
 
 out vec4 vpoint_mv;
 out mat4 MV;
 out vec2 uv;
+
+out float transparency;
 
 
 void main() {
@@ -39,5 +44,6 @@ void main() {
     // point position to send to fshader for shading
     vpoint_mv = MV * vec4(pos_3d, 1.0);
 
-
+    // transparency for distant pixels (transparency gets stronger with quadratic order (1.5) )
+    transparency = 1-pow(pow(pos_3d.x+cam_pos_x, 2) + pow(pos_3d.z+cam_pos_z, 2), 1.5);
 }
