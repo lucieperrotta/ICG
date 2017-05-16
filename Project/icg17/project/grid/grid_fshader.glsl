@@ -27,10 +27,14 @@ in vec2 uv;
 in vec4 vpoint_mv;
 in mat4 MV;
 
-out vec3 color;
+in float transparency;
+
+out vec4 color;
+
+vec3 color1 = vec3(0,0,0);
 
 
-void chooseColorOnHeight(float height, vec3 normal_mv) {
+void choosecolor1OnHeight(float height, vec3 normal_mv) {
 
     float sand_level = lake_level + 0.02*height_scale;
     float grass_level = sand_level + 0.15*height_scale;
@@ -49,11 +53,11 @@ void chooseColorOnHeight(float height, vec3 normal_mv) {
         blend_factor = (height - lake_level)/(sand_level - lake_level);
 
         t1 = 0.85*texture(tex_sand, uv_offset_scale);
-        t2 = texture(tex_sand, uv_offset_scale);
-        color = mix(t1, t2, blend_factor).xyz;
+        t2 = texture(tex_sand, uv);
+        color1 = mix(t1, t2, blend_factor).xyz;
     } else if(height <= sand_level) {
         // Sand & Lake level
-        color = texture(tex_sand, uv_offset_scale).xyz;
+        color1 = texture(tex_sand, uv_offset_scale).xyz;
     } else if(height <= grass_level) {
         // Grass & Forest level
         t1 = texture(tex_sand, uv_offset_scale);
@@ -63,13 +67,13 @@ void chooseColorOnHeight(float height, vec3 normal_mv) {
         blend_factor = (height - sand_level)/(grass_level - sand_level);
 
         if(normal_mv.x < 0.2) {
-            color = t1.xyz;
+            color1 = t1.xyz;
         } else {
-            color = t2.xyz;
+            color1 = t2.xyz;
         }
 
-        // Equivalent to color = (t1*(1-grass_height) + t2*grass_height).xyz;
-        color = mix(t1, t2, blend_factor).xyz;
+        // Equivalent to color1 = (t1*(1-grass_height) + t2*grass_height).xyz;
+        color1 = mix(t1, t2, blend_factor).xyz;
     } else if(height <= mountains_level) {
         // Rock & Mountains Level
         t1 = texture(tex_grass, uv_offset_scale);
@@ -78,7 +82,7 @@ void chooseColorOnHeight(float height, vec3 normal_mv) {
         // Compute the blend factor which depends on the height
         blend_factor = (height - grass_level)/(mountains_level - grass_level);
 
-        color = mix(t1, t2, blend_factor).xyz;
+        color1 = mix(t1, t2, blend_factor).xyz;
     } else {
         // Snow of moutains level
         t1 = texture(tex_rock, uv_offset_scale);
@@ -87,7 +91,7 @@ void chooseColorOnHeight(float height, vec3 normal_mv) {
         // Compute the blend factor which depends on the height
         float snow_height = (height - mountains_level)/(1.0 - mountains_level);
 
-        color = mix(t1, t2, snow_height).xyz;
+        color1 = mix(t1, t2, snow_height).xyz;
     }
 
 }
@@ -111,19 +115,19 @@ void main() {
     vec3 normal_mv = vec3(MV * vec4(normal, 0));
 
 
-    chooseColorOnHeight(height, normal_mv);
+    choosecolor1OnHeight(height, normal_mv);
 
 
 
     // PHONG SHADING
-    //color=vec3(0);    
+    //color1=vec3(0);
 
     vec3 light_dir = light_pos - vpoint_mv.xyz;
     vec3 view_dir = -vpoint_mv.xyz;
 
     // ambient term
     vec3 ambient = ka * La;
-    //color += ambient;
+    //color1 += ambient;
 
     vec3 n = normalize(normal_mv);
     vec3 l = normalize(light_dir);
@@ -133,14 +137,14 @@ void main() {
 
         // diffuse term
         vec3 diffuse = Ld*kd*lambert;
-        color += diffuse * 2;
-
-
+        color1 += diffuse;
 
         // specular term
         vec3 v = normalize(view_dir);
         vec3 reflect = reflect(-l, n);
         vec3 specular = Ls*ks*pow(max(dot(reflect,v), 0.0), alpha);
-        //color += specular;
+        //color1 += specular;
     }
+    //transparency for direant pixels
+    color=vec4(color1, transparency);
 }

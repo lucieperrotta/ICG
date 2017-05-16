@@ -398,10 +398,15 @@ public:
         glBindTexture(GL_TEXTURE_2D, 0);
     }
 
-    void Draw(float time, vec2 offset, const glm::mat4 &model = IDENTITY_MATRIX, const glm::mat4 &view = IDENTITY_MATRIX,
+
+    void Draw(vec3 cam_pos, float time, vec2 offset, const glm::mat4 &model = IDENTITY_MATRIX, const glm::mat4 &view = IDENTITY_MATRIX,
               const glm::mat4 &projection = IDENTITY_MATRIX, int upper = 1) {
         glUseProgram(program_id_);
         glBindVertexArray(vertex_array_id_);
+
+        // transparency
+        glEnable(GL_BLEND);
+        glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
         // setup variables for shading
         Material::Setup(program_id_);
@@ -426,6 +431,10 @@ public:
         glUniform1f(glGetUniformLocation(program_id_, "offsetX"), offset.x);
         glUniform1f(glGetUniformLocation(program_id_, "offsetY"), offset.y);
 
+        // MOUNTAINS GET TRANSPARENT WITH DISTANCE
+        glUniform1f(glGetUniformLocation(program_id_, "cam_pos_x"), cam_pos.x);
+        glUniform1f(glGetUniformLocation(program_id_, "cam_pos_z"), cam_pos.z);
+
         // draw
         // You can do that by uncommenting the next line.
         //glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
@@ -435,5 +444,8 @@ public:
 
         glBindVertexArray(0);
         glUseProgram(0);
+
+        //end transparency
+        glDisable(GL_BLEND);
     }
 };

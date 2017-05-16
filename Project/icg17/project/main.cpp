@@ -40,7 +40,7 @@ using namespace glm;
 
 float window_ratio = window_width / (float) window_height;
 
-float lake_level = 0.4f;
+float lake_level = 0.2f;
 float height_scale = 0.7;
 int LengthSegmentArea = 2; // grid side length
 
@@ -185,7 +185,7 @@ void Display() {
         */
 
         //sky.Draw(time, quad_model_matrix, inverse(trackball_matrix*axis_invert)*view_matrix_mirror, projection_matrix);
-        grid.Draw(time, offset, quad_model_matrix, view_matrix_mirror, projection_matrix);
+        grid.Draw(cam_pos, time, offset, quad_model_matrix, view_matrix_mirror, projection_matrix);
     }
     waterFramebuffer.Unbind();
 
@@ -193,8 +193,8 @@ void Display() {
     glViewport(0, 0, window_width, window_height);
 
     sky.Draw(time, quad_model_matrix, trackball_matrix*view_matrix, projection_matrix);
-    grid.Draw(time, offset, quad_model_matrix, trackball_matrix*view_matrix, projection_matrix);
-    grid.Draw(time, offset, quad_model_matrix, trackball_matrix*view_matrix, projection_matrix,0);
+    grid.Draw(cam_pos, time, offset, quad_model_matrix, trackball_matrix*view_matrix, projection_matrix);
+    grid.Draw(cam_pos, time, offset, quad_model_matrix, trackball_matrix*view_matrix, projection_matrix,0);
     water.Draw(time, offset, quad_model_matrix, trackball_matrix*view_matrix, projection_matrix);
 
 }
@@ -334,7 +334,7 @@ void KeyCallback(GLFWwindow* window, int key, int scancode, int action, int mods
         else if(cameraStatus.y == 1){
             int pos = 3*(window_width/2*window_height + window_width/2);
             std::cout << pixels[pos];
-             //cam_pos.y = pixels[pos];
+            //cam_pos.y = pixels[pos];
         }
         break;
     case GLFW_KEY_UP:
