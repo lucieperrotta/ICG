@@ -4,6 +4,9 @@ uniform sampler2D tex_water;
 uniform float offsetX;
 uniform float offsetY;
 
+uniform float water_width;
+uniform float water_height;
+
 in vec2 uv;
 
 out vec4 color;

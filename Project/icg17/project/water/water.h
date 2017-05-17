@@ -13,16 +13,21 @@ private:
     GLuint reflection_texture_id_;          // texture ID
     GLuint num_indices_;                    // number of vertices to render
 
+    int water_width_;
+    int water_height_;
+
 public:
+
+    void UpdateSize(int water_width, int water_height) {
+        this->water_width_ = water_width;
+        this->water_height_ = water_height;
+    }
+
+
     void Init(GLuint framebuffer_texture_id_, int LengthSegmentArea, float lake_level) {
         // compile the shaders.
         program_id_ = icg_helper::LoadShaders("water_vshader.glsl", "water_fshader.glsl");
 
-        // forest texture
-        const int colormap_size = 9;
-        GLfloat texture_forest[colormap_size] = {0.3f, 0.5f, 0.0f, // yellow
-                                                 0.0f, 0.15f, 0.0f, // green
-                                                 0.8f, 0.8f, 0.8f}; // grey
 
         if(!program_id_) {
             exit(EXIT_FAILURE);
@@ -153,6 +158,8 @@ public:
         glUniform1f(glGetUniformLocation(program_id_, "time"), time);
         glUniform1f(glGetUniformLocation(program_id_, "offsetX"), offset.x);
         glUniform1f(glGetUniformLocation(program_id_, "offsetY"), offset.y);
+        glUniform1f(glGetUniformLocation(program_id_, "water_width"), this->water_width_);
+        glUniform1f(glGetUniformLocation(program_id_, "water_height"), this->water_height_);
 
         // draw
         //glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);

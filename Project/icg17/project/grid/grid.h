@@ -88,10 +88,10 @@ private:
 
         // Bind sand texture
         {
-            glActiveTexture(GL_TEXTURE1);
+            glActiveTexture(GL_TEXTURE11);
             glBindTexture(GL_TEXTURE_2D, tex_sand_);
             GLuint tex_sand_id = glGetUniformLocation(program_id_, "tex_sand");
-            glUniform1i(tex_sand_id, 1 /*GL_TEXTURE1*/);
+            glUniform1i(tex_sand_id, 11 /*GL_TEXTURE1*/);
         }
 
         // Bind grass texture
@@ -154,7 +154,7 @@ private:
             }
 
             glGenTextures(1, &tex_sand_);
-            glActiveTexture(GL_TEXTURE1);
+            glActiveTexture(GL_TEXTURE11);
             glBindTexture(GL_TEXTURE_2D, tex_sand_);
 
             glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);

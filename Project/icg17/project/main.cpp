@@ -20,8 +20,8 @@
 #define M_PI 3.14159
 float currentAngle = 0;
 
-int window_width = 800;
-int window_height = 600;
+int window_width = 1200;
+int window_height = 800;
 
 FrameBuffer framebuffer;
 FrameBuffer waterFramebuffer;
@@ -40,12 +40,12 @@ using namespace glm;
 
 float window_ratio = window_width / (float) window_height;
 
-float lake_level = 0.2f;
+float lake_level = 0.45f;
 float height_scale = 0.7;
 int LengthSegmentArea = 2; // grid side length
 
 vec3 defaultCamPos = vec3(0.1f, 0.5f, 0.0f); // 0.1 0.5 0.0
-vec3 defaultCamLook = vec3(0.0f, 0.5f, 0.0f);
+vec3 defaultCamLook = vec3(-0.1f, 0.5f, 0.0f); // 0 .5 0
 
 vec3 cam_pos = defaultCamPos;
 vec3 cam_look = defaultCamLook;
@@ -123,7 +123,7 @@ void Init(GLFWwindow* window) {
 vec3 bezierCurves(float time){
 
     // deCasteljau algorithm
-    vec3 b0 = vec3(1.5f, 1.5f, 0.0f);
+    vec3 b0 = defaultCamPos;
     vec3 b1 = vec3(4,1.5f,0);
     vec3 b2 = vec3(4,1.5f,3);
 
@@ -175,7 +175,7 @@ void Display() {
         vec3 cam_pos_mirror = cam_pos;
         cam_pos_mirror.y = cam_pos.y - 2*abs(cam_pos.y-lake_level);
         vec3 cam_look_mirror = cam_look;
-        cam_look_mirror.y = cam_look.y + 2*abs(cam_look.y-lake_level);
+        cam_look_mirror.y = cam_look.y + 2*(lake_level-cam_look.y);
         mat4 view_matrix_mirror = lookAt(cam_pos_mirror, cam_look_mirror, cam_up);
 
         /*mat4 axis_invert = mat4(vec4(-1,0,0,0),
@@ -184,7 +184,7 @@ void Display() {
                                 vec4(0,0,0,1));
         */
 
-        //sky.Draw(time, quad_model_matrix, inverse(trackball_matrix*axis_invert)*view_matrix_mirror, projection_matrix);
+        sky.Draw(time, quad_model_matrix, inverse(trackball_matrix*axis_invert)*view_matrix_mirror, projection_matrix);
         grid.Draw(cam_pos, time, offset, quad_model_matrix, view_matrix_mirror, projection_matrix);
     }
     waterFramebuffer.Unbind();
@@ -264,7 +264,8 @@ void ResizeCallback(GLFWwindow* window, int width, int height) {
     // when the window is resized, the framebuffer and the screenquad should also be resized
     framebuffer.Cleanup();
     framebuffer.Init(window_width, window_height);
-    noise.UpdateSize(window_width, window_height);
+    //noise.UpdateSize(window_width, window_height);
+    //water.UpdateSize(window_width, window_height);
 }
 
 
@@ -282,7 +283,6 @@ void KeyCallback(GLFWwindow* window, int key, int scancode, int action, int mods
     if(action != GLFW_RELEASE) {
         return;
     }
-
 
     float delta = 0.65;
     float deltaXY = 0.03;
@@ -354,6 +354,7 @@ void KeyCallback(GLFWwindow* window, int key, int scancode, int action, int mods
         break;
     case 87: // W
         cam_look += vec3(0,deltaLook,0);
+        std::cout << " - " << cam_look.y;
         break;
     case 83: // S
         cam_look -= vec3(0,deltaLook,0);
