@@ -123,7 +123,7 @@ void Init(GLFWwindow* window) {
 vec3 bezierCurves(float time){
 
     // deCasteljau algorithm
-    vec3 b0 = defaultCamPos;
+    vec3 b0 = vec3(0,0,0);
     vec3 b1 = vec3(4,1.5f,0);
     vec3 b2 = vec3(4,1.5f,3);
 
@@ -178,11 +178,11 @@ void Display() {
         cam_look_mirror.y = cam_look.y + 2*(lake_level-cam_look.y);
         mat4 view_matrix_mirror = lookAt(cam_pos_mirror, cam_look_mirror, cam_up);
 
-        /*mat4 axis_invert = mat4(vec4(-1,0,0,0),
+        mat4 axis_invert = mat4(vec4(-1,0,0,0),
                                 vec4(0,1,0,0),
                                 vec4(0,0,1,0),
                                 vec4(0,0,0,1));
-        */
+
 
         sky.Draw(time, quad_model_matrix, inverse(trackball_matrix*axis_invert)*view_matrix_mirror, projection_matrix);
         grid.Draw(cam_pos, time, offset, quad_model_matrix, view_matrix_mirror, projection_matrix);
