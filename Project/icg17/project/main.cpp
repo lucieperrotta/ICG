@@ -120,12 +120,12 @@ void Init(GLFWwindow* window) {
 
 }
 
-vec3 bezierCurves(float time){
+vec2 bezierCurves(float time){
 
     // deCasteljau algorithm
-    vec3 b0 = vec3(0,0,0);
-    vec3 b1 = vec3(4,1.5f,0);
-    vec3 b2 = vec3(4,1.5f,3);
+    vec3 b0 = defaultCamPos;
+    vec3 b1 = b0 + vec3(2,0,0);
+    vec3 b2 = b1 + vec3(0,0,2);
 
     // make it work until s seconds -> time should go from 0 to 1
     float t = time/bezierLimit;
@@ -134,7 +134,7 @@ vec3 bezierCurves(float time){
     vec3 b1_1 = (1-t)*b1 + t*b2;
     vec3 b0_2 = (1-t)*b0_1 + t*b1_1;
 
-    return b0_2;
+    return vec2(b0_2.x,b0_2.z);
 }
 
 void Display() {
@@ -146,7 +146,7 @@ void Display() {
     // BEZIER CURVES
     if(cameraStatus.z == 1){
         if(stop != 1) bezierCount += 0.1;
-        cam_pos = bezierCurves(bezierCount);
+        offset = bezierCurves(bezierCount);
     }
     // begin again if go too far
     bezierCount = (bezierCount > bezierLimit) ? 0 : bezierCount;
@@ -313,6 +313,7 @@ void KeyCallback(GLFWwindow* window, int key, int scancode, int action, int mods
         break;
     case 51: //3 - bezier curves
         cameraStatus = vec3(0,0,1);
+        // need to set cam_pos to default if want to start somewhere else than current
         bezierCount = 0;
         break;
     case GLFW_KEY_LEFT:
@@ -323,6 +324,8 @@ void KeyCallback(GLFWwindow* window, int key, int scancode, int action, int mods
     case GLFW_KEY_RIGHT:
         if(cameraStatus.x == 1){
             offset-= vec2(-delta_offset, delta_offset)*cross_dir2;
+            std::cout << "--x:" << offset.x;
+            std::cout << "--y:" << offset.y << endl;
         }
         break;
     case GLFW_KEY_DOWN:
@@ -341,7 +344,7 @@ void KeyCallback(GLFWwindow* window, int key, int scancode, int action, int mods
         if(cameraStatus.x == 1){
             offset -= vec2(-delta_offset, delta_offset)*dir;
             std::cout << "--x:" << offset.x;
-            std::cout << "--y:" << offset.y;
+            std::cout << "--y:" << offset.y << endl;
             cam_pos.y += delta*direction.y;
             cam_look.y += delta*direction.y;
         }
