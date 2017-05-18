@@ -71,12 +71,13 @@ vec3 b2_fps;
 vec2 tmp_offset;
 float bezierLimitFPS = 2; // duration time
 float bezierCountFPS = 0;
+float speedBezierFPS = 0.05;
 
 // camera mode
 vec3 cameraStatus = vec3(1,0,0);
 float delta_offset = 0.1; // unit of movement horizontally
 float delta = 0.63; // percentage of movement vertically
-float cameraBezierDelta = 0.05; // unit of movement fps
+float cameraBezierDelta = 0.2; // unit of movement fps
 
 
 void setMVPmatrices() {
@@ -169,7 +170,7 @@ void Display() {
             bezierCountFPS = 0;
         }
         else {
-            bezierCountFPS += 0.05;
+            bezierCountFPS += speedBezierFPS;
             vec3 res = bezierCurves(bezierCountFPS, bezierLimitFPS, b0_fps, b1_fps, b2_fps);
             offset = vec2(res.x, res.z);
         }
@@ -420,7 +421,7 @@ void KeyCallback(GLFWwindow* window, int key, int scancode, int action, int mods
     if(cameraStatus.y == 1){ // FPS
         if(action == GLFW_PRESS){
             b0_fps = vec3(offset.x,0,offset.y);
-            float v1 = 3.f/4.f;
+            float v1 = 0.72;
             float v2 = 1-v1;
 
             switch(key){
@@ -446,11 +447,20 @@ void KeyCallback(GLFWwindow* window, int key, int scancode, int action, int mods
                 b2_fps = b1_fps + vec3(-cameraBezierDelta*v2,0,0);
                 bezierFPSStatus = 1;
                 break;
+
+            case 81: // Q
+                if(speedBezierFPS > 0.08 && speedBezierFPS < 0.9){
+                    speedBezierFPS -= 0.05;
+                }
+                break;
+            case 69: // E
+                speedBezierFPS += 0.05;
+                break;
             }
         }
     }
-
 }
+
 
 
 int main(int argc, char *argv[]) {
