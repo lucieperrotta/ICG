@@ -184,7 +184,7 @@ void Display() {
                                 vec4(0,0,0,1));
 
 
-        sky.Draw(time, quad_model_matrix, inverse(trackball_matrix*axis_invert)*view_matrix_mirror, projection_matrix);
+        sky.Draw(time, quad_model_matrix, view_matrix_mirror, projection_matrix);
         grid.Draw(cam_pos, time, offset, quad_model_matrix, view_matrix_mirror, projection_matrix);
     }
     waterFramebuffer.Unbind();
@@ -279,10 +279,6 @@ void KeyCallback(GLFWwindow* window, int key, int scancode, int action, int mods
     if (key == GLFW_KEY_ESCAPE && action == GLFW_PRESS) {
         glfwSetWindowShouldClose(window, GL_TRUE);
     }
-    // only act on release
-    if(action != GLFW_RELEASE) {
-        return;
-    }
 
     float delta = 0.65;
     float deltaXY = 0.03;
@@ -299,94 +295,97 @@ void KeyCallback(GLFWwindow* window, int key, int scancode, int action, int mods
     GLubyte* pixels = new GLubyte [n_values];
     glGetTexImage(GL_TEXTURE_2D, 0, GL_RED, GL_UNSIGNED_BYTE, pixels);
 
-    // @TODO add inertie : ie fadein/out movement -> bezier ! et c'est un bonus en plus d'utiliser bezier
-    switch(key) {
-    case 49: //1 - navigation mode
-        cameraStatus = vec3(1,0,0);
-        cam_pos = defaultCamPos;
-        cam_look = defaultCamLook;
-        break;
-    case 50: //2 - fps mode
-        cameraStatus = vec3(0,1,0);
-        cam_pos = defaultCamPos;
-        cam_look = defaultCamLook;
-        break;
-    case 51: //3 - bezier curves
-        cameraStatus = vec3(0,0,1);
-        // need to set cam_pos to default if want to start somewhere else than current
-        bezierCount = 0;
-        break;
-    case GLFW_KEY_LEFT:
-        if(cameraStatus.x == 1){
-            offset+= vec2(-delta_offset, delta_offset)*cross_dir2;
-        }
-        break;
-    case GLFW_KEY_RIGHT:
-        if(cameraStatus.x == 1){
-            offset-= vec2(-delta_offset, delta_offset)*cross_dir2;
-            std::cout << "--x:" << offset.x;
-            std::cout << "--y:" << offset.y << endl;
-        }
-        break;
-    case GLFW_KEY_DOWN:
-        if(cameraStatus.x == 1){
-            offset+= vec2(-delta_offset, delta_offset)*dir;
-            cam_pos.y -= delta*direction.y;
-            cam_look.y -= delta*direction.y;
-        }
-        else if(cameraStatus.y == 1){
-            int pos = 3*(window_width/2*window_height + window_width/2);
-            std::cout << pixels[pos];
-            //cam_pos.y = pixels[pos];
-        }
-        break;
-    case GLFW_KEY_UP:
-        if(cameraStatus.x == 1){
-            offset -= vec2(-delta_offset, delta_offset)*dir;
-            std::cout << "--x:" << offset.x;
-            std::cout << "--y:" << offset.y << endl;
-            cam_pos.y += delta*direction.y;
-            cam_look.y += delta*direction.y;
-        }
-        break;
-    case 65: // A
-        cam_look -= cross(direction, vec3(0.0,1.0,0))*deltaLR;
-        break;
-    case 68: // D
-        cam_look += cross(direction, vec3(0.0,1.0,0))*deltaLR;
-        break;
-    case 87: // W
-        cam_look += vec3(0,deltaLook,0);
-        std::cout << " - " << cam_look.y;
-        break;
-    case 83: // S
-        cam_look -= vec3(0,deltaLook,0);
-        break;
-    case 88: // X
-        if(cameraStatus.x == 1){
-            cam_look -= vec3(0,deltaXY,0);
-            cam_pos -= vec3(0,deltaXY,0);
-        }
-        else if(cameraStatus.z==1){
-            stop = 1;
-        }
-        break;
 
-    case 90: // Y
-        if(cameraStatus.x == 1){
-            cam_look += vec3(0,deltaXY,0);
-            cam_pos += vec3(0,deltaXY,0);
+    // @TODO add inertie : ie fadein/out movement -> bezier ! et c'est un bonus en plus d'utiliser bezier
+    if(action == GLFW_REPEAT){
+        switch(key) {
+        case 49: //1 - navigation mode
+            cameraStatus = vec3(1,0,0);
+            cam_pos = defaultCamPos;
+            cam_look = defaultCamLook;
+            break;
+        case 50: //2 - fps mode
+            cameraStatus = vec3(0,1,0);
+            cam_pos = defaultCamPos;
+            cam_look = defaultCamLook;
+            break;
+        case 51: //3 - bezier curves
+            cameraStatus = vec3(0,0,1);
+            // need to set cam_pos to default if want to start somewhere else than current
+            bezierCount = 0;
+            break;
+        case GLFW_KEY_LEFT:
+            if(cameraStatus.x == 1){
+                offset+= vec2(-delta_offset, delta_offset)*cross_dir2;
+            }
+            break;
+        case GLFW_KEY_RIGHT:
+            if(cameraStatus.x == 1){
+                offset-= vec2(-delta_offset, delta_offset)*cross_dir2;
+                std::cout << "--x:" << offset.x;
+                std::cout << "--y:" << offset.y << endl;
+            }
+            break;
+        case GLFW_KEY_DOWN:
+            if(cameraStatus.x == 1){
+                offset+= vec2(-delta_offset, delta_offset)*dir;
+                cam_pos.y -= delta*direction.y;
+                cam_look.y -= delta*direction.y;
+            }
+            else if(cameraStatus.y == 1){
+                int pos = 3*(window_width/2*window_height + window_width/2);
+                std::cout << pixels[pos];
+                //cam_pos.y = pixels[pos];
+            }
+            break;
+        case GLFW_KEY_UP:
+            if(cameraStatus.x == 1){
+                offset -= vec2(-delta_offset, delta_offset)*dir;
+                std::cout << "--x:" << offset.x;
+                std::cout << "--y:" << offset.y << endl;
+                cam_pos.y += delta*direction.y;
+                cam_look.y += delta*direction.y;
+            }
+            break;
+        case 65: // A
+            cam_look -= cross(direction, vec3(0.0,1.0,0))*deltaLR;
+            break;
+        case 68: // D
+            cam_look += cross(direction, vec3(0.0,1.0,0))*deltaLR;
+            break;
+        case 87: // W
+            cam_look += vec3(0,deltaLook,0);
+            std::cout << " - " << cam_look.y;
+            break;
+        case 83: // S
+            cam_look -= vec3(0,deltaLook,0);
+            break;
+        case 88: // X
+            if(cameraStatus.x == 1){
+                cam_look -= vec3(0,deltaXY,0);
+                cam_pos -= vec3(0,deltaXY,0);
+            }
+            else if(cameraStatus.z==1){
+                stop = 1;
+            }
+            break;
+
+        case 90: // Y
+            if(cameraStatus.x == 1){
+                cam_look += vec3(0,deltaXY,0);
+                cam_pos += vec3(0,deltaXY,0);
+            }
+            else if(cameraStatus.z==1){
+                stop = 0;
+            }
+            break;
+        case 81: // Q
+            break;
+        case 69: // E
+            break;
+        default:
+            break;
         }
-        else if(cameraStatus.z==1){
-            stop = 0;
-        }
-        break;
-    case 81: // Q
-        break;
-    case 69: // E
-        break;
-    default:
-        break;
     }
 
 }
