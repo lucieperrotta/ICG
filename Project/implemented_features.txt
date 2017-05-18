@@ -1,0 +1,28 @@
+- 3 screenshots highlighting the most important aspects of your project
+- a video of less than 1 min. showing some fly-through or other dynamic interaction with your scene
+- a repository with the full source code
+- a single A4 page listing all the features you implemented beyond the minimum requirement with a small explanation (1-2 sentences per feature)
+- a short paragraph explaining how you split the work among the team members
+- a list of any external code or other resources used in the project
+
+
+Additionnal implemented features
+
+Infinite terrain generation
+
+Clouds and transparency
+
+Fbm
+
+Multifractal
+
+Water simulation : In addition to the reflection, the water is also moving in small movement.
+
+Sky moving
+
+Navigation : We can continue moving in the same direction when we continue pressing the key.
+
+Work :
+Kim Lan Phan Hoang : 33%
+Lucie Perrotta : 33%
+Tim Nguyen : 33%
