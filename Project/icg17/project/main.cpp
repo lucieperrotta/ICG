@@ -61,12 +61,22 @@ mat4 old_trackball_matrix;
 vec2 offset = vec2(0., 0.);
 
 // [navigation, fps, bezier]
+int bezierFPSStatus = 0;
 float bezierLimit = 80; // limit
 float bezierCount = 0;
 int stop = 0;
+vec3 b0_fps;
+vec3 b1_fps;
+vec3 b2_fps;
+vec2 tmp_offset;
+float bezierLimitFPS = 2; // duration time
+float bezierCountFPS = 0;
 
 // camera mode
 vec3 cameraStatus = vec3(1,0,0);
+float delta_offset = 0.1; // unit of movement horizontally
+float delta = 0.63; // percentage of movement vertically
+float cameraBezierDelta = 0.05; // unit of movement fps
 
 
 void setMVPmatrices() {
@@ -120,21 +130,17 @@ void Init(GLFWwindow* window) {
 
 }
 
-vec2 bezierCurves(float time){
-
-    // deCasteljau algorithm
-    vec3 b0 = defaultCamPos;
-    vec3 b1 = b0 + vec3(2,0,0);
-    vec3 b2 = b1 + vec3(0,0,2);
+vec3 bezierCurves(float time, float limit, vec3 b0, vec3 b1, vec3 b2){
 
     // make it work until s seconds -> time should go from 0 to 1
-    float t = time/bezierLimit;
+    float t = time/limit;
 
+    // deCasteljau algorithm
     vec3 b0_1 = (1-t)*b0 + t*b1;
     vec3 b1_1 = (1-t)*b1 + t*b2;
     vec3 b0_2 = (1-t)*b0_1 + t*b1_1;
 
-    return vec2(b0_2.x,b0_2.z);
+    return b0_2;
 }
 
 void Display() {
@@ -146,10 +152,28 @@ void Display() {
     // BEZIER CURVES
     if(cameraStatus.z == 1){
         if(stop != 1) bezierCount += 0.1;
-        offset = bezierCurves(bezierCount);
+
+        vec3 b0 = defaultCamPos;
+        vec3 b1 = b0 + vec3(2,0,0);
+        vec3 b2 = b1 + vec3(0,0,2);
+        vec3 res = bezierCurves(bezierCount, bezierLimit, b0, b1, b2);
+        offset = vec2(res.x, res.z);
     }
     // begin again if go too far
     bezierCount = (bezierCount > bezierLimit) ? 0 : bezierCount;
+
+
+    if(bezierFPSStatus == 1){
+        if(bezierCountFPS > bezierLimitFPS){
+            bezierFPSStatus = 0;
+            bezierCountFPS = 0;
+        }
+        else {
+            bezierCountFPS += 0.05;
+            vec3 res = bezierCurves(bezierCountFPS, bezierLimitFPS, b0_fps, b1_fps, b2_fps);
+            offset = vec2(res.x, res.z);
+        }
+    }
 
 
     // set up matrices for MVP
@@ -280,9 +304,7 @@ void KeyCallback(GLFWwindow* window, int key, int scancode, int action, int mods
         glfwSetWindowShouldClose(window, GL_TRUE);
     }
 
-    float delta = 0.65;
     float deltaXY = 0.03;
-    float delta_offset = 0.1;
     float deltaLR = 0.05;
     float deltaLook = 0.01;
     vec3 direction = cam_look - cam_pos;
@@ -291,100 +313,140 @@ void KeyCallback(GLFWwindow* window, int key, int scancode, int action, int mods
     vec2 cross_dir2 = vec2(cross_dir.x, cross_dir.z);
 
     // TRIED TO GET HEIGHTMAP
-    const size_t n_values = window_width*window_height*3;
-    GLubyte* pixels = new GLubyte [n_values];
-    glGetTexImage(GL_TEXTURE_2D, 0, GL_RED, GL_UNSIGNED_BYTE, pixels);
+    framebuffer.Bind();
+    //glGetTexImage(GL_TEXTURE_2D, 0, GL_RED, GL_UNSIGNED_BYTE, pixels);
+    framebuffer.Unbind();
 
+    //std::cout << key << " - ";
 
-    // @TODO add inertie : ie fadein/out movement -> bezier ! et c'est un bonus en plus d'utiliser bezier
-    if(action == GLFW_REPEAT){
-        switch(key) {
-        case 49: //1 - navigation mode
-            cameraStatus = vec3(1,0,0);
-            cam_pos = defaultCamPos;
-            cam_look = defaultCamLook;
-            break;
-        case 50: //2 - fps mode
-            cameraStatus = vec3(0,1,0);
-            cam_pos = defaultCamPos;
-            cam_look = defaultCamLook;
-            break;
-        case 51: //3 - bezier curves
-            cameraStatus = vec3(0,0,1);
-            // need to set cam_pos to default if want to start somewhere else than current
-            bezierCount = 0;
-            break;
-        case GLFW_KEY_LEFT:
-            if(cameraStatus.x == 1){
+    // TO CHOOSE NAVIGATION MODE
+    switch(key) {
+    case 49: //1 - navigation mode
+        cameraStatus = vec3(1,0,0);
+        cam_pos = defaultCamPos;
+        cam_look = defaultCamLook;
+        break;
+    case 50: //2 - fps mode
+        cameraStatus = vec3(0,1,0);
+        cam_pos = defaultCamPos;
+        cam_look = defaultCamLook;
+        break;
+    case 51: //3 - bezier curves
+        cameraStatus = vec3(0,0,1);
+        // need to set cam_pos to default if want to start somewhere else than current
+        bezierCount = 0;
+        break;
+    }
+
+    if(cameraStatus.x == 1){ // NAVIGATION
+        if(action == GLFW_REPEAT || action == GLFW_PRESS){ // make the navigation stop at the beginning
+            switch(key) {
+            case GLFW_KEY_LEFT:
                 offset+= vec2(-delta_offset, delta_offset)*cross_dir2;
-            }
-            break;
-        case GLFW_KEY_RIGHT:
-            if(cameraStatus.x == 1){
+                break;
+
+            case GLFW_KEY_RIGHT:
                 offset-= vec2(-delta_offset, delta_offset)*cross_dir2;
-                std::cout << "--x:" << offset.x;
-                std::cout << "--y:" << offset.y << endl;
-            }
-            break;
-        case GLFW_KEY_DOWN:
-            if(cameraStatus.x == 1){
+                /*std::cout << "--x:" << offset.x;
+                std::cout << "--y:" << offset.y << endl;*/
+                break;
+            case GLFW_KEY_DOWN:
                 offset+= vec2(-delta_offset, delta_offset)*dir;
                 cam_pos.y -= delta*direction.y;
                 cam_look.y -= delta*direction.y;
-            }
-            else if(cameraStatus.y == 1){
-                int pos = 3*(window_width/2*window_height + window_width/2);
-                std::cout << pixels[pos];
-                //cam_pos.y = pixels[pos];
-            }
-            break;
-        case GLFW_KEY_UP:
-            if(cameraStatus.x == 1){
+                break;
+            case GLFW_KEY_UP:
                 offset -= vec2(-delta_offset, delta_offset)*dir;
-                std::cout << "--x:" << offset.x;
-                std::cout << "--y:" << offset.y << endl;
+                /*std::cout << "--x:" << offset.x;
+                std::cout << "--y:" << offset.y << endl;*/
                 cam_pos.y += delta*direction.y;
                 cam_look.y += delta*direction.y;
-            }
-            break;
-        case 65: // A
-            cam_look -= cross(direction, vec3(0.0,1.0,0))*deltaLR;
-            break;
-        case 68: // D
-            cam_look += cross(direction, vec3(0.0,1.0,0))*deltaLR;
-            break;
-        case 87: // W
-            cam_look += vec3(0,deltaLook,0);
-            std::cout << " - " << cam_look.y;
-            break;
-        case 83: // S
-            cam_look -= vec3(0,deltaLook,0);
-            break;
-        case 88: // X
-            if(cameraStatus.x == 1){
+                break;
+            case 65: // A
+                cam_look -= cross(direction, vec3(0.0,1.0,0))*deltaLR;
+                break;
+            case 68: // D
+                cam_look += cross(direction, vec3(0.0,1.0,0))*deltaLR;
+                break;
+            case 87: // W
+                cam_look += vec3(0,deltaLook,0);
+                std::cout << " - " << cam_look.y;
+                break;
+            case 83: // S
+                cam_look -= vec3(0,deltaLook,0);
+                break;
+            case 90: // Y
                 cam_look -= vec3(0,deltaXY,0);
                 cam_pos -= vec3(0,deltaXY,0);
-            }
-            else if(cameraStatus.z==1){
-                stop = 1;
-            }
-            break;
+                break;
 
-        case 90: // Y
-            if(cameraStatus.x == 1){
+            case 88: // X
                 cam_look += vec3(0,deltaXY,0);
                 cam_pos += vec3(0,deltaXY,0);
+                break;
+            case 81: // Q
+                if(delta_offset > 0.08) { // to not be negative, otherwise will go backwards
+                    delta_offset -= 0.05;
+                }
+                break;
+            case 69: // E
+                delta_offset += 0.05;
+                break;
+            default:
+                break;
             }
-            else if(cameraStatus.z==1){
-                stop = 0;
-            }
+        }
+    }
+
+    if(cameraStatus.z==1){ // PANORAMA
+        switch(key){
+        case 90: // Y
+            stop = 1;
             break;
+
+        case 88: // X
+            stop = 0;
+            break;
+
         case 81: // Q
+            // slower
             break;
         case 69: // E
+            // faster
             break;
-        default:
-            break;
+        }
+    }
+
+    if(cameraStatus.y == 1){ // FPS
+        if(action == GLFW_PRESS){
+            b0_fps = vec3(offset.x,0,offset.y);
+            float v1 = 3.f/4.f;
+            float v2 = 1-v1;
+
+            switch(key){
+
+            case GLFW_KEY_LEFT:
+                b1_fps = b0_fps + vec3(0,0,-cameraBezierDelta*v1);
+                b2_fps = b1_fps + vec3(0,0,-cameraBezierDelta*v2);
+                bezierFPSStatus = 1;
+                break;
+            case GLFW_KEY_RIGHT:
+                b1_fps = b0_fps + vec3(0,0,cameraBezierDelta*v1);
+                b2_fps = b1_fps + vec3(0,0,cameraBezierDelta*v2);
+                bezierFPSStatus = 1;
+                break;
+            case GLFW_KEY_DOWN:
+                b1_fps = b0_fps + vec3(cameraBezierDelta*v1,0,0);
+                b2_fps = b1_fps + vec3(cameraBezierDelta*v2,0,0);
+                bezierFPSStatus = 1;
+
+                break;
+            case GLFW_KEY_UP:
+                b1_fps = b0_fps + vec3(-cameraBezierDelta*v1,0,0);
+                b2_fps = b1_fps + vec3(-cameraBezierDelta*v2,0,0);
+                bezierFPSStatus = 1;
+                break;
+            }
         }
     }
 
