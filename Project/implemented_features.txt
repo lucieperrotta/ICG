@@ -16,11 +16,11 @@ Fbm
 
 Multifractal
 
-Water simulation : In addition to the reflection, the water is also moving in small movement.
+Water simulation : In addition to the colored reflection, the water is also moving in small movement.
 
 Sky moving
 
-Navigation : We can continue moving in the same direction when we continue pressing the key.
+Navigation : We can continue moving in the same direction when we continue pressing the key. Bezier curves are used to create smoother FPS movements.
 
 Work :
 Kim Lan Phan Hoang : 33%
