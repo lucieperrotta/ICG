@@ -44,8 +44,8 @@ float lake_level = 0.45f;
 float height_scale = 0.7;
 int LengthSegmentArea = 2; // grid side length
 
-vec3 defaultCamPos = vec3(0.1f, 0.5f, 0.0f); // 0.1 0.5 0.0
-vec3 defaultCamLook = vec3(-0.1f, 0.5f, 0.0f); // 0 .5 0
+vec3 defaultCamPos = vec3(0.0f, lake_level + 0.1, 0.0f); // 0.1 0.5 0.0
+vec3 defaultCamLook = vec3(-0.1f, lake_level + 0.1, 0.0f); // 0 .5 0
 
 vec3 cam_pos = defaultCamPos;
 vec3 cam_look = defaultCamLook;
@@ -60,11 +60,11 @@ mat4 old_trackball_matrix;
 
 vec2 offset = vec2(0., 0.);
 
-// [navigation, fps, bezier]
+// BEZIER PARAMETERS
 int bezierFPSStatus = 0;
-float bezierLimit = 80; // limit
-float bezierCount = 0;
-int stop = 0;
+float bezierLimitPanorama = 80; // limit
+float bezierCountPanorama = 0;
+int stopPanorama = 0;
 vec3 b0_fps;
 vec3 b1_fps;
 vec3 b2_fps;
@@ -77,7 +77,7 @@ float speedBezierFPS = 0.05;
 vec3 cameraStatus = vec3(1,0,0);
 float delta_offset = 0.1; // unit of movement horizontally
 float delta = 0.63; // percentage of movement vertically
-float cameraBezierDelta = 0.2; // unit of movement fps
+float delta_fps = 0.2; // unit of movement fps
 
 
 void setMVPmatrices() {
@@ -150,20 +150,21 @@ void Display() {
 
     float time = glfwGetTime();
 
-    // BEZIER CURVES
+    // PANORAMA
     if(cameraStatus.z == 1){
-        if(stop != 1) bezierCount += 0.1;
+        if(stopPanorama != 1) bezierCountPanorama += 0.1;
 
         vec3 b0 = defaultCamPos;
         vec3 b1 = b0 + vec3(2,0,0);
         vec3 b2 = b1 + vec3(0,0,2);
-        vec3 res = bezierCurves(bezierCount, bezierLimit, b0, b1, b2);
+        vec3 res = bezierCurves(bezierCountPanorama, bezierLimitPanorama, b0, b1, b2);
         offset = vec2(res.x, res.z);
     }
     // begin again if go too far
-    bezierCount = (bezierCount > bezierLimit) ? 0 : bezierCount;
+    bezierCountPanorama = (bezierCountPanorama > bezierLimitPanorama) ? 0 : bezierCountPanorama;
 
 
+    // FPS
     if(bezierFPSStatus == 1){
         if(bezierCountFPS > bezierLimitFPS){
             bezierFPSStatus = 0;
@@ -318,27 +319,28 @@ void KeyCallback(GLFWwindow* window, int key, int scancode, int action, int mods
     //glGetTexImage(GL_TEXTURE_2D, 0, GL_RED, GL_UNSIGNED_BYTE, pixels);
     framebuffer.Unbind();
 
-    //std::cout << key << " - ";
-
     // TO CHOOSE NAVIGATION MODE
-    switch(key) {
-    case 49: //1 - navigation mode
-        cameraStatus = vec3(1,0,0);
-        cam_pos = defaultCamPos;
-        cam_look = defaultCamLook;
-        break;
-    case 50: //2 - fps mode
-        cameraStatus = vec3(0,1,0);
-        cam_pos = defaultCamPos;
-        cam_look = defaultCamLook;
-        break;
-    case 51: //3 - bezier curves
-        cameraStatus = vec3(0,0,1);
-        // need to set cam_pos to default if want to start somewhere else than current
-        bezierCount = 0;
-        break;
+    if(action == GLFW_PRESS){
+        switch(key) {
+        case 49: //1 - navigation mode
+            cameraStatus = vec3(1,0,0);
+            cam_pos = defaultCamPos;
+            cam_look = defaultCamLook;
+            break;
+        case 50: //2 - fps mode
+            cameraStatus = vec3(0,1,0);
+            cam_pos = defaultCamPos;
+            cam_look = defaultCamLook;
+            break;
+        case 51: //3 - bezier curves
+            cameraStatus = vec3(0,0,1);
+            // need to set cam_pos to default if want to start somewhere else than current
+            bezierCountPanorama = 0;
+            break;
+        }
     }
 
+    //std::cout << key << " - ";
     if(cameraStatus.x == 1){ // NAVIGATION
         if(action == GLFW_REPEAT || action == GLFW_PRESS){ // make the navigation stop at the beginning
             switch(key) {
@@ -402,11 +404,11 @@ void KeyCallback(GLFWwindow* window, int key, int scancode, int action, int mods
     if(cameraStatus.z==1){ // PANORAMA
         switch(key){
         case 90: // Y
-            stop = 1;
+            stopPanorama = 1;
             break;
 
         case 88: // X
-            stop = 0;
+            stopPanorama = 0;
             break;
 
         case 81: // Q
@@ -421,35 +423,37 @@ void KeyCallback(GLFWwindow* window, int key, int scancode, int action, int mods
     if(cameraStatus.y == 1){ // FPS
         if(action == GLFW_PRESS){
             b0_fps = vec3(offset.x,0,offset.y);
+
+            // variation of speed
             float v1 = 0.72;
             float v2 = 1-v1;
 
             switch(key){
 
             case GLFW_KEY_LEFT:
-                b1_fps = b0_fps + vec3(0,0,-cameraBezierDelta*v1);
-                b2_fps = b1_fps + vec3(0,0,-cameraBezierDelta*v2);
+                b1_fps = b0_fps + vec3(0,0,-delta_fps*v1);
+                b2_fps = b1_fps + vec3(0,0,-delta_fps*v2);
                 bezierFPSStatus = 1;
                 break;
             case GLFW_KEY_RIGHT:
-                b1_fps = b0_fps + vec3(0,0,cameraBezierDelta*v1);
-                b2_fps = b1_fps + vec3(0,0,cameraBezierDelta*v2);
+                b1_fps = b0_fps + vec3(0,0,delta_fps*v1);
+                b2_fps = b1_fps + vec3(0,0,delta_fps*v2);
                 bezierFPSStatus = 1;
                 break;
             case GLFW_KEY_DOWN:
-                b1_fps = b0_fps + vec3(cameraBezierDelta*v1,0,0);
-                b2_fps = b1_fps + vec3(cameraBezierDelta*v2,0,0);
+                b1_fps = b0_fps + vec3(delta_fps*v1,0,0);
+                b2_fps = b1_fps + vec3(delta_fps*v2,0,0);
                 bezierFPSStatus = 1;
 
                 break;
             case GLFW_KEY_UP:
-                b1_fps = b0_fps + vec3(-cameraBezierDelta*v1,0,0);
-                b2_fps = b1_fps + vec3(-cameraBezierDelta*v2,0,0);
+                b1_fps = b0_fps + vec3(-delta_fps*v1,0,0);
+                b2_fps = b1_fps + vec3(-delta_fps*v2,0,0);
                 bezierFPSStatus = 1;
                 break;
 
             case 81: // Q
-                if(speedBezierFPS > 0.08 && speedBezierFPS < 0.9){
+                if(speedBezierFPS > 0.08 && speedBezierFPS < 0.9){ // to avoid go further than cameraBezierDelta and to be negative
                     speedBezierFPS -= 0.05;
                 }
                 break;

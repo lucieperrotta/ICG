@@ -44,7 +44,7 @@ class FrameBuffer {
                 }
 
                 // create texture for the color attachment
-                glTexImage2D(GL_TEXTURE_2D, 0, GL_R32F, width_, height_, 0, GL_RED, GL_UNSIGNED_BYTE, NULL);
+                glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width_, height_, 0, GL_RGB, GL_UNSIGNED_BYTE, NULL);
 
                 glBindTexture(GL_TEXTURE_2D, 0);
             }

@@ -44,16 +44,16 @@ void choosecolor1OnHeight(float height, vec3 normal_mv) {
     vec4 t1 = vec4(0.0);
     vec4 t2 = vec4(0.0);
     float blend_factor = 0.0;
-    float scale_factor = 14; // used to make textures smaller so we can repeat them
+    float scale_factor = 18; // used to make textures smaller so we can repeat them
 
-    vec2 uv_offset_scale = (uv + vec2(offsetX, offsetY))*scale_factor;
+    vec2 uv_offset_scale = (uv + (vec2(offsetX, offsetY)+1)/1.3f)*scale_factor;
 
     if(height < lake_level) {
         // Compute the blend factor which depends on the height
         blend_factor = (height - lake_level)/(sand_level - lake_level);
 
         t1 = 0.85*texture(tex_sand, uv_offset_scale);
-        t2 = texture(tex_sand, uv);
+        t2 = texture(tex_sand, uv_offset_scale);
         color1 = mix(t1, t2, blend_factor).xyz;
     } else if(height <= sand_level) {
         // Sand & Lake level
@@ -101,7 +101,7 @@ void main() {
     float height = texture(tex_grid, uv).x;
     if(
             (((upper==0)) && (height >= lake_level)) ||
-            ((upper==1)) && (height <= lake_level)
+            ((upper==1)) && (height < lake_level)
             ) discard;
 
     // compute normal : compute
