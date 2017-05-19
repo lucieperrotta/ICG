@@ -221,7 +221,7 @@ void Display() {
     sky.Draw(time, quad_model_matrix, trackball_matrix*view_matrix, projection_matrix);
     grid.Draw(cam_pos, time, offset, quad_model_matrix, trackball_matrix*view_matrix, projection_matrix);
     grid.Draw(cam_pos, time, offset, quad_model_matrix, trackball_matrix*view_matrix, projection_matrix,0);
-    water.Draw(time, offset, quad_model_matrix, trackball_matrix*view_matrix, projection_matrix);
+    water.Draw(cam_pos, time, offset, quad_model_matrix, trackball_matrix*view_matrix, projection_matrix);
 
 }
 

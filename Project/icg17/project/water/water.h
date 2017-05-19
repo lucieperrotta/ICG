@@ -124,7 +124,7 @@ public:
         glDeleteTextures(1, &reflection_texture_id_);
     }
 
-    void Draw(float time, vec2 offset, const glm::mat4 &model = IDENTITY_MATRIX, const glm::mat4 &view = IDENTITY_MATRIX,
+    void Draw(vec3 cam_pos, float time, vec2 offset, const glm::mat4 &model = IDENTITY_MATRIX, const glm::mat4 &view = IDENTITY_MATRIX,
               const glm::mat4 &projection = IDENTITY_MATRIX) {
         glUseProgram(program_id_);
         glBindVertexArray(vertex_array_id_);
@@ -160,6 +160,10 @@ public:
         glUniform1f(glGetUniformLocation(program_id_, "offsetY"), offset.y);
         glUniform1f(glGetUniformLocation(program_id_, "water_width"), this->water_width_);
         glUniform1f(glGetUniformLocation(program_id_, "water_height"), this->water_height_);
+
+        // WATER GET TRANSPARENT WITH DISTANCE
+        glUniform1f(glGetUniformLocation(program_id_, "cam_pos_x"), cam_pos.x);
+        glUniform1f(glGetUniformLocation(program_id_, "cam_pos_z"), cam_pos.z);
 
         // draw
         //glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);

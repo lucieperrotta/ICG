@@ -12,6 +12,8 @@ uniform float water_height;
 
 in vec2 uv;
 
+in float transparency;
+
 out vec4 color;
 
 void main() {
@@ -37,7 +39,9 @@ void main() {
     vec4 tex_water_color = texture(tex_water,vec2(_u,1-_v)).rgba;
     vec4 water_blue_color = mix(blue,tex_water_color,vec4(0.2));
     vec3 final_color = mix(wave_color,water_blue_color,vec4(0.9)).rgb;
-    color = vec4(final_color,0.5);
+
     //color = blue;
     //color = vec4(texture(tex_water,vec2(_u,1-_v)).rgb,1);
+
+    color=vec4(final_color, 0.5*transparency);
 }
