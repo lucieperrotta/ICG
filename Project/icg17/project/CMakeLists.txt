@@ -6,6 +6,7 @@ file(GLOB_RECURSE HEADERS "*.h")
 file(GLOB TEXTURES
     sky/sky_texture.tga
     sky/sky_texture_2.tga
+    sky/fog_sky.tga
     grid/grid_texture.tga
     grid/rock.tga
     grid/rock_texture.tga

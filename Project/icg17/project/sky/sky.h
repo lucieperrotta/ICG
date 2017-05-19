@@ -184,7 +184,7 @@ public:
             int width;
             int height;
             int nb_component;
-            string texture_filename = "sky_texture_2.tga";
+            string texture_filename = "fog_sky.tga";
             stbi_set_flip_vertically_on_load(1);
             unsigned char* image = stbi_load(texture_filename.c_str(), &width, &height, &nb_component, 0);
 
