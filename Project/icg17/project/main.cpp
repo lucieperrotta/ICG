@@ -373,7 +373,6 @@ void KeyCallback(GLFWwindow* window, int key, int scancode, int action, int mods
                 break;
             case 87: // W
                 cam_look += vec3(0,deltaLook,0);
-                std::cout << " - " << cam_look.y;
                 break;
             case 83: // S
                 cam_look -= vec3(0,deltaLook,0);
