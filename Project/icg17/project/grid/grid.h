@@ -118,12 +118,12 @@ private:
             glUniform1i(tex_snow_id, 4 /*GL_TEXTURE4*/);
         }
 
-        // Bind snow texture
+        // Bind lol texture
         {
             glActiveTexture(GL_TEXTURE5);
             glBindTexture(GL_TEXTURE_2D, tex_lol_);
             GLuint tex_snow_id = glGetUniformLocation(program_id_, "tex_lol");
-            glUniform1i(tex_snow_id, 5 /*GL_TEXTURE4*/);
+            glUniform1i(tex_snow_id, 5 /*GL_TEXTURE5*/);
         }
 
         // Cleanup
@@ -176,7 +176,7 @@ private:
 
         // load grass texture
         {
-            filename = "grass.tga";
+            filename = "grass_texture.tga";
 
             // set stb_image to have the same coordinates as OpenGL
             stbi_set_flip_vertically_on_load(1);
@@ -236,7 +236,7 @@ private:
 
         // load snow texture
         {
-            filename = "snow.tga";
+            filename = "snow_texture.tga";
 
             // set stb_image to have the same coordinates as OpenGL
             stbi_set_flip_vertically_on_load(1);
@@ -264,7 +264,7 @@ private:
 
         // load lol texture
         {
-            filename = "snow_texture.tga";
+            filename = "grass_texture.tga";
 
             // set stb_image to have the same coordinates as OpenGL
             stbi_set_flip_vertically_on_load(1);
@@ -395,6 +395,7 @@ public:
         glDeleteTextures(1, &tex_grass_);
         glDeleteTextures(1, &tex_rock_);
         glDeleteTextures(1, &tex_snow_);
+        glDeleteTextures(1, &tex_lol_);
         glBindTexture(GL_TEXTURE_2D, 0);
     }
 
