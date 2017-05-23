@@ -44,8 +44,9 @@ float lake_level = 0.25f;
 float height_scale = 0.7;
 int LengthSegmentArea = 4; // grid side length
 
-vec3 defaultCamPos = vec3(0.0f, lake_level + 0.1, 0.0f); // 0.1 0.5 0.0
-vec3 defaultCamLook = vec3(-0.1f, lake_level + 0.1, 0.0f); // 0 .5 0
+vec3 defaultCamPos = vec3(0.0f, lake_level + 0.2, 0.0f); // 0.1 0.5 0.0
+vec3 defaultCamLook = vec3(-0.1f, lake_level + 0.2, 0.0f); // 0 .5 0
+GLfloat last_height = lake_level + 0.2;
 
 vec3 cam_pos = defaultCamPos;
 vec3 cam_look = defaultCamLook;
@@ -62,7 +63,7 @@ vec2 offset = vec2(0., 0.);
 
 // BEZIER PARAMETERS
 int bezierFPSStatus = 0;
-float bezierLimitPanorama = 80; // limit
+float bezierLimitPanorama = 200; // limit
 float bezierCountPanorama = 0;
 int stopPanorama = 0;
 vec3 b0_fps;
@@ -77,8 +78,7 @@ float speedBezierFPS = 0.05;
 vec3 cameraStatus = vec3(1,0,0);
 float delta_offset = 0.1; // unit of movement horizontally
 float delta = 0.63; // percentage of movement vertically
-float delta_fps = 0.2; // unit of movement fps
-
+float delta_fps = 1; // unit of movement fps
 
 void setMVPmatrices() {
     // setup view and projection matrices
@@ -159,9 +159,16 @@ void Display() {
         vec3 b2 = b1 + vec3(0,0,2);
         vec3 res = bezierCurves(bezierCountPanorama, bezierLimitPanorama, b0, b1, b2);
         offset = vec2(res.x, res.z);
+
+        vec3 b0_look = defaultCamLook;
+        vec3 b1_look = b0_look - vec3(0.2,0,0.2);
+        vec3 b2_look = b1_look + vec3(0.2,0,0.1);
+        vec3 res_look = bezierCurves(bezierCountPanorama, bezierLimitPanorama, b0_look, b1_look, b2_look);
+        cam_look = res_look;
+
+        // begin again if go too far
+        bezierCountPanorama = (bezierCountPanorama > bezierLimitPanorama) ? 0 : bezierCountPanorama;
     }
-    // begin again if go too far
-    bezierCountPanorama = (bezierCountPanorama > bezierLimitPanorama) ? 0 : bezierCountPanorama;
 
 
     // FPS
@@ -171,9 +178,32 @@ void Display() {
             bezierCountFPS = 0;
         }
         else {
+
             bezierCountFPS += speedBezierFPS;
             vec3 res = bezierCurves(bezierCountFPS, bezierLimitFPS, b0_fps, b1_fps, b2_fps);
             offset = vec2(res.x, res.z);
+
+            framebuffer.Bind();
+            {
+                GLfloat height;
+                glReadPixels(window_width/2.f, window_height/2.f, 1, 1, GL_RED, GL_FLOAT, &height);
+                if(height < lake_level) height = lake_level; // avoid to walk under lake
+                height += 0.16; // to be a bit higher
+                cam_pos.y = height;
+                cam_look.y = height;
+
+                // look change depending on climbing or not
+                /*
+                float delta_look = 250;
+                GLfloat height_look;
+                vec3 dir = cam_pos - cam_look;
+                std::cout << dir.x << " - " << dir.z << endl;
+                glReadPixels(window_width/2.f + delta_look*dir.x, window_height/2.f + delta_look*dir.z,1, 1, GL_RED, GL_FLOAT, &height_look);
+                cam_look.y = height_look;
+                */
+
+            }
+            framebuffer.Unbind();
         }
     }
 
@@ -189,8 +219,6 @@ void Display() {
     }
     framebuffer.Unbind();
 
-    //displayTexture1.Draw();
-    //displayTexture2.Draw();
 
     // water reflection
     waterFramebuffer.Bind();
@@ -430,27 +458,39 @@ void KeyCallback(GLFWwindow* window, int key, int scancode, int action, int mods
             switch(key){
 
             case GLFW_KEY_LEFT:
-                b1_fps = b0_fps + vec3(0,0,-delta_fps*v1);
-                b2_fps = b1_fps + vec3(0,0,-delta_fps*v2);
+                b1_fps = b0_fps - vec3(delta_fps*v1,0,-delta_fps*v1)*cross_dir;
+                b2_fps = b1_fps - vec3(delta_fps*v2,0,-delta_fps*v2)*cross_dir;
                 bezierFPSStatus = 1;
                 break;
             case GLFW_KEY_RIGHT:
-                b1_fps = b0_fps + vec3(0,0,delta_fps*v1);
-                b2_fps = b1_fps + vec3(0,0,delta_fps*v2);
+                b1_fps = b0_fps + vec3(delta_fps*v1,0,-delta_fps*v1)*cross_dir;
+                b2_fps = b1_fps + vec3(delta_fps*v2,0,-delta_fps*v2)*cross_dir;
                 bezierFPSStatus = 1;
                 break;
             case GLFW_KEY_DOWN:
-                b1_fps = b0_fps + vec3(delta_fps*v1,0,0);
-                b2_fps = b1_fps + vec3(delta_fps*v2,0,0);
+                b1_fps = b0_fps - vec3(delta_fps*v1,0,-delta_fps*v1)*direction;
+                b2_fps = b1_fps - vec3(delta_fps*v2,0,-delta_fps*v2)*direction;
                 bezierFPSStatus = 1;
-
                 break;
             case GLFW_KEY_UP:
-                b1_fps = b0_fps + vec3(-delta_fps*v1,0,0);
-                b2_fps = b1_fps + vec3(-delta_fps*v2,0,0);
+                b1_fps = b0_fps + vec3(delta_fps*v1,0,-delta_fps*v1)*direction;
+                b2_fps = b1_fps + vec3(delta_fps*v2,0,-delta_fps*v2)*direction;
                 bezierFPSStatus = 1;
                 break;
-
+            /*
+            case 65: // A
+                cam_look -= cross(direction, vec3(0.0,1.0,0))*deltaLR;
+                break;
+            case 68: // D
+                cam_look += cross(direction, vec3(0.0,1.0,0))*deltaLR;
+                break;
+            case 87: // W
+                cam_look += vec3(0,deltaLook,0);
+                break;
+            case 83: // S
+                cam_look -= vec3(0,deltaLook,0);
+                break;
+            */
             case 81: // Q
                 if(speedBezierFPS > 0.08 && speedBezierFPS < 0.9){ // to avoid go further than cameraBezierDelta and to be negative
                     speedBezierFPS -= 0.05;

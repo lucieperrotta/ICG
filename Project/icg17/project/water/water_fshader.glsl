@@ -37,7 +37,7 @@ void main() {
     //vec4 blue = vec4(27./255., 41./255., 92./255., 0.8);
     vec4 blue = vec4(0./255., 124./255., 195./255., 1);
     vec4 tex_water_color = texture(tex_water,vec2(_u,1-_v)).rgba;
-    vec4 water_blue_color = mix(blue,tex_water_color,vec4(0.2));
+    vec4 water_blue_color = mix(blue,tex_water_color,vec4(0.4));
     vec3 final_color = mix(wave_color,water_blue_color,vec4(0.9)).rgb;
 
     // mix hardcoded with skybox color to et smoother fade away
