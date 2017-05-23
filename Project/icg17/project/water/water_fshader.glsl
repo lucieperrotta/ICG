@@ -41,10 +41,7 @@ void main() {
     vec3 final_color = mix(wave_color,water_blue_color,vec4(0.9)).rgb;
 
     // mix hardcoded with skybox color to et smoother fade away
-    final_color = mix(final_color, vec3(109./255., 108./255., 122./255.), pow(1-transparency, 0.5));
-
-    //color = blue;
-    //color = vec4(texture(tex_water,vec2(_u,1-_v)).rgb,1);
+    final_color = mix(final_color, vec3(110./255., 110./255., 120./255.), pow(1-transparency, 0.5));
 
     color=vec4(final_color, 0.5*transparency);
 }

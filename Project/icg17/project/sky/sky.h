@@ -206,7 +206,7 @@ public:
             }
 
             GLuint tex_id = glGetUniformLocation(program_id_, "tex_sky");
-            glUniform1i(tex_id, 0 /*GL_TEXTURE0*/);
+            glUniform1i(tex_id, 10 /*GL_TEXTURE10*/);
 
             // cleanup
             glBindTexture(GL_TEXTURE_2D, 0);
@@ -237,7 +237,7 @@ public:
         glDisable(GL_DEPTH_TEST); // sky always in background
 
         // bind textures
-        glActiveTexture(GL_TEXTURE0);
+        glActiveTexture(GL_TEXTURE10);
         glBindTexture(GL_TEXTURE_2D, texture_id_sky);
 
         // time

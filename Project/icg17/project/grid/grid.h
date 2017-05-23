@@ -83,15 +83,15 @@ private:
             glActiveTexture(GL_TEXTURE0);
             glBindTexture(GL_TEXTURE_2D, texture_id_grid);
             GLuint texture_id_grid_ = glGetUniformLocation(program_id_, "tex_grid");
-            glUniform1i(texture_id_grid_, 0);
+            glUniform1i(texture_id_grid_, 0 /*GL_TEXTURE0*/);
         }
 
         // Bind sand texture
         {
-            glActiveTexture(GL_TEXTURE11);
+            glActiveTexture(GL_TEXTURE1);
             glBindTexture(GL_TEXTURE_2D, tex_sand_);
             GLuint tex_sand_id = glGetUniformLocation(program_id_, "tex_sand");
-            glUniform1i(tex_sand_id, 11 /*GL_TEXTURE1*/);
+            glUniform1i(tex_sand_id, 1 /*GL_TEXTURE1*/);
         }
 
         // Bind grass texture
@@ -154,7 +154,7 @@ private:
             }
 
             glGenTextures(1, &tex_sand_);
-            glActiveTexture(GL_TEXTURE11);
+            glActiveTexture(GL_TEXTURE1);
             glBindTexture(GL_TEXTURE_2D, tex_sand_);
 
             glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
@@ -176,7 +176,7 @@ private:
 
         // load grass texture
         {
-            filename = "grass_texture.tga";
+            filename = "grass.tga";
 
             // set stb_image to have the same coordinates as OpenGL
             stbi_set_flip_vertically_on_load(1);
