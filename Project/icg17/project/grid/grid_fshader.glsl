@@ -40,8 +40,8 @@ void chooseraw_colorOnHeight(float height, vec3 normal) {
 
     float sand_level = lake_level + 0.02*height;
     float sand_grass_transition = sand_level + 0.1*height;
-    float grass_level = sand_grass_transition + 0.1*height;
-    float grass_rock_transition = grass_level + 0.1*height;
+    float grass_level = sand_grass_transition + 0.05*height;
+    float grass_rock_transition = grass_level + 0.12*height;
     float mountains_level = grass_rock_transition + 0.05*height;
     float rock_mountains_transition = mountains_level + 0.1*height;
 
@@ -50,7 +50,7 @@ void chooseraw_colorOnHeight(float height, vec3 normal) {
     vec4 t2 = vec4(0.0);
     vec4 t3 = vec4(0.0);
     float blend_factor = 0.0;
-    float scale_factor = 40; // used to make textures smaller so we can repeat them
+    float scale_factor = 25; // used to make textures smaller so we can repeat them
 
     vec2 uv_offset_scale = (uv + (vec2(offsetX, offsetY)+1)/1.3f)*scale_factor;
 
@@ -78,7 +78,7 @@ void chooseraw_colorOnHeight(float height, vec3 normal) {
         raw_color = mix(t1, t2, blend_factor).xyz;
     } else if(height <= grass_level) {
         // Grass & Forest level
-       // t1 = texture(tex_sand, uv_offset_scale);
+        // t1 = texture(tex_sand, uv_offset_scale);
         //t2 = texture(tex_grass, uv_offset_scale);
         // t3 = texture(tex_rock, uv_offset_scale);
 

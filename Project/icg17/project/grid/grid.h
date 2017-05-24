@@ -176,7 +176,7 @@ private:
 
         // load grass texture
         {
-            filename = "grass.tga";
+            filename = "grass_texture.tga";
 
             // set stb_image to have the same coordinates as OpenGL
             stbi_set_flip_vertically_on_load(1);

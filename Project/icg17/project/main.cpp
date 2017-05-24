@@ -448,58 +448,59 @@ void KeyCallback(GLFWwindow* window, int key, int scancode, int action, int mods
     }
 
     if(cameraStatus.y == 1){ // FPS
-        if(action == GLFW_PRESS){
+        if(action == GLFW_PRESS /*|| action == GLFW_REPEAT*/){
             b0_fps = vec3(offset.x,0,offset.y);
 
             // variation of speed
-            float v1 = 0.72;
+            float v1 = 1;
             float v2 = 1-v1;
+            //if(action == GLFW_REPEAT) {
+                switch(key){
 
-            switch(key){
+                case GLFW_KEY_LEFT:
+                    b1_fps = b0_fps - vec3(delta_fps*v1,0,-delta_fps*v1)*cross_dir;
+                    b2_fps = b1_fps - vec3(delta_fps*v2,0,-delta_fps*v2)*cross_dir;
+                    bezierFPSStatus = 1;
+                    break;
+                case GLFW_KEY_RIGHT:
+                    b1_fps = b0_fps + vec3(delta_fps*v1,0,-delta_fps*v1)*cross_dir;
+                    b2_fps = b1_fps + vec3(delta_fps*v2,0,-delta_fps*v2)*cross_dir;
+                    bezierFPSStatus = 1;
+                    break;
+                case GLFW_KEY_DOWN:
+                    b1_fps = b0_fps - vec3(delta_fps*v1,0,-delta_fps*v1)*direction;
+                    b2_fps = b1_fps - vec3(delta_fps*v2,0,-delta_fps*v2)*direction;
+                    bezierFPSStatus = 1;
+                    break;
+                case GLFW_KEY_UP:
+                    b1_fps = b0_fps + vec3(delta_fps*v1,0,-delta_fps*v1)*direction;
+                    b2_fps = b1_fps + vec3(delta_fps*v2,0,-delta_fps*v2)*direction;
+                    bezierFPSStatus = 1;
+                    break;
 
-            case GLFW_KEY_LEFT:
-                b1_fps = b0_fps - vec3(delta_fps*v1,0,-delta_fps*v1)*cross_dir;
-                b2_fps = b1_fps - vec3(delta_fps*v2,0,-delta_fps*v2)*cross_dir;
-                bezierFPSStatus = 1;
-                break;
-            case GLFW_KEY_RIGHT:
-                b1_fps = b0_fps + vec3(delta_fps*v1,0,-delta_fps*v1)*cross_dir;
-                b2_fps = b1_fps + vec3(delta_fps*v2,0,-delta_fps*v2)*cross_dir;
-                bezierFPSStatus = 1;
-                break;
-            case GLFW_KEY_DOWN:
-                b1_fps = b0_fps - vec3(delta_fps*v1,0,-delta_fps*v1)*direction;
-                b2_fps = b1_fps - vec3(delta_fps*v2,0,-delta_fps*v2)*direction;
-                bezierFPSStatus = 1;
-                break;
-            case GLFW_KEY_UP:
-                b1_fps = b0_fps + vec3(delta_fps*v1,0,-delta_fps*v1)*direction;
-                b2_fps = b1_fps + vec3(delta_fps*v2,0,-delta_fps*v2)*direction;
-                bezierFPSStatus = 1;
-                break;
+                case 65: // A
+                    cam_look -= cross(direction, vec3(0.0,1.0,0))*deltaLR;
+                    break;
+                case 68: // D
+                    cam_look += cross(direction, vec3(0.0,1.0,0))*deltaLR;
+                    break;
+                case 87: // W
+                    cam_look += vec3(0,deltaLook,0);
+                    break;
+                case 83: // S
+                    cam_look -= vec3(0,deltaLook,0);
+                    break;
 
-            case 65: // A
-                cam_look -= cross(direction, vec3(0.0,1.0,0))*deltaLR;
-                break;
-            case 68: // D
-                cam_look += cross(direction, vec3(0.0,1.0,0))*deltaLR;
-                break;
-            case 87: // W
-                cam_look += vec3(0,deltaLook,0);
-                break;
-            case 83: // S
-                cam_look -= vec3(0,deltaLook,0);
-                break;
-
-            case 81: // Q
-                if(speedBezierFPS > 0.08 && speedBezierFPS < 0.9){ // to avoid go further than cameraBezierDelta and to be negative
-                    speedBezierFPS -= 0.05;
+                case 81: // Q
+                    if(speedBezierFPS > 0.08 && speedBezierFPS < 0.9){ // to avoid go further than cameraBezierDelta and to be negative
+                        speedBezierFPS -= 0.05;
+                    }
+                    break;
+                case 69: // E
+                    speedBezierFPS += 0.05;
+                    break;
                 }
-                break;
-            case 69: // E
-                speedBezierFPS += 0.05;
-                break;
-            }
+            //}
         }
     }
 }
