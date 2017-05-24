@@ -452,7 +452,7 @@ void KeyCallback(GLFWwindow* window, int key, int scancode, int action, int mods
             b0_fps = vec3(offset.x,0,offset.y);
 
             // variation of speed
-            float v1 = 1;
+            float v1 = 0.72;
             float v2 = 1-v1;
             //if(action == GLFW_REPEAT) {
                 switch(key){

@@ -85,13 +85,6 @@ void chooseraw_colorOnHeight(float height, vec3 normal) {
         // Compute the blend factor which depends on the height
         blend_factor = (height - grass_level)/(sand_grass_transition - grass_level);
 
-        /*
-        if(abs(normal.y/normal.z) < 0.05) {
-            raw_color = mix(t1, t3, blend_factor).xyz;texture(tex_snow, uv_offset_scale).xyz;//mix(t1, t2, blend_factor).xyz;
-        } else {
-            raw_color = mix(t1, t2, blend_factor).xyz;
-        }*/
-
         // Equivalent to raw_color = (t1*(1-grass_height) + t2*grass_height).xyz;
         raw_color = texture(tex_grass, uv_offset_scale).xyz;
     } else if(height <= grass_rock_transition) {
@@ -99,7 +92,7 @@ void chooseraw_colorOnHeight(float height, vec3 normal) {
         t1 = texture(tex_grass, uv_offset_scale);
         t2 = texture(tex_rock, uv_offset_scale);
 
-        blend_factor = (height - grass_level)/(grass_rock_transition - grass_level);
+        blend_factor = /*dot(normal, vec3(0.0, 0.0, 1.0))*/(height - grass_level)/(grass_rock_transition - grass_level);
 
         raw_color = mix(t1, t2, blend_factor).xyz;
     } else if(height <= mountains_level) {
