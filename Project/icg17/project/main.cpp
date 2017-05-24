@@ -40,7 +40,7 @@ using namespace glm;
 
 float window_ratio = window_width / (float) window_height;
 
-float lake_level = 0.25f;
+float lake_level = 0.3f;
 float height_scale = 0.7;
 int LengthSegmentArea = 4; // grid side length
 
@@ -83,7 +83,7 @@ float delta_fps = 1; // unit of movement fps
 void setMVPmatrices() {
     // setup view and projection matrices
     view_matrix = lookAt(cam_pos, cam_look, cam_up);
-    projection_matrix = perspective(45.0f, window_ratio, 0.1f, 10.0f);
+    projection_matrix = perspective(45.0f, window_ratio, 0.001f, 10.0f);
 }
 
 
@@ -161,8 +161,8 @@ void Display() {
         offset = vec2(res.x, res.z);
 
         vec3 b0_look = defaultCamLook;
-        vec3 b1_look = b0_look - vec3(0.2,0,0.2);
-        vec3 b2_look = b1_look + vec3(0.2,0,0.1);
+        vec3 b1_look = b0_look - vec3(0.1,0,0.1);
+        vec3 b2_look = b1_look + vec3(0.1,0,0.1);
         vec3 res_look = bezierCurves(bezierCountPanorama, bezierLimitPanorama, b0_look, b1_look, b2_look);
         cam_look = res_look;
 
@@ -188,7 +188,7 @@ void Display() {
                 GLfloat height;
                 glReadPixels(window_width/2.f, window_height/2.f, 1, 1, GL_RED, GL_FLOAT, &height);
                 if(height < lake_level) height = lake_level; // avoid to walk under lake
-                height += 0.16; // to be a bit higher
+                height += 0.06; // to be a bit higher
                 cam_pos.y = height;
                 cam_look.y = height;
 
@@ -477,7 +477,7 @@ void KeyCallback(GLFWwindow* window, int key, int scancode, int action, int mods
                 b2_fps = b1_fps + vec3(delta_fps*v2,0,-delta_fps*v2)*direction;
                 bezierFPSStatus = 1;
                 break;
-            /*
+
             case 65: // A
                 cam_look -= cross(direction, vec3(0.0,1.0,0))*deltaLR;
                 break;
@@ -490,7 +490,7 @@ void KeyCallback(GLFWwindow* window, int key, int scancode, int action, int mods
             case 83: // S
                 cam_look -= vec3(0,deltaLook,0);
                 break;
-            */
+
             case 81: // Q
                 if(speedBezierFPS > 0.08 && speedBezierFPS < 0.9){ // to avoid go further than cameraBezierDelta and to be negative
                     speedBezierFPS -= 0.05;

@@ -157,7 +157,7 @@ void main() {
     if(lambert > 0.0) {
 
         // diffuse term
-        vec3 diffuse = Ld*kd*lambert;
+        vec3 diffuse = Ld*kd*lambert*0.5;
         raw_color += diffuse;
 
         // specular term
@@ -167,5 +167,7 @@ void main() {
         // raw_color += specular;
     }
     // transparency for direant pixels
+    raw_color.r += 0.07;
+    raw_color.g += 0.02;
     color = vec4(raw_color, transparency);
 }
