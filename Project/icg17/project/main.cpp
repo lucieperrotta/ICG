@@ -154,7 +154,7 @@ void Display() {
     if(cameraStatus.z == 1){
         if(stopPanorama != 1) bezierCountPanorama += 0.1;
 
-        vec3 b0 = defaultCamPos;
+        vec3 b0 = vec3(0,5,0);
         vec3 b1 = b0 + vec3(2,0,0);
         vec3 b2 = b1 + vec3(0,0,2);
         vec3 res = bezierCurves(bezierCountPanorama, bezierLimitPanorama, b0, b1, b2);
