@@ -8,19 +8,35 @@
 
 Additionnal implemented features
 
-Infinite terrain generation
+Infinite terrain generation:
 
-Clouds and transparency
+Mist and transparency:
 
-Fbm
+Texture shading: 
 
-Multifractal
+Fbm:
 
-Water simulation : In addition to the colored reflection, the water is also moving in small movement.
+Multifractal:
 
-Sky moving
+Water simulation : In addition to the colored reflections, the water is also moving in small movement.
+
+Sky moving:
 
 Navigation : We can continue moving in the same direction when we continue pressing the key. Bezier curves are used to create smoother FPS movements.
+
+Keyboard controls:
+
+Navigation (key 1)
+Arrows
+Q - E : inertie
+W,A,S,D : camera direction
+
+FPS (key 2)
+Arrows
+Q - E : inertie
+W,A,S,D : camera direction
+
+Bezier (key 3)
 
 Work :
 Kim Lan Phan Hoang : 33%
