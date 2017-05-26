@@ -61,21 +61,17 @@ private:
     GLuint vertex_buffer_object_index_;     // memory buffer for indices
     GLuint program_id_;                     // GLSL shader program ID
 
-    GLuint texture_id_grid;                     // texture ID
-    GLuint tex_coloring_;                  // texture for coloring
+    GLuint texture_id_grid;                 // texture ID
+    GLuint tex_coloring_;                   // texture for coloring
 
-    GLuint tex_sand_;                        // texture of the sand
-    GLuint tex_grass_;                       // texture of the grass
-    GLuint tex_rock_;                        // texture of the rock
-    GLuint tex_snow_;                        // texture of the snow
+    GLuint tex_sand_;                       // texture of the sand
+    GLuint tex_grass_;                      // texture of the grass
+    GLuint tex_rock_;                       // texture of the rock
+    GLuint tex_snow_;                       // texture of the snow
     GLuint tex_lol_;                        // texture to load all others -> make it work o/w last one is failing
 
     GLuint num_indices_;                    // number of vertices to render
-    //GLuint MVP_id_;                         // model, view, proj matrix ID
-
-
-
-    // BIND TEXTURE https://openclassrooms.com/courses/creez-des-programmes-en-3d-avec-opengl/les-textures-3
+    //GLuint MVP_id_;                       // model, view, proj matrix ID
 
     void BindShader(GLuint program_id_) {
         // Bind grid texture
@@ -124,7 +120,7 @@ private:
             glBindTexture(GL_TEXTURE_2D, tex_lol_);
             GLuint tex_snow_id = glGetUniformLocation(program_id_, "tex_lol");
             glUniform1i(tex_snow_id, 5 /*GL_TEXTURE5*/);
-        }
+         }
 
         // Cleanup
         glBindTexture(GL_TEXTURE_2D, 0);
@@ -139,7 +135,6 @@ private:
         string filename;
 
         // load sand texture
-
         {
             filename = "sand.tga";
 
@@ -150,7 +145,6 @@ private:
             // if the image is null
             if(sand_image == nullptr) {
                 throw(string("Failed to load texture"));
-                printf("OMG GIRL THERE IS A BIG FAILURE RIGHT HERE !!!\n");
             }
 
             glGenTextures(1, &tex_sand_);
@@ -182,9 +176,19 @@ private:
             stbi_set_flip_vertically_on_load(1);
             unsigned char* grass_image = stbi_load(filename.c_str(), &width, &height, &nb_component, 0);
 
+            // if the image is null
+            if(grass_image == nullptr) {
+                throw(string("Failed to load texture"));
+            }
+
             glGenTextures(1, &tex_grass_);
             glActiveTexture(GL_TEXTURE2);
             glBindTexture(GL_TEXTURE_2D, tex_grass_);
+
+            glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+            glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+            glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
+            glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
 
             // check image features
             if(nb_component == 3) {
@@ -192,11 +196,6 @@ private:
             } else if(nb_component == 4) {
                 glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, grass_image);
             }
-
-            glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-            glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-            glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
-            glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
 
             // cleanup
             stbi_image_free(grass_image);
@@ -212,7 +211,6 @@ private:
 
             if(rock_image == nullptr) {
                 throw(string("Failed to load texture"));
-                printf("OMG GIRL THERE IS A BIG FAILURE RIGHT HERE !!!\n");
             }
             glGenTextures(1, &tex_rock_);
             glActiveTexture(GL_TEXTURE3);
@@ -300,11 +298,9 @@ public:
         }
         glUseProgram(program_id_);
 
-
         // tex grid - height map
         this->texture_id_grid = framebuffer_texture_id_grid;
         // -> uniform in bind with the others
-
 
         // vertex one vertex array
         glGenVertexArrays(1, &vertex_array_id_);
@@ -318,7 +314,7 @@ public:
             // nb of quad/square -> make the grid more precize
             float grid_dim = 2000;
 
-            float c = grid_dim/5;
+            float c = grid_dim/4;
             int count = 0;
 
             // length of segment (square side)
@@ -347,10 +343,8 @@ public:
                         indices.push_back(2 + 4*count);
                         indices.push_back(0 + 4*(count+1));
                     }
-
                     count++;
                 }
-
             }
 
             num_indices_ = indices.size();

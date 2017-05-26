@@ -44,8 +44,8 @@ float lake_level = 0.3f;
 float height_scale = 0.7;
 int LengthSegmentArea = 4; // grid side length
 
-vec3 defaultCamPos = vec3(0.0f, lake_level + 0.2, 0.0f); // 0.1 0.5 0.0
-vec3 defaultCamLook = vec3(-0.1f, lake_level + 0.2, 0.0f); // 0 .5 0
+vec3 defaultCamPos = vec3(0.0f, lake_level + 0.2, 0.0f); // 0.1 0.5 0.0.0
+vec3 defaultCamLook = vec3(-0.1f, lake_level + 0.2, 0.0f); // 0.0 0.5 0.0
 GLfloat last_height = lake_level + 0.2;
 
 vec3 cam_pos = defaultCamPos;
@@ -127,7 +127,7 @@ void Init(GLFWwindow* window) {
     displayTexture2.Init(water_texture_id, 0.5f);
 
     // trackball
-    trackball_matrix = IDENTITY_MATRIX;
+    //trackball_matrix = IDENTITY_MATRIX;
 
 }
 
@@ -268,6 +268,9 @@ void MouseButton(GLFWwindow* window, int button, int action, int mod) {
         double x_i, y_i;
         glfwGetCursorPos(window, &x_i, &y_i);
         vec2 p = TransformScreenCoords(window, x_i, y_i);
+
+        // idea : transfer A, S, D, W to mouse buttons
+
         trackball.BeingDrag(p.x, p.y);
         old_trackball_matrix = trackball_matrix;
     }
@@ -455,51 +458,51 @@ void KeyCallback(GLFWwindow* window, int key, int scancode, int action, int mods
             float v1 = 0.72;
             float v2 = 1-v1;
             //if(action == GLFW_REPEAT) {
-                switch(key){
+            switch(key){
 
-                case GLFW_KEY_LEFT:
-                    b1_fps = b0_fps - vec3(delta_fps*v1,0,-delta_fps*v1)*cross_dir;
-                    b2_fps = b1_fps - vec3(delta_fps*v2,0,-delta_fps*v2)*cross_dir;
-                    bezierFPSStatus = 1;
-                    break;
-                case GLFW_KEY_RIGHT:
-                    b1_fps = b0_fps + vec3(delta_fps*v1,0,-delta_fps*v1)*cross_dir;
-                    b2_fps = b1_fps + vec3(delta_fps*v2,0,-delta_fps*v2)*cross_dir;
-                    bezierFPSStatus = 1;
-                    break;
-                case GLFW_KEY_DOWN:
-                    b1_fps = b0_fps - vec3(delta_fps*v1,0,-delta_fps*v1)*direction;
-                    b2_fps = b1_fps - vec3(delta_fps*v2,0,-delta_fps*v2)*direction;
-                    bezierFPSStatus = 1;
-                    break;
-                case GLFW_KEY_UP:
-                    b1_fps = b0_fps + vec3(delta_fps*v1,0,-delta_fps*v1)*direction;
-                    b2_fps = b1_fps + vec3(delta_fps*v2,0,-delta_fps*v2)*direction;
-                    bezierFPSStatus = 1;
-                    break;
+            case GLFW_KEY_LEFT:
+                b1_fps = b0_fps - vec3(delta_fps*v1,0,-delta_fps*v1)*cross_dir;
+                b2_fps = b1_fps - vec3(delta_fps*v2,0,-delta_fps*v2)*cross_dir;
+                bezierFPSStatus = 1;
+                break;
+            case GLFW_KEY_RIGHT:
+                b1_fps = b0_fps + vec3(delta_fps*v1,0,-delta_fps*v1)*cross_dir;
+                b2_fps = b1_fps + vec3(delta_fps*v2,0,-delta_fps*v2)*cross_dir;
+                bezierFPSStatus = 1;
+                break;
+            case GLFW_KEY_DOWN:
+                b1_fps = b0_fps - vec3(delta_fps*v1,0,-delta_fps*v1)*direction;
+                b2_fps = b1_fps - vec3(delta_fps*v2,0,-delta_fps*v2)*direction;
+                bezierFPSStatus = 1;
+                break;
+            case GLFW_KEY_UP:
+                b1_fps = b0_fps + vec3(delta_fps*v1,0,-delta_fps*v1)*direction;
+                b2_fps = b1_fps + vec3(delta_fps*v2,0,-delta_fps*v2)*direction;
+                bezierFPSStatus = 1;
+                break;
 
-                case 65: // A
-                    cam_look -= cross(direction, vec3(0.0,1.0,0))*deltaLR;
-                    break;
-                case 68: // D
-                    cam_look += cross(direction, vec3(0.0,1.0,0))*deltaLR;
-                    break;
-                case 87: // W
-                    cam_look += vec3(0,deltaLook,0);
-                    break;
-                case 83: // S
-                    cam_look -= vec3(0,deltaLook,0);
-                    break;
+            case 65: // A
+                cam_look -= cross(direction, vec3(0.0,1.0,0))*deltaLR;
+                break;
+            case 68: // D
+                cam_look += cross(direction, vec3(0.0,1.0,0))*deltaLR;
+                break;
+            case 87: // W
+                cam_look += vec3(0,deltaLook,0);
+                break;
+            case 83: // S
+                cam_look -= vec3(0,deltaLook,0);
+                break;
 
-                case 81: // Q
-                    if(speedBezierFPS > 0.08 && speedBezierFPS < 0.9){ // to avoid go further than cameraBezierDelta and to be negative
-                        speedBezierFPS -= 0.05;
-                    }
-                    break;
-                case 69: // E
-                    speedBezierFPS += 0.05;
-                    break;
+            case 81: // Q
+                if(speedBezierFPS > 0.08 && speedBezierFPS < 0.9){ // to avoid go further than cameraBezierDelta and to be negative
+                    speedBezierFPS -= 0.05;
                 }
+                break;
+            case 69: // E
+                speedBezierFPS += 0.05;
+                break;
+            }
             //}
         }
     }
