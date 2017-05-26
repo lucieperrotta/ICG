@@ -7,22 +7,25 @@
 
 
 Additionnal implemented features
+--------------------------------
 
-Infinite terrain generation:
+Infinite terrain generation: Instead if moving the camera over the plate, the camera stays in the middle of plate and the plate changes shape because the FbM is actually moving. This allows us to walk infinitely ahead.
 
-Mist and transparency:
+Mist and transparency: The mountains fade out with distance and mix with the sky, which looks like there is some fog. Also the water changes color with distance to make it look "dirtier" with distance (like if the atmosphere is charged with dust). Please note that we had to set the fog distance to very near the camera since our PCs are not powerfull at all and increasing that distance make them melt.
 
 Texture shading: 
 
-Fbm:
+Simplex noise: We implement an alternative of the simplex noise which features a gain parameter to modifiy the gain of the noise picture. We also added that gain parameter to the perlin noise.
 
-Multifractal:
+Ridged Fbm: The mountains look more sharp on the tops.
+
+Multifractal: This is an alternative to FbM, which allows us to mix many different noises (simplex and perlin) to create the mountains. 
 
 Water simulation : In addition to the colored reflections, the water is also moving in small movement.
 
-Sky moving:
+Sky moving: The skybox is slowly moving the give the impression of the sky changing over the day.
 
-Navigation : We can continue moving in the same direction when we continue pressing the key. Bezier curves are used to create smoother FPS movements.
+Navigation: We can continue moving in the same direction when we continue pressing the key. Bezier curves are used to create smoother FPS movements.
 
 Keyboard controls:
 
