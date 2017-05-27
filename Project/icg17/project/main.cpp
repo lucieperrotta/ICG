@@ -6,23 +6,23 @@
 #include "icg_helper.h"
 #include "glm/gtc/matrix_transform.hpp"
 
-#include "framebuffer.h"
 #include "trackball.h"
-
+#include "framebuffer.h"
 #include "grid/grid.h"
 #include "noise/noise.h"
 #include "water/water.h"
 #include "sky/sky.h"
 
-#include "displaytexture/displaytexture.h"
-
 #undef M_PI
 #define M_PI 3.14159
-float currentAngle = 0;
+
+using namespace glm;
 
 int window_width = 1200;
 int window_height = 800;
+float window_ratio = window_width / (float) window_height;
 
+// OBJECTS
 FrameBuffer framebuffer;
 FrameBuffer waterFramebuffer;
 Noise noise;
@@ -30,33 +30,32 @@ Grid grid;
 Water water;
 Sky sky;
 
-float previousZ = 0.;
+// MATRIX PROJECTION
+mat4 projection_matrix;
+mat4 view_matrix;
+//mat4 quad_model_matrix = translate(mat4(1.0f), vec3(0.0f, -0.0f, 0.0f));
+mat4 quad_model_matrix = IDENTITY_MATRIX;
 
-DisplayTexture displayTexture1;
-DisplayTexture displayTexture2;
-
-using namespace glm;
-
-float window_ratio = window_width / (float) window_height;
-
+// LIMITS
 float lake_level = 0.3f;
 float sky_limit = 1.f;
 float height_scale = 0.7f;
 int LengthSegmentArea = 4; // grid side length
 
+// CAMERA PARAMETERS
 vec3 defaultCamPos = vec3(0.0f, lake_level + 0.2f, 0.0f); // 0.1 0.5 0.0.0
 vec3 defaultCamLook = vec3(-0.1f, lake_level + 0.2f, 0.0f); // 0.0 0.5 0.0
-GLfloat last_height = lake_level + 0.2f;
-
 vec3 cam_pos = defaultCamPos;
 vec3 cam_look = defaultCamLook;
 vec3 cam_up = vec3(0.0f, 1.0f, 0.0f);
+vec3 cameraStatus = vec3(1,0,0);
+float delta_offset = 0.1f; // unit of movement horizontally
+float delta = 0.63f; // percentage of movement vertically
+float delta_fps = 0.7f; // unit of movement fps
 
-mat4 projection_matrix;
-mat4 view_matrix;
-//mat4 quad_model_matrix = translate(mat4(1.0f), vec3(0.0f, -0.0f, 0.0f));
-mat4 quad_model_matrix = IDENTITY_MATRIX;
-vec2 offset = vec2(0., 0.);
+const int nb_pixels = 16; // nb pixel to get from height map to smooth fps camera movement
+
+vec2 offset = vec2(0., 0.); // to create movement
 
 // BEZIER PARAMETERS
 int bezierFPSStatus = 0;
@@ -67,23 +66,17 @@ vec3 b0_fps;
 vec3 b1_fps;
 vec3 b2_fps;
 vec2 tmp_offset;
-float bezierLimitFPS = 2.f; // duration time
+float bezierLimitFPS = 1.5f; // duration time
 float bezierCountFPS = 0.f;
 float speedBezierFPS = 0.05f;
 
-// camera mode
-vec3 cameraStatus = vec3(1,0,0);
-float delta_offset = 0.1f; // unit of movement horizontally
-float delta = 0.63f; // percentage of movement vertically
-float delta_fps = 1.f; // unit of movement fps
-
+// setup view and projection matrices
 void setMVPmatrices() {
-    // setup view and projection matrices
     view_matrix = lookAt(cam_pos, cam_look, cam_up);
     projection_matrix = perspective(45.0f, window_ratio, 0.001f, 10.0f);
 }
 
-
+// create perpective matrix
 mat4 PerspectiveProjection(float fovy, float aspect, float near, float far) {
     float top = near*tan(fovy/2.f);
     float bottom = -top;
@@ -103,10 +96,10 @@ mat4 PerspectiveProjection(float fovy, float aspect, float near, float far) {
     return perspective;
 }
 
-
+// init elements
 void Init(GLFWwindow* window) {
     // sets background color
-    glClearColor(1,1, 1, 1.0);
+    glClearColor(1, 1, 1, 1.0);
     glEnable(GL_DEPTH_TEST);
 
     // on retina/hidpi displays, pixels != screen coordinates
@@ -120,12 +113,9 @@ void Init(GLFWwindow* window) {
     grid.Init(framebuffer_texture_id, lake_level, height_scale, LengthSegmentArea);
     sky.Init();
 
-    displayTexture1.Init(0, 0);
-    displayTexture2.Init(water_texture_id, 0.5f);
-
-
 }
 
+// Bezier curves definition
 vec3 bezierCurves(float time, float limit, vec3 b0, vec3 b1, vec3 b2){
 
     // make it work until s seconds -> time should go from 0 to 1
@@ -145,7 +135,7 @@ void Display() {
 
     float time = glfwGetTime();
 
-    // PANORAMA
+    // PANORAMA CAMERA
     if(cameraStatus.z == 1){
         if(stopPanorama != 1) bezierCountPanorama += 0.1f;
 
@@ -166,33 +156,42 @@ void Display() {
     }
 
 
-    // FPS
+    // FPS CAMERA
     if(bezierFPSStatus == 1){
         if(bezierCountFPS > bezierLimitFPS){
             bezierFPSStatus = 0;
             bezierCountFPS = 0;
         }
         else {
-
             bezierCountFPS += speedBezierFPS;
             vec3 res = bezierCurves(bezierCountFPS, bezierLimitFPS, b0_fps, b1_fps, b2_fps);
             offset = vec2(res.x, res.z);
 
             framebuffer.Bind();
             {
-                GLfloat height;
-                glReadPixels(window_width/2.f, window_height/2.f, 1, 1, GL_RED, GL_FLOAT, &height);
-                if(height < lake_level) height = lake_level; // avoid to walk under lake
-                height += 0.06f; // to be a bit higher
-                cam_pos.y = height;
-                cam_look.y = height;
+                int nb_pixels_by_side = sqrt(nb_pixels);
+                GLfloat height[nb_pixels];
+                glReadPixels(window_width/2 - nb_pixels_by_side/2, window_height/2 - nb_pixels_by_side/2, nb_pixels_by_side, nb_pixels_by_side, GL_RED, GL_FLOAT, &height);
 
+                // get average value of heigthmap pixels
+                float sum = 0;
+                for(int i = 0;i < nb_pixels; i++){
+                    sum += height[i];
+                }
+                float average = sum/(float)nb_pixels;
 
+                // avoid to walk under lake
+                if(average < lake_level) average = lake_level;
+
+                float offset_height = 0.05f;
+
+                float height_final = average + offset_height; // to be a bit higher
+                cam_pos.y = height_final;
+                cam_look.y = height_final;
             }
             framebuffer.Unbind();
         }
     }
-
 
     // set up matrices for MVP
     setMVPmatrices();
@@ -204,7 +203,6 @@ void Display() {
         noise.Draw(offset);
     }
     framebuffer.Unbind();
-
 
     // water reflection
     waterFramebuffer.Bind();
@@ -230,7 +228,6 @@ void Display() {
     grid.Draw(cam_pos, time, offset, quad_model_matrix, view_matrix, projection_matrix);
     grid.Draw(cam_pos, time, offset, quad_model_matrix, view_matrix, projection_matrix,0);
     water.Draw(cam_pos, time, offset, quad_model_matrix, view_matrix, projection_matrix);
-
 }
 
 
@@ -243,38 +240,6 @@ vec2 TransformScreenCoords(GLFWwindow* window, int x, int y) {
     return vec2(2.0f * (float)x / width - 1.0f, 1.0f - 2.0f * (float)y / height);
 }
 
-/*
-void MouseButton(GLFWwindow* window, int button, int action, int mod) {
-    if (button == GLFW_MOUSE_BUTTON_LEFT && action == GLFW_PRESS) {
-        double x_i, y_i;
-        glfwGetCursorPos(window, &x_i, &y_i);
-        vec2 p = TransformScreenCoords(window, x_i, y_i);
-
-        // idea : transfer A, S, D, W to mouse buttons
-
-        trackball.BeingDrag(p.x, p.y);
-        old_trackball_matrix = trackball_matrix;
-    }
-}
-
-
-void MousePos(GLFWwindow* window, double x, double y) {
-    vec2 p = TransformScreenCoords(window, x, y);
-    if (glfwGetMouseButton(window, GLFW_MOUSE_BUTTON_LEFT) == GLFW_PRESS) {
-        double x_i, y_i;
-        glfwGetCursorPos(window, &x_i, &y_i);
-        p = TransformScreenCoords(window, x_i, y_i);
-        trackball_matrix = trackball.Drag(p.x,p.y) * old_trackball_matrix;
-    }
-
-    // zoom
-    if (glfwGetMouseButton(window, GLFW_MOUSE_BUTTON_RIGHT) == GLFW_PRESS) {
-        vec3 newVec = vec3(0., 0., p.y-previousZ);
-        view_matrix=translate(view_matrix, newVec);
-    }
-    previousZ = p.y; // for not going infinitely fast
-}
-*/
 
 // Gets called when the windows/framebuffer is resized.
 void SetupProjection(GLFWwindow* window, int width, int height) {
@@ -299,11 +264,11 @@ void ResizeCallback(GLFWwindow* window, int width, int height) {
 
     glViewport(0, 0, window_width, window_height);
 
-    // when the window is resized, the framebuffer and the screenquad should also be resized
+    // when the window is resized
     framebuffer.Cleanup();
     framebuffer.Init(window_width, window_height);
-    //noise.UpdateSize(window_width, window_height);
-    //water.UpdateSize(window_width, window_height);
+    noise.UpdateSize(window_width, window_height);
+    water.UpdateSize(window_width, window_height);
 }
 
 
@@ -566,8 +531,6 @@ int main(int argc, char *argv[]) {
     noise.Cleanup();
     water.Cleanup();
     sky.Cleanup();
-    displayTexture1.Cleanup();
-    displayTexture2.Cleanup();
 
     // close OpenGL window and terminate GLFW
     glfwDestroyWindow(window);
