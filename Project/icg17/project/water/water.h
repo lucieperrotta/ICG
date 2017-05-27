@@ -39,7 +39,7 @@ public:
         glGenVertexArrays(1, &vertex_array_id_);
         glBindVertexArray(vertex_array_id_);
 
-        // vertex coordinates and indices
+        // create water grid
         {
             std::vector<GLfloat> vertices;
             std::vector<GLuint> indices;
@@ -156,12 +156,8 @@ public:
 
         // pass the current time stamp to the shader.
         glUniform1f(glGetUniformLocation(program_id_, "time"), time);
-        glUniform1f(glGetUniformLocation(program_id_, "offsetX"), offset.x);
-        glUniform1f(glGetUniformLocation(program_id_, "offsetY"), offset.y);
-        glUniform1f(glGetUniformLocation(program_id_, "water_width"), this->water_width_);
-        glUniform1f(glGetUniformLocation(program_id_, "water_height"), this->water_height_);
 
-        // WATER GET TRANSPARENT WITH DISTANCE
+        // water get transparent with distance
         glUniform1f(glGetUniformLocation(program_id_, "cam_pos_x"), cam_pos.x);
         glUniform1f(glGetUniformLocation(program_id_, "cam_pos_z"), cam_pos.z);
 

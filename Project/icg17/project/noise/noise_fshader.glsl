@@ -4,8 +4,6 @@ in vec2 uv;
 out vec3 color;
 
 uniform sampler2D tex;
-uniform float tex_width;
-uniform float tex_height;
 
 uniform float offset_x;
 uniform float offset_y;

@@ -26,6 +26,7 @@ void main() {
     // model view matrix -> used for perspective and stuff like this
     MV = view * model;
 
+    // simulate little waves on water
     const float PI = 3.1415;
     float v = 7*PI;
     float acc = 2.;

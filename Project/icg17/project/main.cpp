@@ -30,7 +30,6 @@ Grid grid;
 Water water;
 Sky sky;
 
-Trackball trackball;
 float previousZ = 0.;
 
 DisplayTexture displayTexture1;
@@ -41,12 +40,13 @@ using namespace glm;
 float window_ratio = window_width / (float) window_height;
 
 float lake_level = 0.3f;
-float height_scale = 0.7;
+float sky_limit = 1.f;
+float height_scale = 0.7f;
 int LengthSegmentArea = 4; // grid side length
 
-vec3 defaultCamPos = vec3(0.0f, lake_level + 0.2, 0.0f); // 0.1 0.5 0.0.0
-vec3 defaultCamLook = vec3(-0.1f, lake_level + 0.2, 0.0f); // 0.0 0.5 0.0
-GLfloat last_height = lake_level + 0.2;
+vec3 defaultCamPos = vec3(0.0f, lake_level + 0.2f, 0.0f); // 0.1 0.5 0.0.0
+vec3 defaultCamLook = vec3(-0.1f, lake_level + 0.2f, 0.0f); // 0.0 0.5 0.0
+GLfloat last_height = lake_level + 0.2f;
 
 vec3 cam_pos = defaultCamPos;
 vec3 cam_look = defaultCamLook;
@@ -56,9 +56,6 @@ mat4 projection_matrix;
 mat4 view_matrix;
 //mat4 quad_model_matrix = translate(mat4(1.0f), vec3(0.0f, -0.0f, 0.0f));
 mat4 quad_model_matrix = IDENTITY_MATRIX;
-mat4 trackball_matrix;
-mat4 old_trackball_matrix;
-
 vec2 offset = vec2(0., 0.);
 
 // BEZIER PARAMETERS
@@ -70,15 +67,15 @@ vec3 b0_fps;
 vec3 b1_fps;
 vec3 b2_fps;
 vec2 tmp_offset;
-float bezierLimitFPS = 2; // duration time
-float bezierCountFPS = 0;
-float speedBezierFPS = 0.05;
+float bezierLimitFPS = 2.f; // duration time
+float bezierCountFPS = 0.f;
+float speedBezierFPS = 0.05f;
 
 // camera mode
 vec3 cameraStatus = vec3(1,0,0);
-float delta_offset = 0.1; // unit of movement horizontally
-float delta = 0.63; // percentage of movement vertically
-float delta_fps = 1; // unit of movement fps
+float delta_offset = 0.1f; // unit of movement horizontally
+float delta = 0.63f; // percentage of movement vertically
+float delta_fps = 1.f; // unit of movement fps
 
 void setMVPmatrices() {
     // setup view and projection matrices
@@ -126,8 +123,6 @@ void Init(GLFWwindow* window) {
     displayTexture1.Init(0, 0);
     displayTexture2.Init(water_texture_id, 0.5f);
 
-    // trackball
-    //trackball_matrix = IDENTITY_MATRIX;
 
 }
 
@@ -152,7 +147,7 @@ void Display() {
 
     // PANORAMA
     if(cameraStatus.z == 1){
-        if(stopPanorama != 1) bezierCountPanorama += 0.1;
+        if(stopPanorama != 1) bezierCountPanorama += 0.1f;
 
         vec3 b0 = vec3(0,5,0);
         vec3 b1 = b0 + vec3(2,0,0);
@@ -188,19 +183,10 @@ void Display() {
                 GLfloat height;
                 glReadPixels(window_width/2.f, window_height/2.f, 1, 1, GL_RED, GL_FLOAT, &height);
                 if(height < lake_level) height = lake_level; // avoid to walk under lake
-                height += 0.06; // to be a bit higher
+                height += 0.06f; // to be a bit higher
                 cam_pos.y = height;
                 cam_look.y = height;
 
-                // look change depending on climbing or not
-                /*
-                float delta_look = 250;
-                GLfloat height_look;
-                vec3 dir = cam_pos - cam_look;
-                std::cout << dir.x << " - " << dir.z << endl;
-                glReadPixels(window_width/2.f + delta_look*dir.x, window_height/2.f + delta_look*dir.z,1, 1, GL_RED, GL_FLOAT, &height_look);
-                cam_look.y = height_look;
-                */
 
             }
             framebuffer.Unbind();
@@ -232,12 +218,6 @@ void Display() {
         cam_look_mirror.y = cam_look.y + 2*(lake_level-cam_look.y);
         mat4 view_matrix_mirror = lookAt(cam_pos_mirror, cam_look_mirror, cam_up);
 
-        mat4 axis_invert = mat4(vec4(-1,0,0,0),
-                                vec4(0,1,0,0),
-                                vec4(0,0,1,0),
-                                vec4(0,0,0,1));
-
-
         sky.Draw(time, quad_model_matrix, view_matrix_mirror, projection_matrix);
         grid.Draw(cam_pos, time, offset, quad_model_matrix, view_matrix_mirror, projection_matrix);
     }
@@ -246,10 +226,10 @@ void Display() {
     // render to Window
     glViewport(0, 0, window_width, window_height);
 
-    sky.Draw(time, quad_model_matrix, trackball_matrix*view_matrix, projection_matrix);
-    grid.Draw(cam_pos, time, offset, quad_model_matrix, trackball_matrix*view_matrix, projection_matrix);
-    grid.Draw(cam_pos, time, offset, quad_model_matrix, trackball_matrix*view_matrix, projection_matrix,0);
-    water.Draw(cam_pos, time, offset, quad_model_matrix, trackball_matrix*view_matrix, projection_matrix);
+    sky.Draw(time, quad_model_matrix, view_matrix, projection_matrix);
+    grid.Draw(cam_pos, time, offset, quad_model_matrix, view_matrix, projection_matrix);
+    grid.Draw(cam_pos, time, offset, quad_model_matrix, view_matrix, projection_matrix,0);
+    water.Draw(cam_pos, time, offset, quad_model_matrix, view_matrix, projection_matrix);
 
 }
 
@@ -263,6 +243,7 @@ vec2 TransformScreenCoords(GLFWwindow* window, int x, int y) {
     return vec2(2.0f * (float)x / width - 1.0f, 1.0f - 2.0f * (float)y / height);
 }
 
+/*
 void MouseButton(GLFWwindow* window, int button, int action, int mod) {
     if (button == GLFW_MOUSE_BUTTON_LEFT && action == GLFW_PRESS) {
         double x_i, y_i;
@@ -293,7 +274,7 @@ void MousePos(GLFWwindow* window, double x, double y) {
     }
     previousZ = p.y; // for not going infinitely fast
 }
-
+*/
 
 // Gets called when the windows/framebuffer is resized.
 void SetupProjection(GLFWwindow* window, int width, int height) {
@@ -337,18 +318,18 @@ void KeyCallback(GLFWwindow* window, int key, int scancode, int action, int mods
         glfwSetWindowShouldClose(window, GL_TRUE);
     }
 
-    float deltaXY = 0.03;
-    float deltaLR = 0.05;
-    float deltaLook = 0.01;
+    float deltaXY = 0.03f; // unit of movement on height direction
+    float deltaLR = 0.05f; // unit of movement on left and right cam_look
+    float deltaLook = 0.01f; // unit of movement on up and down cam_look
+
+    // look direction
     vec3 direction = cam_look - cam_pos;
     vec2 dir = vec2(direction.x,direction.z);
+
+    // side direction
     vec3 cross_dir = cross(direction, vec3(0.0,1.0,0));
     vec2 cross_dir2 = vec2(cross_dir.x, cross_dir.z);
 
-    // TRIED TO GET HEIGHTMAP
-    framebuffer.Bind();
-    //glGetTexImage(GL_TEXTURE_2D, 0, GL_RED, GL_UNSIGNED_BYTE, pixels);
-    framebuffer.Unbind();
 
     // TO CHOOSE NAVIGATION MODE
     if(action == GLFW_PRESS){
@@ -371,59 +352,75 @@ void KeyCallback(GLFWwindow* window, int key, int scancode, int action, int mods
         }
     }
 
-    //std::cout << key << " - ";
-    if(cameraStatus.x == 1){ // NAVIGATION
+    // NAVIGATION CAMERA
+    if(cameraStatus.x == 1){
         if(action == GLFW_REPEAT || action == GLFW_PRESS){ // make the navigation stop at the beginning
             switch(key) {
+
+            // is able to move depending on look direction
             case GLFW_KEY_LEFT:
                 offset+= vec2(-delta_offset, delta_offset)*cross_dir2;
                 break;
 
             case GLFW_KEY_RIGHT:
                 offset-= vec2(-delta_offset, delta_offset)*cross_dir2;
-                /*std::cout << "--x:" << offset.x;
-                std::cout << "--y:" << offset.y << endl;*/
                 break;
+
             case GLFW_KEY_DOWN:
-                offset+= vec2(-delta_offset, delta_offset)*dir;
-                cam_pos.y -= delta*direction.y;
-                cam_look.y -= delta*direction.y;
+                if(cam_pos.y - delta*direction.y > lake_level &&
+                        cam_pos.y - delta*direction.y < sky_limit){ // avoid going under lake level
+                    offset+= vec2(-delta_offset, delta_offset)*dir;
+                    cam_pos.y -= delta*direction.y;
+                    cam_look.y -= delta*direction.y;
+                }
                 break;
+
             case GLFW_KEY_UP:
-                offset -= vec2(-delta_offset, delta_offset)*dir;
-                /*std::cout << "--x:" << offset.x;
-                std::cout << "--y:" << offset.y << endl;*/
-                cam_pos.y += delta*direction.y;
-                cam_look.y += delta*direction.y;
+                if(cam_pos.y + delta*direction.y > lake_level &&
+                        cam_pos.y + delta*direction.y < sky_limit){ // avoid going under lake level
+                    offset -= vec2(-delta_offset, delta_offset)*dir;
+                    cam_pos.y += delta*direction.y;
+                    cam_look.y += delta*direction.y;
+                }
                 break;
+
             case 65: // A
                 cam_look -= cross(direction, vec3(0.0,1.0,0))*deltaLR;
                 break;
+
             case 68: // D
                 cam_look += cross(direction, vec3(0.0,1.0,0))*deltaLR;
                 break;
+
             case 87: // W
-                cam_look += vec3(0,deltaLook,0);
+                if(std::abs(cam_look.y-cam_pos.y+deltaLook) < 0.2f) cam_look += vec3(0,deltaLook,0); // block at a certain level
                 break;
+
             case 83: // S
-                cam_look -= vec3(0,deltaLook,0);
+                if(std::abs(cam_look.y-cam_pos.y-deltaLook) < 0.2f) cam_look -= vec3(0,deltaLook,0); // block at a certain level
                 break;
+
             case 90: // Y
-                cam_look -= vec3(0,deltaXY,0);
-                cam_pos -= vec3(0,deltaXY,0);
+                if(cam_look.y - deltaXY > lake_level) { // avoid going under lake level
+                    cam_look -= vec3(0,deltaXY,0);
+                    cam_pos -= vec3(0,deltaXY,0);
+                }
                 break;
 
             case 88: // X
-                cam_look += vec3(0,deltaXY,0);
-                cam_pos += vec3(0,deltaXY,0);
-                break;
-            case 81: // Q
-                if(delta_offset > 0.08) { // to not be negative, otherwise will go backwards
-                    delta_offset -= 0.05;
+                if(cam_look.y + deltaXY < sky_limit){ // avoid going too high
+                    cam_look += vec3(0,deltaXY,0);
+                    cam_pos += vec3(0,deltaXY,0);
                 }
                 break;
+            case 81: // Q
+                if(delta_offset > 0.08) { // avoid to be negative, otherwise will go backwards
+                    delta_offset -= 0.05f;
+                }
+                break;
+
             case 69: // E
-                delta_offset += 0.05;
+                delta_offset += 0.05f;
                 break;
             default:
                 break;
@@ -450,12 +447,13 @@ void KeyCallback(GLFWwindow* window, int key, int scancode, int action, int mods
         }
     }
 
-    if(cameraStatus.y == 1){ // FPS
+    // FPS CAMERA
+    if(cameraStatus.y == 1){
         if(action == GLFW_PRESS /*|| action == GLFW_REPEAT*/){
             b0_fps = vec3(offset.x,0,offset.y);
 
             // variation of speed
-            float v1 = 0.72;
+            float v1 = 0.72f;
             float v2 = 1-v1;
             //if(action == GLFW_REPEAT) {
             switch(key){
@@ -496,11 +494,11 @@ void KeyCallback(GLFWwindow* window, int key, int scancode, int action, int mods
 
             case 81: // Q
                 if(speedBezierFPS > 0.08 && speedBezierFPS < 0.9){ // to avoid go further than cameraBezierDelta and to be negative
-                    speedBezierFPS -= 0.05;
+                    speedBezierFPS -= 0.05f;
                 }
                 break;
             case 69: // E
-                speedBezierFPS += 0.05;
+                speedBezierFPS += 0.05f;
                 break;
             }
             //}
@@ -540,13 +538,7 @@ int main(int argc, char *argv[]) {
 
     // set the framebuffer resize callback
     glfwSetFramebufferSizeCallback(window, ResizeCallback);
-
-    // set the framebuffer resize callback
     glfwSetFramebufferSizeCallback(window, SetupProjection);
-
-    // set the mouse press and position callback
-    glfwSetMouseButtonCallback(window, MouseButton);
-    glfwSetCursorPosCallback(window, MousePos);
 
     // GLEW Initialization (must have a context)
     glewExperimental = GL_TRUE; // fixes glew error (see above link)

@@ -120,7 +120,7 @@ private:
             glBindTexture(GL_TEXTURE_2D, tex_lol_);
             GLuint tex_snow_id = glGetUniformLocation(program_id_, "tex_lol");
             glUniform1i(tex_snow_id, 5 /*GL_TEXTURE5*/);
-         }
+        }
 
         // Cleanup
         glBindTexture(GL_TEXTURE_2D, 0);

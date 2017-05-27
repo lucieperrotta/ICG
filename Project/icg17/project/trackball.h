@@ -58,7 +58,7 @@ private:
             p.z = sqrt(radius2 - (x2 + y2));
         }else{
             // Formula outside (hyperbolic) is r*r/2 / sqrt(x^2+x^2)
-            p.z = (radius2/2.0) / sqrt(x2+y2);
+            p.z = (radius2/2.0f) / sqrt(x2+y2);
         }
 
         normalize(p);

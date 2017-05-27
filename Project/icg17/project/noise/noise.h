@@ -9,11 +9,11 @@ private:
     GLuint vertex_buffer_object_;   // memory buffer
     GLuint texture_id_;             // texture ID
 
-    float noise_width_;
-    float noise_height_;
+    int noise_width_;
+    int noise_height_;
 
 public:
-    void Init(float noise_width, float noise_height, GLuint texture) {
+    void Init(int noise_width, int noise_height, GLuint texture) {
 
         // set noise size
         this->noise_width_ = noise_width;
@@ -50,7 +50,7 @@ public:
 
         // texture coordinates
         {   // SIZE OF MOUNTAINES (HOW STRECHED THEY ARE)
-            float strech = 1.3;
+            float strech = 1.3f;
 
             const GLfloat vertex_texture_coordinates[] = { /*V1*/ 0.0f, 0.0f,
                                                            /*V2*/ strech, 0.0f,
@@ -96,10 +96,6 @@ public:
     void Draw(vec2 offset) {
         glUseProgram(program_id_);
         glBindVertexArray(vertex_array_id_);
-
-        // window size uniforms
-        glUniform1f(glGetUniformLocation(program_id_, "tex_width"), this->noise_width_);
-        glUniform1f(glGetUniformLocation(program_id_, "tex_height"), this->noise_height_);
 
         // BIG OFFSET MUFF FEEL LIKE WALKING
         glUniform1f(glGetUniformLocation(program_id_, "offset_x"), offset.x);
