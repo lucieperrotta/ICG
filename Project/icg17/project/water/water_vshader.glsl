@@ -3,7 +3,6 @@ uniform mat4 projection;
 uniform mat4 model;
 uniform mat4 view;
 uniform float time;
-uniform sampler2D tex_water;
 uniform float lake_level;
 
 uniform float cam_pos_x;
@@ -11,7 +10,6 @@ uniform float cam_pos_z;
 
 in vec2 position;
 
-out vec4 vpoint_mv;
 out mat4 MV;
 out vec2 uv;
 
@@ -19,8 +17,6 @@ out float transparency;
 
 
 void main() {
-    //uv = position;
-    //float height = lake_level ;//+ sin(time*uv.x)/30;
     uv = (position + vec2(1.0, 1.0)) * 0.5;
 
     // model view matrix -> used for perspective and stuff like this

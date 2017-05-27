@@ -43,7 +43,7 @@ void chooseColorOnHeight(float height, vec3 normal) {
     float grass_level = sand_grass_transition + 0.05*height;
     float grass_rock_transition = grass_level + 0.1*height;
     float mountains_level = grass_rock_transition + 0.05*height;
-    float rock_mountains_transition = mountains_level + 0.1*height;
+    float rock_mountains_transition = mountains_level + 0.01*height;
 
     // Initalize the texture vectors and the blending factor
     vec4 t1 = vec4(0.0);
@@ -89,18 +89,18 @@ void chooseColorOnHeight(float height, vec3 normal) {
     } else if(height <= mountains_level) {
         // Rock & Mountains Level
         raw_color = texture(tex_rock, uv_offset_scale).xyz;
-    } else if(height <= rock_mountains_transition) {
+    } else /*if(height <= rock_mountains_transition)*/ {
         // Rock & Snow level
         t1 = texture(tex_rock, uv_offset_scale);
         t2 = texture(tex_snow, uv_offset_scale);
 
-        // Compute the blend factor which depends on the height
-        blend_factor = (height - mountains_level)/(rock_mountains_transition - mountains_level);
+        float f = 8;
+        float amplitude = 330;
+        float sin_value = rock_mountains_transition
+                + sin((uv_offset_scale.y+uv_offset_scale.x)*f)/amplitude
+                 + sin((uv_offset_scale.y+uv_offset_scale.x)*3)/amplitude;
 
-        raw_color = mix(t1, t2, blend_factor).xyz;
-    } else {
-        // Snow of moutains level
-        raw_color = texture(tex_snow, uv_offset_scale).xyz;
+        raw_color = (sin_value > height) ? t1.xyz : t2.xyz;
     }
 }
 

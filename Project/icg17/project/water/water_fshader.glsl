@@ -1,11 +1,8 @@
 #version 330
 uniform sampler2D tex_water;
-uniform float lake_level;
-
 uniform float time;
 
 in vec2 uv;
-
 in float transparency;
 
 out vec4 color;

@@ -43,8 +43,8 @@ float height_scale = 0.7f;
 int LengthSegmentArea = 4; // grid side length
 
 // CAMERA PARAMETERS
-vec3 defaultCamPos = vec3(0.0f, lake_level + 0.2f, 0.0f); // 0.1 0.5 0.0.0
-vec3 defaultCamLook = vec3(-0.1f, lake_level + 0.2f, 0.0f); // 0.0 0.5 0.0
+vec3 defaultCamPos = vec3(0.0f, lake_level + 0.12f, 0.0f); // 0.1 0.5 0.0.0
+vec3 defaultCamLook = vec3(0.1f, lake_level + 0.12f, 0.0f); // 0.0 0.5 0.0
 vec3 cam_pos = defaultCamPos;
 vec3 cam_look = defaultCamLook;
 vec3 cam_up = vec3(0.0f, 1.0f, 0.0f);
