@@ -136,7 +136,7 @@ private:
 
         // load sand texture
         {
-            filename = "sand.tga";
+            filename = "sand_texture.tga";
 
             // set stb_image to have the same coordinates as OpenGL
             stbi_set_flip_vertically_on_load(1);
@@ -203,7 +203,7 @@ private:
 
         // load rock texture
         {
-            filename = "rock.tga";
+            filename = "rock_texture.tga";
 
             // set stb_image to have the same coordinates as OpenGL
             stbi_set_flip_vertically_on_load(1);

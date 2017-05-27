@@ -83,7 +83,7 @@ void chooseColorOnHeight(float height, vec3 normal) {
         t1 = texture(tex_grass, uv_offset_scale);
         t2 = texture(tex_rock, uv_offset_scale);
 
-        blend_factor = /*dot(normal, vec3(0.0, 0.0, 1.0))*/(height - grass_level)/(grass_rock_transition - grass_level);
+        blend_factor = (height - grass_level)/(grass_rock_transition - grass_level);
 
         raw_color = mix(t1, t2, blend_factor).xyz;
     } else if(height <= mountains_level) {
@@ -94,13 +94,15 @@ void chooseColorOnHeight(float height, vec3 normal) {
         t1 = texture(tex_rock, uv_offset_scale);
         t2 = texture(tex_snow, uv_offset_scale);
 
-        float f = 8;
-        float amplitude = 330;
+        blend_factor = 0.7*(height - mountains_level)/(rock_mountains_transition - mountains_level);
+
+        float f = 10;
+        float amplitude = 230;
         float sin_value = rock_mountains_transition
                 + sin((uv_offset_scale.y+uv_offset_scale.x)*f)/amplitude
                  + sin((uv_offset_scale.y+uv_offset_scale.x)*3)/amplitude;
 
-        raw_color = (sin_value > height) ? t1.xyz : t2.xyz;
+        raw_color = (sin_value > height) ? mix(t1, t2, blend_factor).xyz : t2.xyz;
     }
 }
 
@@ -119,11 +121,8 @@ void main() {
     float yz = texture(tex_grid, uv + vec2(0, delta/2.0)).r - texture(tex_grid, uv - vec2(0, delta/2.0)).r;
     vec3 x = vec3(delta, 0, xz);
     vec3 y = vec3(0, delta, yz);
-    //vec3 normal = normalize(cross(x,y));
-    //vec3 normal_mv = vec3(MV * vec4(normal, 0));
-
-    vec3 normal = cross(x,y);
-    vec3 normal_mv = normalize(vec3(MV * vec4(normal, 0)));
+    vec3 normal = normalize(cross(x,y));
+    vec3 normal_mv = vec3(MV * vec4(normal, 0));
 
     chooseColorOnHeight(height, normal);
 
