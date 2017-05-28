@@ -67,12 +67,7 @@ public:
             if (glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE) {
                 cerr << "!!!ERROR: Framebuffer not OK :(" << endl;
             }
-<<<<<<< HEAD
             glBindFramebuffer(GL_FRAMEBUFFER, 0); // avoid pollution
-=======
-
-            return color_texture_id_;
->>>>>>> parent of 58d4dcb... reset master
         }
 
         return color_texture_id_;

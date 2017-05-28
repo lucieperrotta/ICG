@@ -29,27 +29,7 @@ Grid grid;
 Water water;
 Sky sky;
 
-<<<<<<< HEAD
 // MATRIX PROJECTION
-=======
-Trackball trackball;
-float previousZ = 0.;
-
-DisplayTexture displayTexture1;
-DisplayTexture displayTexture2;
-
-using namespace glm;
-
-float window_ratio = window_width / (float) window_height;
-
-float lake_level = 0.35f;
-int LengthSegmentArea = 2; // grid side length
-
-vec3 cam_pos = vec3(1.5f, 1.5f, 0.0f);
-vec3 cam_look = vec3(0.0f, 0.0f, 0.0f);
-vec3 cam_up = vec3(0.0f, 1.0f, 0.0f);
-
->>>>>>> parent of 58d4dcb... reset master
 mat4 projection_matrix;
 mat4 view_matrix;
 //mat4 quad_model_matrix = translate(mat4(1.0f), vec3(0.0f, -0.0f, 0.0f));
@@ -129,20 +109,8 @@ void Init(GLFWwindow* window) {
 
     water.Init(water_texture_id, LengthSegmentArea, lake_level);
     noise.Init(window_width, window_height, framebuffer_texture_id);
-<<<<<<< HEAD
     grid.Init(framebuffer_texture_id, lake_level, height_scale, LengthSegmentArea);
     sky.Init();
-=======
-    grid.Init(framebuffer_texture_id, lake_level, LengthSegmentArea);
-    sky.Init();
-
-    displayTexture1.Init(0, 0);
-    displayTexture2.Init(0, 0.5f);
-
-    // trackball
-    trackball_matrix = IDENTITY_MATRIX;
-
->>>>>>> parent of 58d4dcb... reset master
 }
 
 // Bezier curves definition
@@ -253,20 +221,10 @@ void Display() {
     // render to Window
     glViewport(0, 0, window_width, window_height);
 
-<<<<<<< HEAD
     sky.Draw(time, quad_model_matrix, view_matrix, projection_matrix);
     grid.Draw(cam_pos, time, offset, quad_model_matrix, view_matrix, projection_matrix);
     grid.Draw(cam_pos, time, offset, quad_model_matrix, view_matrix, projection_matrix,0);
     water.Draw(cam_pos, time, offset, quad_model_matrix, view_matrix, projection_matrix);
-=======
-    sky.Draw(time, quad_model_matrix, trackball_matrix*view_matrix, projection_matrix);
-    grid.Draw(time, quad_model_matrix, trackball_matrix*view_matrix, projection_matrix);
-    grid.Draw(time, quad_model_matrix, trackball_matrix*view_matrix, projection_matrix,0);
-    water.Draw(time, quad_model_matrix, trackball_matrix*view_matrix, projection_matrix);
-
-    //displayTexture1.Draw();
-    //displayTexture2.Draw();
->>>>>>> parent of 58d4dcb... reset master
 }
 
 // transforms glfw screen coordinates into normalized OpenGL coordinates.

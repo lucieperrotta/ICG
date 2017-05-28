@@ -4,26 +4,11 @@ file(GLOB_RECURSE HEADERS "*.h")
 
 # these files are copied only once
 file(GLOB TEXTURES
-<<<<<<< HEAD
     sky/fog_sky.tga
     textures/sand_texture.tga
     textures/grass_texture.tga
     textures/rock_texture.tga
     textures/snow_texture.tga
-=======
-    sky/sky_texture.tga
-    sky/sky_texture_2.tga
-    grid/grid_texture.tga
-    grid/rock.tga
-    grid/rock_texture.tga
-    grid/sand_texture.tga
-    grid/sand.tga
-    grid/snow.tga
-    grid/snow_texture.tga
-    grid/grass.tga
-    grid/grass_texture.tga
-    #quad/quad_texture.tga
->>>>>>> parent of 58d4dcb... reset master
     )
 copy_files_once(${TEXTURES})
 
