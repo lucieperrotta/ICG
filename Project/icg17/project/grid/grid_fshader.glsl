@@ -6,12 +6,16 @@ uniform vec3 light_pos;
 
 uniform float time;
 
+uniform float time1;
+
 uniform sampler2D tex_grid;
 
 uniform sampler2D tex_sand;
 uniform sampler2D tex_grass;
 uniform sampler2D tex_rock;
 uniform sampler2D tex_snow;
+
+uniform sampler2D noise_snow;
 
 uniform int upper;
 
@@ -21,6 +25,7 @@ uniform float lake_level;
 float sand_level = lake_level+0.015;
 float grass_level = sand_level + 0.02;
 float mountains_level = grass_level + 0.18;
+float scale_factor = 5; // used to make textures smaller so we can repeat them
 
 in vec2 uv;
 in vec4 vpoint_mv;
@@ -34,7 +39,6 @@ void chooseColorOnHeight(float height, vec3 normal) {
     vec4 t1 = vec4(0.0);
     vec4 t2 = vec4(0.0);
     float blend_factor = 0.0;
-    float scale_factor = 5; // used to make textures smaller so we can repeat them
 
     if(height < lake_level) {
         // Compute the blend factor which depends on the height
@@ -105,12 +109,18 @@ void main() {
 
     chooseColorOnHeight(height, normal_mv);
 
+    float delta_night = 0.1;
+    color -= delta_night*time;
 
 
     // PHONG SHADING
     //color=vec3(0);    
 
-    vec3 light_dir = light_pos - vpoint_mv.xyz;
+    vec3 light_pos_depending_time = light_pos;
+    //light_pos_depending_time.x += time/10;
+
+
+    vec3 light_dir = light_pos_depending_time - vpoint_mv.xyz;
     vec3 view_dir = -vpoint_mv.xyz;
 
     // ambient term
@@ -133,4 +143,7 @@ void main() {
         vec3 specular = Ls*ks*pow(max(dot(reflect,v), 0.0), alpha);
         //color += specular;
     }
+
+    //vec3 snow_noise = texture(noise_snow, uv*scale_factor).rrr;
+    //color = snow_noise.xxx;
 }

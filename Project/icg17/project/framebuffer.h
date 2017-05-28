@@ -69,7 +69,6 @@ class FrameBuffer {
                 }
                 glBindFramebuffer(GL_FRAMEBUFFER, 0); // avoid pollution
             }
-
             return color_texture_id_;
         }
 

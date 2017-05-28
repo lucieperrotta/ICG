@@ -29,12 +29,14 @@ void main() {
     // draw above lake if upper == 1
     // draw below lake if upper == 0
 
+    // Grid size factor
+    float grid_size = 5;
 
-        vec3 pos_3d = vec3(position.x, height, -position.y);
-        gl_Position =  projection*MV * vec4(pos_3d, 1.0);
+    vec3 pos_3d = vec3(grid_size*position.x, height, -grid_size*position.y);
+    gl_Position =  projection*MV * vec4(pos_3d, 1.0);
 
-        // point position to send to fshader for shading
-        vpoint_mv = MV * vec4(pos_3d, 1.0);
+    // point position to send to fshader for shading
+    vpoint_mv = MV * vec4(pos_3d, 1.0);
 
 
 }
