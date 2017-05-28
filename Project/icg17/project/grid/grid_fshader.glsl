@@ -43,7 +43,7 @@ void chooseColorOnHeight(float height, vec3 normal) {
     float grass_level = sand_grass_transition + 0.05*height;
     float grass_rock_transition = grass_level + 0.1*height;
     float mountains_level = grass_rock_transition + 0.05*height;
-    float rock_mountains_transition = mountains_level + 0.01*height;
+    float rock_mountains_transition = mountains_level + 0.03*height;
 
     // Initalize the texture vectors and the blending factor
     vec4 t1 = vec4(0.0);
