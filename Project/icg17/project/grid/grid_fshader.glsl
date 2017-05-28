@@ -38,7 +38,7 @@ vec3 raw_color = vec3(0,0,0);
 
 void chooseColorOnHeight(float height, vec3 normal) {
 
-    float sand_level = lake_level + 0.05*height;
+    float sand_level = lake_level + 0.04*height;
     float sand_grass_transition = sand_level + 0.1*height;
     float grass_level = sand_grass_transition + 0.05*height;
     float grass_rock_transition = grass_level + 0.1*height;
@@ -59,7 +59,7 @@ void chooseColorOnHeight(float height, vec3 normal) {
         // Compute the blend factor which depends on the height
         blend_factor = (height - lake_level)/(sand_level - lake_level);
 
-        t1 = 0.75*texture(tex_sand, uv_offset_scale);
+        t1 = 0.9*texture(tex_sand, uv_offset_scale);
         t2 = texture(tex_sand, uv_offset_scale);
 
         raw_color = mix(t1, t2, blend_factor).xyz;

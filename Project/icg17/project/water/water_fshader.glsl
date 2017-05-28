@@ -24,10 +24,10 @@ void main() {
     float wave = (sin((uv.x*v-time)*acc)+cos((uv.y*v-time)*acc))*amplitude + 1.5;
     vec4 wave_color = vec4(wave);
 
-    vec4 blue = vec4(20./255., 50./255., 200./255., 1.0);
+    vec4 blue = vec4(15./255., 40./255., 150./255., 1.0);
     vec4 tex_water_color = texture(tex_water,vec2(_u,1-_v)).rgba; // 1-v to inverse texture
 
-    vec4 reflect_intensity = vec4(0.75);
+    vec4 reflect_intensity = vec4(0.65);
     vec4 water_blue_color = mix(blue, tex_water_color, reflect_intensity);
     vec3 final_color = mix(wave_color, water_blue_color, vec4(0.9)).rgb;
 
