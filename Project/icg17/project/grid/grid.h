@@ -2,6 +2,8 @@
 #include "icg_helper.h"
 #include <glm/gtc/type_ptr.hpp>
 
+using namespace glm;
+
 #undef M_PI
 #define M_PI 3.14159
 

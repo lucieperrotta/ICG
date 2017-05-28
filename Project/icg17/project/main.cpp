@@ -6,7 +6,6 @@
 #include "icg_helper.h"
 #include "glm/gtc/matrix_transform.hpp"
 
-#include "trackball.h"
 #include "framebuffer.h"
 #include "grid/grid.h"
 #include "noise/noise.h"
@@ -69,6 +68,34 @@ vec2 tmp_offset;
 float bezierLimitFPS = 1.5f; // duration time
 float bezierCountFPS = 0.f;
 float speedBezierFPS = 0.05f;
+
+// Project onto surface
+float radius_;
+vec3 anchor_pos_;
+mat4 rotation_;
+
+// projects the point p (whose z coordiante is still empty/zero) onto the
+// trackball surface. If the position at the mouse cursor is outside the
+// trackball, use a hyberbolic sheet as explained in:
+// https://www.opengl.org/wiki/Object_Mouse_Trackball.
+// The trackball radius is given by 'radius_'.
+void ProjectOntoSurface(vec3& p)  {
+    // TODO 2 DONE : Implement this function. Read above link for details.
+    // Check hover inside sphere
+    float x2 = p.x * p.x;
+    float y2 = p.y * p.y;
+    float radius2 = radius_*radius_;
+
+    if( x2 + y2 <= (radius2/2.0)){
+        // Formula inside sphere is z(x,y) = sqrt(r^2 - x^2 + y^2)
+        p.z = sqrt(radius2 - (x2 + y2));
+    }else{
+        // Formula outside (hyperbolic) is r*r/2 / sqrt(x^2+x^2)
+        p.z = (radius2/2.0f) / sqrt(x2+y2);
+    }
+
+    normalize(p);
+}
 
 // setup view and projection matrices
 void setMVPmatrices() {
@@ -470,7 +497,6 @@ void KeyCallback(GLFWwindow* window, int key, int scancode, int action, int mods
         }
     }
 }
-
 
 
 int main(int argc, char *argv[]) {
