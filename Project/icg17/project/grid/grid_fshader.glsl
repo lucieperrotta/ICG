@@ -59,7 +59,7 @@ void chooseColorOnHeight(float height, vec3 normal) {
         // Compute the blend factor which depends on the height
         blend_factor = (height - lake_level)/(sand_level - lake_level);
 
-        t1 = 0.9*texture(tex_sand, uv_offset_scale);
+        t1 = 0.85*texture(tex_sand, uv_offset_scale);
         t2 = texture(tex_sand, uv_offset_scale);
 
         raw_color = mix(t1, t2, blend_factor).xyz;
