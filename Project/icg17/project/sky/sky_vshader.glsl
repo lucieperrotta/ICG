@@ -34,7 +34,12 @@ mat4 Ry(float alpha){
 }
 
 void main() {
+<<<<<<< HEAD
     gl_Position =  MVP * T(0,1,0) * S(6,6,6) * Ry(time/100) *vec4(vpoint,1);
+=======
+    // center of the cube
+    gl_Position =  MVP * T(0,1,0) * S(6,6,6) *vec4(vpoint,1);
+>>>>>>> parent of 58d4dcb... reset master
 
     uv = vtexcoord;
 }
