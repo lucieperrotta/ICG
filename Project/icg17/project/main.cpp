@@ -69,34 +69,6 @@ float bezierLimitFPS = 1.5f; // duration time
 float bezierCountFPS = 0.f;
 float speedBezierFPS = 0.05f;
 
-// Project onto surface
-float radius_;
-vec3 anchor_pos_;
-mat4 rotation_;
-
-// projects the point p (whose z coordiante is still empty/zero) onto the
-// trackball surface. If the position at the mouse cursor is outside the
-// trackball, use a hyberbolic sheet as explained in:
-// https://www.opengl.org/wiki/Object_Mouse_Trackball.
-// The trackball radius is given by 'radius_'.
-void ProjectOntoSurface(vec3& p)  {
-    // TODO 2 DONE : Implement this function. Read above link for details.
-    // Check hover inside sphere
-    float x2 = p.x * p.x;
-    float y2 = p.y * p.y;
-    float radius2 = radius_*radius_;
-
-    if( x2 + y2 <= (radius2/2.0)){
-        // Formula inside sphere is z(x,y) = sqrt(r^2 - x^2 + y^2)
-        p.z = sqrt(radius2 - (x2 + y2));
-    }else{
-        // Formula outside (hyperbolic) is r*r/2 / sqrt(x^2+x^2)
-        p.z = (radius2/2.0f) / sqrt(x2+y2);
-    }
-
-    normalize(p);
-}
-
 // setup view and projection matrices
 void setMVPmatrices() {
     view_matrix = lookAt(cam_pos, cam_look, cam_up);
@@ -139,7 +111,6 @@ void Init(GLFWwindow* window) {
     noise.Init(window_width, window_height, framebuffer_texture_id);
     grid.Init(framebuffer_texture_id, lake_level, height_scale, LengthSegmentArea);
     sky.Init();
-
 }
 
 // Bezier curves definition
@@ -181,7 +152,6 @@ void Display() {
         // begin again if go too far
         bezierCountPanorama = (bezierCountPanorama > bezierLimitPanorama) ? 0 : bezierCountPanorama;
     }
-
 
     // FPS CAMERA
     if(bezierFPSStatus == 1){
@@ -257,7 +227,6 @@ void Display() {
     water.Draw(cam_pos, time, offset, quad_model_matrix, view_matrix, projection_matrix);
 }
 
-
 // transforms glfw screen coordinates into normalized OpenGL coordinates.
 vec2 TransformScreenCoords(GLFWwindow* window, int x, int y) {
     // the framebuffer and the window doesn't necessarily have the same size
@@ -266,7 +235,6 @@ vec2 TransformScreenCoords(GLFWwindow* window, int x, int y) {
     glfwGetWindowSize(window, &width, &height);
     return vec2(2.0f * (float)x / width - 1.0f, 1.0f - 2.0f * (float)y / height);
 }
-
 
 // Gets called when the windows/framebuffer is resized.
 void SetupProjection(GLFWwindow* window, int width, int height) {
@@ -279,7 +247,6 @@ void SetupProjection(GLFWwindow* window, int width, int height) {
 
     projection_matrix = PerspectiveProjection(45.0f, (GLfloat)window_width / window_height, 0.1f, 100.f);
 }
-
 
 // gets called when the windows/framebuffer is resized.
 void ResizeCallback(GLFWwindow* window, int width, int height) {
@@ -298,11 +265,9 @@ void ResizeCallback(GLFWwindow* window, int width, int height) {
     water.UpdateSize(window_width, window_height);
 }
 
-
 void ErrorCallback(int error, const char* description) {
     fputs(description, stderr);
 }
-
 
 void KeyCallback(GLFWwindow* window, int key, int scancode, int action, int mods) {
     // escape to close window
@@ -321,7 +286,6 @@ void KeyCallback(GLFWwindow* window, int key, int scancode, int action, int mods
     // side direction
     vec3 cross_dir = cross(direction, vec3(0.0,1.0,0));
     vec2 cross_dir2 = vec2(cross_dir.x, cross_dir.z);
-
 
     // TO CHOOSE NAVIGATION MODE
     if(action == GLFW_PRESS){
@@ -542,7 +506,6 @@ int main(int argc, char *argv[]) {
 
     // initialize our OpenGL program
     Init(window);
-
 
     // render loop
     while(!glfwWindowShouldClose(window)){

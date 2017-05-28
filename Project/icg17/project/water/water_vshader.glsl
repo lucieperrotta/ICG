@@ -34,5 +34,4 @@ void main() {
 
     // transparency for distant pixels (transparency gets stronger with quadratic order (1.5) )
     transparency = 1-pow(pow(pos_3d.x+cam_pos_x, 2) + pow(pos_3d.z+cam_pos_z, 2), 1.5);
-
 }

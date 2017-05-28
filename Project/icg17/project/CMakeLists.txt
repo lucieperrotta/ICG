@@ -18,7 +18,6 @@ file(GLOB SHADERS
     sky/*.glsl
     cube/*.glsl
     water/*.glsl
-    #quad/*.glsl
     noise/*.glsl
     displaytexture/*.glsl
     grid/*.glsl
