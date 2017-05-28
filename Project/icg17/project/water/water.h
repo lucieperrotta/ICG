@@ -13,16 +13,21 @@ private:
     GLuint reflection_texture_id_;          // texture ID
     GLuint num_indices_;                    // number of vertices to render
 
+    int water_width_;
+    int water_height_;
+
 public:
+
+    void UpdateSize(int water_width, int water_height) {
+        this->water_width_ = water_width;
+        this->water_height_ = water_height;
+    }
+
+
     void Init(GLuint framebuffer_texture_id_, int LengthSegmentArea, float lake_level) {
         // compile the shaders.
         program_id_ = icg_helper::LoadShaders("water_vshader.glsl", "water_fshader.glsl");
 
-        // forest texture
-        const int colormap_size = 9;
-        GLfloat texture_forest[colormap_size] = {0.3f, 0.5f, 0.0f, // yellow
-                                                 0.0f, 0.15f, 0.0f, // green
-                                                 0.8f, 0.8f, 0.8f}; // grey
 
         if(!program_id_) {
             exit(EXIT_FAILURE);
@@ -34,7 +39,7 @@ public:
         glGenVertexArrays(1, &vertex_array_id_);
         glBindVertexArray(vertex_array_id_);
 
-        // vertex coordinates and indices
+        // create water grid
         {
             std::vector<GLfloat> vertices;
             std::vector<GLuint> indices;
@@ -119,7 +124,7 @@ public:
         glDeleteTextures(1, &reflection_texture_id_);
     }
 
-    void Draw(float time, const glm::mat4 &model = IDENTITY_MATRIX, const glm::mat4 &view = IDENTITY_MATRIX,
+    void Draw(vec3 cam_pos, float time, vec2 offset, const glm::mat4 &model = IDENTITY_MATRIX, const glm::mat4 &view = IDENTITY_MATRIX,
               const glm::mat4 &projection = IDENTITY_MATRIX) {
         glUseProgram(program_id_);
         glBindVertexArray(vertex_array_id_);
@@ -151,6 +156,10 @@ public:
 
         // pass the current time stamp to the shader.
         glUniform1f(glGetUniformLocation(program_id_, "time"), time);
+
+        // water get transparent with distance
+        glUniform1f(glGetUniformLocation(program_id_, "cam_pos_x"), cam_pos.x);
+        glUniform1f(glGetUniformLocation(program_id_, "cam_pos_z"), cam_pos.z);
 
         // draw
         //glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);

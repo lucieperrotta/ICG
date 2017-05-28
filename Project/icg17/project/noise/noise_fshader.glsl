@@ -3,26 +3,30 @@
 in vec2 uv;
 out vec3 color;
 
-uniform sampler2D tex;
-uniform float tex_width;
-uniform float tex_height;
+uniform float offset_x;
+uniform float offset_y;
 
-// Functions headers
-float ridged_fBm(vec2 point, float H, float lacunarity, int octaves, float gain, float offset);
+// Noise mixers functions headers
+float ridged_fBm(vec2 point, float H, float lacunarity, int octaves, float gain, float offset, float height_scale);
 float fBm(vec2 point, float H, float lacunarity, int octaves, float gain, float offset);
-float multifractal(vec2 point, float H, float lacunarity, float octaves, float gain, float offset);
+float multifractal(vec2 point, float H, float lacunarity, float octaves, float gain, float offset, float height_scale);
 
+// Noise functions headers
 float perlin(vec2 uv);
 float simplex(vec2 uv);
 
+// Helper functions headers
 vec2 hash(vec2 p);
 float smooth_interpolation(float t);
 float mix(float x, float y, float alpha);
 
 void main() {
-    color=vec3(ridged_fBm(uv, 1.5, 1.5, 10, 0.5, 0.0));
-    //color = vec3(multifractal(uv, 0.5, 3.7, 7.0, 0.));
-    // color = vec3(multifractal(uv, 0.5, 2.5, 10, 0.17, 1));
+
+    // Offset apply (to move in the mountain)
+    vec2 uv2 = uv + vec2(offset_x, offset_y);
+
+    float height_scale = 1.8;
+    color = vec3(ridged_fBm(uv2, 1.5, 1.5, 10, 0.5, 0.0, height_scale));
 }
 
 float fBm(vec2 point, float H, float lacunarity, int octaves, float gain, float offset){
@@ -36,7 +40,7 @@ float fBm(vec2 point, float H, float lacunarity, int octaves, float gain, float 
     return value;
 }
 
-float ridged_fBm(vec2 point, float H, float lacunarity, int octaves, float gain, float offset){
+float ridged_fBm(vec2 point, float H, float lacunarity, int octaves, float gain, float offset, float height_scale){
     float value = 0.0;
     /* inner loop of fractal construction */
     for (int i = 0; i < octaves; i++) {
@@ -44,10 +48,10 @@ float ridged_fBm(vec2 point, float H, float lacunarity, int octaves, float gain,
         value-=offset;
         point *= lacunarity;
     }
-    return value;
+    return value/height_scale;
 }
 
-float multifractal(vec2 point, float H, float lacunarity, float octaves, float gain, float offset){
+float multifractal(vec2 point, float H, float lacunarity, float octaves, float gain, float offset, float height_scale){
     // We have to fix the max size because a GLSL array can't take variable size
     float value[20];
 
@@ -79,7 +83,7 @@ float multifractal(vec2 point, float H, float lacunarity, float octaves, float g
     if ( floor(remainder) == remainder ){ // check if remainder is integer
         result += gain * remainder * simplex(point) * value[i];
     }
-    return(result);
+    return result/height_scale;
 }
 
 // Inspired by Ashima
@@ -207,12 +211,3 @@ float smooth_interpolation(float t){
 float mix(float x, float y, float alpha){
     return (1-alpha)*x + alpha*y;
 }
-
-
-
-/* ULTIMATE DEBUG TECHNIQUE
-if (bl_diff.x < -1.0 || bl_diff.y < -1.0 || bl_diff.x > 1.0 || bl_diff.y > 1.0 ) {
-    color = vec3(1, 0, 0);
-    return;
-}
-*/

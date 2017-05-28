@@ -1,0 +1,47 @@
+- 3 screenshots highlighting the most important aspects of your project
+- a video of less than 1 min. showing some fly-through or other dynamic interaction with your scene
+- a repository with the full source code
+- a single A4 page listing all the features you implemented beyond the minimum requirement with a small explanation (1-2 sentences per feature)
+- a short paragraph explaining how you split the work among the team members
+- a list of any external code or other resources used in the project
+
+
+Additionnal implemented features
+--------------------------------
+
+Infinite terrain generation: Instead if moving the camera over the plate, the camera stays in the middle of plate and the plate changes shape because the FbM is actually moving. This allows us to walk infinitely ahead.
+
+Mist and transparency: The mountains fade out with distance and mix with the sky, which looks like there is some fog. Also the water changes color with distance to make it look "dirtier" with distance (like if the atmosphere is charged with dust). Please note that we had to set the fog distance to very near the camera since our PCs are not powerfull at all and increasing that distance make them melt.
+
+Texture shading: 
+
+Simplex noise: We implement an alternative of the simplex noise which features a gain parameter to modifiy the gain of the noise picture. We also added that gain parameter to the perlin noise.
+
+Ridged Fbm: The mountains look more sharp on the tops.
+
+Multifractal: This is an alternative to FbM, which allows us to mix many different noises (simplex and perlin) to create the mountains. 
+
+Water simulation : In addition to the colored reflections, the water is also moving in small movement.
+
+Sky moving: The skybox is slowly moving the give the impression of the sky changing over the day.
+
+Navigation: We can continue moving in the same direction when we continue pressing the key. Bezier curves are used to create smoother FPS movements.
+
+Keyboard controls:
+
+Navigation (key 1)
+Arrows
+Q - E : inertie
+W,A,S,D : camera direction
+
+FPS (key 2)
+Arrows
+Q - E : inertie
+W,A,S,D : camera direction
+
+Bezier (key 3)
+
+Work :
+Kim Lan Phan Hoang : 33%
+Lucie Perrotta : 33%
+Tim Nguyen : 33%
