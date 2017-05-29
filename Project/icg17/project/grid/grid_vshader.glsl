@@ -32,9 +32,6 @@ void main() {
     // use the texture to obtain z axis
     float height = texture(tex_grid, uv).x;
 
-    // draw above lake if upper == 1
-    // draw below lake if upper == 0
-
 
     vec3 pos_3d = vec3(position.x, height, -position.y);
     gl_Position =  projection*MV * vec4(pos_3d, 1.0);

@@ -65,7 +65,7 @@ vec3 b0_fps;
 vec3 b1_fps;
 vec3 b2_fps;
 vec2 tmp_offset;
-float bezierLimitFPS = 1.5f; // duration time
+float bezierLimitFPS = 1.0f; // duration time
 float bezierCountFPS = 0.f;
 float speedBezierFPS = 0.05f;
 
@@ -139,13 +139,13 @@ void Display() {
 
         vec3 b0 = vec3(0,5,0);
         vec3 b1 = b0 + vec3(2,0,0);
-        vec3 b2 = b1 + vec3(0,0,2);
+        vec3 b2 = b1 + vec3(0,0,3);
         vec3 res = bezierCurves(bezierCountPanorama, bezierLimitPanorama, b0, b1, b2);
         offset = vec2(res.x, res.z);
 
         vec3 b0_look = defaultCamLook;
-        vec3 b1_look = b0_look - vec3(0.1,0,0.1);
-        vec3 b2_look = b1_look + vec3(0.1,0,0.1);
+        vec3 b1_look = b0_look - vec3(0.2,0,0.2);
+        vec3 b2_look = b1_look + vec3(0.2,0,0.2);
         vec3 res_look = bezierCurves(bezierCountPanorama, bezierLimitPanorama, b0_look, b1_look, b2_look);
         cam_look = res_look;
 
@@ -393,13 +393,6 @@ void KeyCallback(GLFWwindow* window, int key, int scancode, int action, int mods
         case 88: // X
             stopPanorama = 0;
             break;
-
-        case 81: // Q
-            // slower
-            break;
-        case 69: // E
-            // faster
-            break;
         }
     }
 
@@ -440,12 +433,6 @@ void KeyCallback(GLFWwindow* window, int key, int scancode, int action, int mods
                 break;
             case 68: // D
                 cam_look += cross(direction, vec3(0.0,1.0,0))*deltaLR;
-                break;
-            case 87: // W
-                cam_look += vec3(0,deltaLook,0);
-                break;
-            case 83: // S
-                cam_look -= vec3(0,deltaLook,0);
                 break;
 
             case 81: // Q

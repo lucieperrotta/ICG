@@ -89,7 +89,7 @@ void chooseColorOnHeight(float height, vec3 normal) {
     } else if(height <= mountains_level) {
         // Rock & Mountains Level
         raw_color = texture(tex_rock, uv_offset_scale).xyz;
-    } else /*if(height <= rock_mountains_transition)*/ {
+    } else {
         // Rock & Snow level
         t1 = texture(tex_rock, uv_offset_scale);
         t2 = texture(tex_snow, uv_offset_scale);
@@ -153,7 +153,7 @@ void main() {
         // raw_color += specular;
     }
     // transparency for direant pixels
-    raw_color.r += 0.07;
+    raw_color.r += 0.08;
     raw_color.g += 0.02;
     color = vec4(raw_color, transparency);
 }
