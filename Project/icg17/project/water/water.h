@@ -10,8 +10,10 @@ private:
     GLuint vertex_buffer_object_position_;  // memory buffer for positions
     GLuint vertex_buffer_object_index_;     // memory buffer for indices
     GLuint program_id_;                     // GLSL shader program ID
+    GLuint framebuffer_tex_lowergrid_id_;          // texture ID
     GLuint reflection_texture_id_;          // texture ID
     GLuint num_indices_;                    // number of vertices to render
+    GLuint tex_dudv_;
 
     int water_width_;
     int water_height_;
@@ -24,7 +26,7 @@ public:
     }
 
 
-    void Init(GLuint framebuffer_texture_id_, int LengthSegmentArea, float lake_level) {
+    void Init(GLuint framebuffer_texture_id_, GLuint framebuffer_tex_lowergrid_id_, int LengthSegmentArea, float lake_level) {
         // compile the shaders.
         program_id_ = icg_helper::LoadShaders("water_vshader.glsl", "water_fshader.glsl");
 
@@ -101,7 +103,7 @@ public:
         // load texture
         {
             reflection_texture_id_ = framebuffer_texture_id_;
-
+            this->framebuffer_tex_lowergrid_id_ = framebuffer_tex_lowergrid_id_;
             // cleanup
             glBindTexture(GL_TEXTURE_2D, 0);
             //stbi_image_free(image);
@@ -145,6 +147,59 @@ public:
             glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
             glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
         }
+
+        // Bind lower grid texture
+        {
+            glActiveTexture(GL_TEXTURE19);
+            glBindTexture(GL_TEXTURE_2D, framebuffer_tex_lowergrid_id_);
+            GLuint tex_id = glGetUniformLocation(program_id_, "tex_lower_grid");
+            glUniform1i(tex_id, 19);
+
+            glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+            glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+            glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
+            glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+        }
+
+        // load dudv texture
+        {
+            int width;
+            int height;
+            int nb_component;
+            string filename = "waterDUDV.tga";
+
+            // set stb_image to have the same coordinates as OpenGL
+            stbi_set_flip_vertically_on_load(1);
+            unsigned char* water_image = stbi_load(filename.c_str(), &width, &height, &nb_component, 0);
+
+            // if the image is null
+            if(water_image == nullptr) {
+                throw(string("Failed to load texture"));
+            }
+
+            glGenTextures(1, &tex_dudv_);
+            glActiveTexture(GL_TEXTURE18);
+            glBindTexture(GL_TEXTURE_2D, tex_dudv_);
+
+            glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+            glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+            glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
+            glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+
+            // check image features
+            if(nb_component == 3) {
+                glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, water_image);
+            } else if(nb_component == 4) {
+                glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, water_image);
+            }
+
+            // cleanup
+            stbi_image_free(water_image);
+        }
+        glActiveTexture(GL_TEXTURE18);
+        glBindTexture(GL_TEXTURE_2D, tex_dudv_);
+        GLuint tex_dudv_id = glGetUniformLocation(program_id_, "tex_dudv");
+        glUniform1i(tex_dudv_id, 18 /*GL_TEXTURE3*/);
 
         // setup matrix stack - model, view, projection
         GLint model_id = glGetUniformLocation(program_id_, "model");

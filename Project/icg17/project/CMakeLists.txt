@@ -9,6 +9,7 @@ file(GLOB TEXTURES
     textures/grass_texture.tga
     textures/rock_texture.tga
     textures/snow_texture.tga
+    water/waterDUDV.tga
     )
 copy_files_once(${TEXTURES})
 

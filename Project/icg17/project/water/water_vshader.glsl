@@ -12,6 +12,7 @@ in vec2 position;
 
 out mat4 MV;
 out vec2 uv;
+out vec2 textureCoords;
 
 out float transparency;
 
@@ -24,7 +25,7 @@ void main() {
 
     // simulate little waves on water
     const float PI = 3.1415;
-    float v = 7*PI;
+    float v = 5*PI;
     float acc = 2.;
     float amplitude = 0.001;
     float height = (sin((uv.x*v-time)*acc)+cos((uv.y*v-time)*acc))*amplitude + lake_level;
@@ -34,4 +35,6 @@ void main() {
 
     // transparency for distant pixels (transparency gets stronger with quadratic order (1.5) )
     transparency = 1-pow(pow(pos_3d.x+cam_pos_x, 2) + pow(pos_3d.z+cam_pos_z, 2), 1.5);
+
+    textureCoords = vec2(position.x/2.0 + 0.5, position.y/2.0 + 0.5)*5.5;
 }

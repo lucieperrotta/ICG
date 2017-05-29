@@ -24,6 +24,7 @@ float window_ratio = window_width / (float) window_height;
 // OBJECTS
 FrameBuffer framebuffer;
 FrameBuffer waterFramebuffer;
+FrameBuffer lowerGridFramebuffer;
 Noise noise;
 Grid grid;
 Water water;
@@ -106,8 +107,9 @@ void Init(GLFWwindow* window) {
 
     GLuint framebuffer_texture_id = framebuffer.Init(window_width, window_height);
     GLuint water_texture_id = waterFramebuffer.Init(window_width, window_height);
+    GLuint lower_grid_tex_id = lowerGridFramebuffer.Init(window_width, window_height);
 
-    water.Init(water_texture_id, LengthSegmentArea, lake_level);
+    water.Init(water_texture_id, lower_grid_tex_id, LengthSegmentArea, lake_level);
     noise.Init(window_width, window_height, framebuffer_texture_id);
     grid.Init(framebuffer_texture_id, lake_level, height_scale, LengthSegmentArea);
     sky.Init();
@@ -218,12 +220,18 @@ void Display() {
     }
     waterFramebuffer.Unbind();
 
+    lowerGridFramebuffer.Bind();
+    {
+        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+        grid.Draw(cam_pos, time, offset, quad_model_matrix, view_matrix, projection_matrix,0);
+    }
+    lowerGridFramebuffer.Unbind();
+
     // render to Window
     glViewport(0, 0, window_width, window_height);
 
     sky.Draw(time, quad_model_matrix, view_matrix, projection_matrix);
     grid.Draw(cam_pos, time, offset, quad_model_matrix, view_matrix, projection_matrix);
-    grid.Draw(cam_pos, time, offset, quad_model_matrix, view_matrix, projection_matrix,0);
     water.Draw(cam_pos, time, offset, quad_model_matrix, view_matrix, projection_matrix);
 }
 

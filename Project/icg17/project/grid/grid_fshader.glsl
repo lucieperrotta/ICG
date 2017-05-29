@@ -38,7 +38,7 @@ vec3 raw_color = vec3(0,0,0);
 
 void chooseColorOnHeight(float height, vec3 normal) {
 
-    float sand_level = lake_level + 0.04*height;
+    float sand_level = lake_level + 0.01*height;
     float sand_grass_transition = sand_level + 0.1*height;
     float grass_level = sand_grass_transition + 0.05*height;
     float grass_rock_transition = grass_level + 0.1*height;
@@ -59,7 +59,7 @@ void chooseColorOnHeight(float height, vec3 normal) {
         // Compute the blend factor which depends on the height
         blend_factor = (height - lake_level)/(sand_level - lake_level);
 
-        t1 = 0.85*texture(tex_sand, uv_offset_scale);
+        t1 = 0.95*texture(tex_sand, uv_offset_scale);
         t2 = texture(tex_sand, uv_offset_scale);
 
         raw_color = mix(t1, t2, blend_factor).xyz;
@@ -97,12 +97,27 @@ void chooseColorOnHeight(float height, vec3 normal) {
         blend_factor = 0.7*(height - mountains_level)/(rock_mountains_transition - mountains_level);
 
         float f = 10;
+        float f1 = 20;
         float amplitude = 230;
+        float amplitude1 = 200;
         float sin_value = rock_mountains_transition
                 + sin((uv_offset_scale.y+uv_offset_scale.x)*f)/amplitude
                  + sin((uv_offset_scale.y+uv_offset_scale.x)*3)/amplitude;
+        float sin_value1 = rock_mountains_transition-0.08
+                + sin((uv_offset_scale.y+uv_offset_scale.x)*f1)/amplitude1
+                 + sin((uv_offset_scale.y+uv_offset_scale.x)*3)/amplitude1;
 
-        raw_color = (sin_value > height) ? mix(t1, t2, blend_factor).xyz : t2.xyz;
+        if(sin_value < height) {
+            raw_color = t2.xyz;
+        }
+        else if(sin_value > height && height > sin_value1 ){
+            raw_color = mix(t1, t2, blend_factor).xyz;
+        }
+        else {
+            raw_color = t1.xyz;
+        }
+
+        //raw_color = (sin_value > height) ? mix(t1, t2, blend_factor).xyz : t2.xyz;
     }
 }
 
@@ -143,7 +158,7 @@ void main() {
     if(lambert > 0.0) {
 
         // diffuse term
-        vec3 diffuse = Ld*kd*lambert*0.5;
+        vec3 diffuse = Ld*kd*lambert*0.8;
         raw_color += diffuse;
 
         // specular term
@@ -153,7 +168,8 @@ void main() {
         // raw_color += specular;
     }
     // transparency for direant pixels
-    raw_color.r += 0.08;
+    raw_color.r += 0.15;
     raw_color.g += 0.02;
+    raw_color -= 0.17;
     color = vec4(raw_color, transparency);
 }
