@@ -228,10 +228,7 @@ public:
         glDeleteTextures(1, &texture_id_sky);
     }
 
-    void Draw(float time,
-              const glm::mat4& model,
-              const glm::mat4& view,
-              const glm::mat4& projection) {
+    void Draw(float time, const glm::mat4& model, const glm::mat4& view, const glm::mat4& projection) {
         glUseProgram(program_id_);
         glBindVertexArray(vertex_array_id_sky);
         glDisable(GL_DEPTH_TEST); // sky always in background

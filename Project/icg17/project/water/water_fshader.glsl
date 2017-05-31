@@ -43,11 +43,9 @@ void main() {
     vec4 water_blue_color = mix(color1, reflect_color, reflect_intensity);
 
 
-
     // little adjustments
     water_blue_color -= 0.20;
     water_blue_color.b += 15/255.;
-    //water_blue_color.g += 35/255.;
     vec3 final_color = mix(wave_color, water_blue_color, vec4(0.9)).rgb;
 
     // mix hardcoded with skybox color to et smoother fade away
