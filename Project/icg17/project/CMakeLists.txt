@@ -20,7 +20,6 @@ file(GLOB SHADERS
     cube/*.glsl
     water/*.glsl
     noise/*.glsl
-    displaytexture/*.glsl
     grid/*.glsl
         )
 deploy_shaders_to_build_dir(${SHADERS})

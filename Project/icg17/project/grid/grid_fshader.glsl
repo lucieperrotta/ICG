@@ -142,8 +142,6 @@ void main() {
     chooseColorOnHeight(height, normal);
 
     // PHONG SHADING
-    //raw_color=vec3(0);
-
     vec3 light_dir = light_pos - vpoint_mv.xyz;
     vec3 view_dir = -vpoint_mv.xyz;
 

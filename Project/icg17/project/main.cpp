@@ -412,7 +412,6 @@ void KeyCallback(GLFWwindow* window, int key, int scancode, int action, int mods
             // variation of speed
             float v1 = 0.72f;
             float v2 = 1-v1;
-            //if(action == GLFW_REPEAT) {
             switch(key){
 
             case GLFW_KEY_LEFT:
@@ -452,7 +451,6 @@ void KeyCallback(GLFWwindow* window, int key, int scancode, int action, int mods
                 speedBezierFPS += 0.05f;
                 break;
             }
-            //}
         }
     }
 }

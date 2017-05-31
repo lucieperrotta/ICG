@@ -140,7 +140,7 @@ public:
             glActiveTexture(GL_TEXTURE20);
             glBindTexture(GL_TEXTURE_2D, reflection_texture_id_);
             GLuint tex_id = glGetUniformLocation(program_id_, "tex_water");
-            glUniform1i(tex_id, 20 /*GL_TEXTURE0*/);
+            glUniform1i(tex_id, 20);
 
             glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
             glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
@@ -199,7 +199,7 @@ public:
         glActiveTexture(GL_TEXTURE18);
         glBindTexture(GL_TEXTURE_2D, tex_dudv_);
         GLuint tex_dudv_id = glGetUniformLocation(program_id_, "tex_dudv");
-        glUniform1i(tex_dudv_id, 18 /*GL_TEXTURE3*/);
+        glUniform1i(tex_dudv_id, 18);
 
         // setup matrix stack - model, view, projection
         GLint model_id = glGetUniformLocation(program_id_, "model");
